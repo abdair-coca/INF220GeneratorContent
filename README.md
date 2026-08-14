@@ -14,15 +14,3 @@ inf-220-g2/                         ← este repositorio
 ├── clases/                         ← guías HTML generadas (guia_gl01.html, guia_gl02.html)
 └── practicas/                      ← prácticas del curso (las coloca el auxiliar)
 ```
-
-## Qué es lo que NO está aquí
-
-El sistema generador completo vive en `../` (la carpeta padre `2026Semestre2/`):
-
-- `gl_generator.py` — genera las guías HTML desde un JSON de contenido.
-- `public/` — los JSON fuente (`clases_guia/` y `resultados_guia/`).
-- `resueltos/` — ejercicios resueltos (fuera de la repo, no se versionan).
-- `graphify-out/` — grafo de conocimiento del proyecto.
-
-Consulta `AGENTS.md` en la raíz del proyecto para el contexto completo del
-generador, el esquema JSON y el flujo de trabajo.
