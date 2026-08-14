@@ -1,0 +1,279 @@
+<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Diagramas de Flujo — Estructuras de Control Básicas · GL01</title><style>
+:root{--tinta:#1f2430;--gris:#5b6472;--accent:#4F46E5;--accent2:#3730a3;
+--fondo:#ffffff;--oscuro:#16181d;--oscuro2:#20232b;--borde:#e2e5ea;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--tinta);
+background:var(--fondo);line-height:1.55;font-size:15px}
+.topbar{position:sticky;top:0;z-index:50;background:var(--oscuro);color:#fff;
+display:flex;align-items:center;gap:12px;padding:10px 22px;font-size:12.5px;
+letter-spacing:.3px}
+.topbar .sep{opacity:.35}
+.topbar .spacer{flex:1}
+.topbar button{background:var(--accent);color:#fff;border:0;border-radius:6px;
+padding:6px 12px;font-size:12.5px;cursor:pointer}
+.topbar button:hover{background:var(--accent2)}
+.layout{display:flex;max-width:1180px;margin:0 auto;gap:28px;padding:28px 22px 60px}
+nav.toc{width:240px;flex:0 0 240px;position:sticky;top:64px;align-self:flex-start;
+max-height:calc(100vh - 90px);overflow:auto;font-size:13.5px}
+nav.toc .toc-tit{font-weight:700;text-transform:uppercase;font-size:11px;
+letter-spacing:1.2px;color:var(--gris);margin-bottom:10px}
+nav.toc a{display:block;color:var(--gris);text-decoration:none;padding:4px 8px;
+border-left:2px solid transparent;margin-bottom:2px}
+nav.toc a:hover{color:var(--tinta)}
+nav.toc a.activo{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+main{flex:1;min-width:0}
+.hero{border-bottom:3px solid var(--oscuro);padding-bottom:26px;margin-bottom:8px}
+.hero .miga{font-size:12.5px;color:var(--gris);margin-bottom:14px;letter-spacing:.4px}
+.hero h1{font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.15;
+letter-spacing:1px;margin-bottom:10px}
+.hero .subtitulo{font-size:16px;color:var(--gris);max-width:640px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:18px;font-size:13.5px;color:var(--gris)}
+.hero .meta b{color:var(--tinta)}
+.convenciones{background:#f3f4f8;border:1px solid var(--borde);border-radius:8px;
+padding:14px 18px;margin:22px 0 8px;font-size:13.5px}
+.convenciones .box-tag{color:var(--accent)}
+.seccion{margin:38px 0;padding-top:10px;scroll-margin-top:70px}
+.sec-titulo{font-family:Georgia,serif;font-size:22px;margin-bottom:14px;
+padding-bottom:8px;border-bottom:1px solid var(--borde)}
+.sec-num{color:var(--accent);margin-right:8px}
+.sub-titulo{font-size:16.5px;margin:22px 0 10px}
+.parrafo{margin:10px 0}
+.lista{margin:10px 0 10px 22px}
+.pasos{margin:10px 0 10px 22px;counter-reset:paso}
+.pasos li{margin:8px 0}
+.box{border-radius:8px;padding:13px 16px;margin:14px 0;font-size:14px}
+.box-tag{display:inline-block;font-weight:700;font-size:11px;letter-spacing:1.1px;
+margin-bottom:6px;text-transform:uppercase}
+.definicion{background:var(--oscuro);color:#e8eaf0}
+.definicion .box-tag{color:#a5b4fc}
+.nota{background:#f3f4f8;border-left:4px solid var(--accent)}
+.nota .box-tag{color:var(--accent)}
+.ejemplo{background:#eef0fb;border-left:4px solid var(--accent)}
+.ejemplo .box-tag{color:var(--accent)}
+.competencia{background:#eef0fb;border:1px dashed var(--accent)}
+.competencia .box-tag{color:var(--accent)}
+.figura{border:1.5px dashed #b9bfc9;background:#fafbfc;color:var(--gris);text-align:center}
+.figura .box-tag{color:var(--gris)}
+.code-mini{background:var(--oscuro2);border-radius:6px;padding:8px 12px;margin-top:6px}
+.code-mini pre{color:#d6dae3;font-family:'Cascadia Code','Consolas',monospace;font-size:12.5px;white-space:pre-wrap}
+.cell{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid var(--borde)}
+.cell-in{background:var(--oscuro);position:relative}
+.cell-in .cell-tag,.cell-out .cell-tag{display:inline-block;font-size:12px;
+font-family:'Cascadia Code',Consolas,monospace}
+.cell-in .cell-tag{color:#a5b4fc;padding:10px 14px 0}
+.cell-out .cell-tag{color:var(--gris);padding:8px 14px 0}
+.cell-in pre{color:#e6e9f0;font-family:'Cascadia Code','Consolas',monospace;
+font-size:13px;padding:8px 14px 14px;white-space:pre-wrap;word-break:break-word}
+.cell-out{background:#f5f6f8}
+.cell-out .out-pre{font-family:'Cascadia Code','Consolas',monospace;font-size:12.5px;
+color:#333a46;padding:4px 14px 12px;white-space:pre-wrap;word-break:break-word}
+.cell-out canvas{max-width:100%;height:auto;display:block;margin:6px auto 12px;padding:0 14px}
+.btn-copy,.btn-run{position:absolute;top:8px;right:10px;border:1px solid #3a3f4b;
+background:var(--oscuro2);color:#c9cede;border-radius:5px;font-size:11.5px;
+padding:3px 9px;cursor:pointer}
+.btn-copy{right:78px}
+.btn-run{right:10px;background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-run:hover{background:var(--accent2)}
+.btn-run:disabled{opacity:.6;cursor:wait}
+.rubrica{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+.rubrica th,.rubrica td{border:1px solid var(--borde);padding:8px 12px;text-align:left;vertical-align:top}
+.rubrica th{background:var(--oscuro);color:#fff;font-weight:600}
+.rubrica .pts{text-align:center;white-space:nowrap}
+.rubrica tfoot td{font-weight:700;background:#f3f4f8}
+.referencias li{margin:6px 0}
+.diagrama{margin:16px 0;padding:14px;border:1px solid var(--borde);border-radius:8px;
+background:#fff}
+.diagrama figcaption{font-size:12px;color:var(--gris);font-weight:700;letter-spacing:.4px;
+margin-bottom:10px}
+.diagrama .mermaid{display:flex;justify-content:center;overflow:auto}
+.diagrama .mermaid svg{max-width:100%;height:auto}
+.simbolos{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+.simbolos th,.simbolos td{border:1px solid var(--borde);padding:8px 12px;text-align:left;vertical-align:middle}
+.simbolos th{background:var(--oscuro);color:#fff;font-weight:600}
+.simbolos .sim-svg{display:block;text-align:center;min-width:96px}
+.simbolos .sim-svg svg{width:92px;height:36px}
+.quiz{margin:14px 0;padding:14px 16px;border:1px solid var(--borde);border-radius:8px;background:#fafbfc}
+.quiz .box-tag{color:var(--accent)}
+.quiz .quiz-q{font-weight:600;margin:6px 0 10px}
+.quiz-opt{display:block;width:100%;text-align:left;margin:6px 0;padding:8px 12px;
+border:1px solid var(--borde);border-radius:6px;background:#fff;cursor:pointer;
+font-size:13.5px;color:var(--tinta)}
+.quiz-opt:hover{border-color:var(--accent)}
+.quiz-opt.correcta{border-color:#16a34a;background:#ecfdf3;color:#14532d;font-weight:600}
+.quiz-opt.mal{border-color:#dc2626;background:#fef2f2;color:#7f1d1d}
+.quiz-opt:disabled{cursor:default;opacity:.85}
+.quiz-feedback{margin-top:8px;font-size:13px;color:var(--gris);min-height:18px}
+footer{border-top:1px solid var(--borde);color:var(--gris);font-size:12.5px;
+padding:18px 22px 40px;text-align:center}
+#cargando-bar{position:fixed;bottom:18px;right:18px;z-index:99;background:var(--oscuro);
+color:#fff;border-radius:8px;padding:10px 16px;font-size:12.5px;display:none;
+box-shadow:0 4px 14px rgba(0,0,0,.3)}
+@media print{
+.topbar,nav.toc,.btn-copy,.btn-run,#cargando-bar{display:none!important}
+.layout{display:block;padding:0}
+.seccion{break-inside:avoid-page}
+}
+</style></head><body><div class="topbar"><span>INF-220 · Programación Orientada a Objetos</span><span class="sep">·</span><span>GL01</span><span class="sep">·</span><span>UATF · Facultad de Ciencias Puras · Ing. Informática</span><span class="spacer"></span><button onclick="window.print()">🖨 guardar PDF</button></div><div class="layout">
+<nav class="toc">
+  <div class="toc-tit">Contenido</div>
+  <a href="#sec-01">Competencia y objetivos</a><a href="#sec-02">Requisitos y preparación</a><a href="#sec-03">Conceptos previos</a><a href="#sec-04">Estructuras de control</a><a href="#sec-06">Práctica en clase</a><a href="#sec-07">Entregable</a><a href="#sec-08">Rúbrica de evaluación</a><a href="#sec-09">Referencias</a>
+</nav>
+<main><section class="hero"><div class="miga">INF-220 · Programación Orientada a Objetos · GL01 · UATF · Facultad de Ciencias Puras · Ing. Informática</div><h1>Diagramas de Flujo — Estructuras de Control Básicas</h1><p class="subtitulo">Práctica N.º 1 · Diseña únicamente el diagrama de flujo de cada algoritmo: sin código ni pseudocódigo.</p><div class="meta"><span><b>INF-220 · Programación Orientada a Objetos</b></span><span>Ing. Informática · 2º semestre · Gestión 2026-02</span><span>Duración: <b>3 h de laboratorio</b></span><span>Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo</span></div></section><div class="convenciones"><span class="box-tag">NOTA · Convenciones de esta guía</span><p>Los diagramas se muestran como figuras interactivas (ampliables con la rueda del ratón). Los rombos representan decisiones y siempre tienen una entrada y dos salidas (Sí / No). Cada ejercicio de la Práctica N.º 1 se resuelve únicamente con su diagrama de flujo: no se pide código ni pseudocódigo.</p></div><section class="seccion" id="sec-01"><h3 class="sec-titulo"><span class="sec-num">01</span> Competencia y objetivos</h3><p class="parrafo">Competencia de la práctica</p><div class="box competencia"><span class="box-tag">COMPETENCIA DE LA PRÁCTICA</span><p>Diseña algoritmos mediante diagramas de flujo, aplicando las estructuras de control básicas (secuencia, selección y repetición), como fundamento del razonamiento lógico que sostiene la programación orientada a objetos.</p></div><p class="parrafo">Objetivos específicos</p><ul class="lista"><li>Identificar los símbolos del diagrama de flujo y sus reglas de uso.</li><li>Representar algoritmos lineales (secuencia) con entrada, proceso y salida.</li><li>Modelar decisiones con selección simple, doble y múltiple.</li><li>Representar bucles con repetición: mientras, repetir-hasta y para.</li><li>Resolver los ejercicios de la Práctica N.º 1 únicamente con diagramas de flujo.</li></ul></section><section class="seccion" id="sec-02"><h3 class="sec-titulo"><span class="sec-num">02</span> Requisitos y preparación</h3><p class="parrafo">Para esta práctica necesitas material de dibujo o una herramienta digital. Ambos caminos son válidos; elige el que tengas a mano.</p><ul class="lista"><li>Lápiz, regla y plantilla de figuras de diagramas de flujo (o lápiz y papel a mano alzada).</li><li>Alternativa digital: editor gratuito draw.io (https://app.diagrams.net) con la plantilla de flowchart.</li><li>El enunciado de la Práctica N.º 1 (10 ejercicios, fecha de entrega: 18/08/2026).</li></ul><div class="box nota"><span class="box-tag">NOTA</span><p>No se evalúa código ni pseudocódigo: solo el diagrama de flujo. La claridad del trazado y el uso correcto de los símbolos son parte de la nota.</p></div></section><section class="seccion" id="sec-03"><h3 class="sec-titulo"><span class="sec-num">03</span> Conceptos previos</h3><div class="box definicion"><span class="box-tag">DEFINICIÓN · Algoritmo</span><p>Conjunto ordenado y finito de pasos que resuelve un problema. Debe ser preciso (sin ambigüedad), definido (mismo resultado cada vez) y finito (termina en algún momento).</p></div><div class="box definicion"><span class="box-tag">DEFINICIÓN · Diagrama de flujo</span><p>Representación gráfica de un algoritmo mediante símbolos conectados por flechas que indican el orden de ejecución. Permite ver la lógica completa de un vistazo, antes de escribir una sola línea de código.</p></div><p class="parrafo">Simbología básica que usaremos en toda la práctica:</p><table class="simbolos"><thead><tr><th>Símbolo</th><th>Nombre</th><th>Uso</th></tr></thead><tbody><tr><td><span class="sim-svg"><svg viewBox="0 0 80 36"><rect x="4" y="6" width="72" height="24" rx="12" fill="none" stroke="#1f2430" stroke-width="2"/><text x="40" y="22" text-anchor="middle" font-size="10" font-family="Segoe UI,sans-serif" fill="#1f2430">Inicio</text></svg></span></td><td>Terminal</td><td>Marca el <b>inicio</b> o el <b>fin</b> del algoritmo. Todo diagrama empieza y termina aquí.</td></tr><tr><td><span class="sim-svg"><svg viewBox="0 0 80 36"><rect x="4" y="8" width="72" height="20" fill="none" stroke="#1f2430" stroke-width="2"/><text x="40" y="22" text-anchor="middle" font-size="9" font-family="Segoe UI,sans-serif" fill="#1f2430">Proceso</text></svg></span></td><td>Proceso</td><td>Operación o cálculo: asignaciones, fórmulas (p. ej. <i>s ← a + b</i>).</td></tr><tr><td><span class="sim-svg"><svg viewBox="0 0 92 36"><polygon points="16,8 82,8 76,28 10,28" fill="none" stroke="#1f2430" stroke-width="2"/><text x="45" y="22" text-anchor="middle" font-size="8" font-family="Segoe UI,sans-serif" fill="#1f2430">Leer / Mostrar</text></svg></span></td><td>Entrada / Salida</td><td>Lectura de datos desde teclado (<b>Leer</b>) o visualización en pantalla (<b>Mostrar</b>).</td></tr><tr><td><span class="sim-svg"><svg viewBox="0 0 92 36"><polygon points="46,5 86,18 46,31 6,18" fill="none" stroke="#1f2430" stroke-width="2"/><text x="46" y="22" text-anchor="middle" font-size="8" font-family="Segoe UI,sans-serif" fill="#1f2430">¿Condición?</text></svg></span></td><td>Decisión</td><td>Evalúa una condición y ramifica el flujo: siempre tiene <b>una entrada</b> y <b>dos salidas</b> (Sí / No).</td></tr><tr><td><span class="sim-svg"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="8" fill="none" stroke="#1f2430" stroke-width="2"/></svg></span></td><td>Conector</td><td>Enlaza partes del diagrama separadas en la página (mismo círculo = mismo punto de unión).</td></tr><tr><td><span class="sim-svg"><svg viewBox="0 0 40 36"><line x1="4" y1="18" x2="26" y2="18" stroke="#1f2430" stroke-width="2"/><polygon points="22,12 32,18 22,24" fill="#1f2430"/></svg></span></td><td>Flecha de flujo</td><td>Indica la dirección del flujo. Nunca debe cruzarse ni dejar ramas sin continuar.</td></tr></tbody></table><div class="box nota"><span class="box-tag">NOTA</span><p>Reglas de dibujo: todo diagrama empieza con un terminal Inicio y termina con un terminal Fin. Las flechas nunca se cruzan sin necesidad y cada camino debe llegar a Fin. Una decisión siempre tiene dos salidas rotuladas Sí y No.</p></div></section><section class="seccion" id="sec-04"><h3 class="sec-titulo"><span class="sec-num">04</span> Estructuras de control</h3><p class="parrafo">Toda lógica de programación se construye combinando tres estructuras. Dominarlas aquí en el diagrama es dominarlas para siempre en el código.</p><h4 class="sub-titulo">4.1  Secuencia</h4><p class="parrafo">Pasos ejecutados uno tras otro, en orden. Es la estructura más simple: leer datos, procesar, mostrar resultados.</p><figure class="diagrama"><figcaption>Patrón de secuencia</figcaption><pre class="mermaid">flowchart TD
+    A([&quot;Inicio&quot;]) --&gt; B[&quot;Proceso&quot;]
+    B --&gt; C[&quot;Proceso&quot;]
+    C --&gt; D([&quot;Fin&quot;])</pre></figure><h4 class="sub-titulo">4.2  Selección (si / si-no)</h4><p class="parrafo">Ejecuta una u otra rama según una condición. Si la condición es verdadera va por un camino; si es falsa, por el otro. Nunca por los dos a la vez.</p><figure class="diagrama"><figcaption>Patrón de selección doble</figcaption><pre class="mermaid">flowchart TD
+    A([&quot;Inicio&quot;]) --&gt; B{&quot;¿condición?&quot;}
+    B -- &quot;Sí&quot; --&gt; C[&quot;Acción A&quot;]
+    B -- &quot;No&quot; --&gt; D[&quot;Acción B&quot;]
+    C --&gt; E([&quot;Fin&quot;])
+    D --&gt; E</pre></figure><h4 class="sub-titulo">4.3  Repetición mientras</h4><p class="parrafo">La condición se evalúa ANTES de ejecutar el cuerpo: si es falsa desde el inicio, el bucle no se ejecuta ni una vez. Se usa cuando no sabemos de antemano cuántas iteraciones habrá.</p><figure class="diagrama"><figcaption>Patrón de bucle mientras</figcaption><pre class="mermaid">flowchart TD
+    A([&quot;Inicio&quot;]) --&gt; B{&quot;¿condición?&quot;}
+    B -- &quot;Sí&quot; --&gt; C[&quot;Acción&quot;]
+    C --&gt; B
+    B -- &quot;No&quot; --&gt; D([&quot;Fin&quot;])</pre></figure><h4 class="sub-titulo">4.4  Repetición repetir-hasta</h4><p class="parrafo">La condición se evalúa DESPUÉS de ejecutar el cuerpo: el bucle corre al menos una vez y termina cuando la condición se cumple.</p><figure class="diagrama"><figcaption>Patrón de bucle repetir-hasta</figcaption><pre class="mermaid">flowchart TD
+    A([&quot;Inicio&quot;]) --&gt; B[&quot;Acción&quot;]
+    B --&gt; C{&quot;¿condición de salida?&quot;}
+    C -- &quot;No&quot; --&gt; B
+    C -- &quot;Sí&quot; --&gt; D([&quot;Fin&quot;])</pre></figure><h4 class="sub-titulo">4.5  Repetición para (contador)</h4><p class="parrafo">Se usa cuando el número de iteraciones se conoce de antemano. Se inicializa un contador, se evalúa una condición y se incrementa el contador en cada vuelta. En el diagrama se dibuja como un mientras con tres pasos: inicializar, evaluar e incrementar.</p><figure class="diagrama"><figcaption>Patrón de bucle para</figcaption><pre class="mermaid">flowchart TD
+    A([&quot;Inicio&quot;]) --&gt; B[&quot;i ← 1&quot;]
+    B --&gt; C{&quot;¿i &lt;= N?&quot;}
+    C -- &quot;Sí&quot; --&gt; D[&quot;Acción&quot;]
+    D --&gt; E[&quot;i ← i + 1&quot;]
+    E --&gt; C
+    C -- &quot;No&quot; --&gt; F([&quot;Fin&quot;])</pre></figure><div class="quiz" data-correcta="1"><span class="box-tag">AUTOEVALUACIÓN</span><p class="quiz-q">Un rombo de decisión recibe una entrada y produce:</p><button class="quiz-opt" data-i="0">Una sola salida (el flujo continúa en línea recta)</button><button class="quiz-opt" data-i="1">Dos salidas rotuladas Sí y No</button><button class="quiz-opt" data-i="2">Ninguna salida: solo procesa datos</button><button class="quiz-opt" data-i="3">Tantas salidas como condiciones existan</button><p class="quiz-feedback"></p></div><div class="quiz" data-correcta="2"><span class="box-tag">AUTOEVALUACIÓN</span><p class="quiz-q">En la estructura mientras, la condición se evalúa:</p><button class="quiz-opt" data-i="0">Después de cada iteración</button><button class="quiz-opt" data-i="1">Solo una vez al inicio</button><button class="quiz-opt" data-i="2">Antes de cada iteración; si es falsa al inicio, no se ejecuta ninguna</button><button class="quiz-opt" data-i="3">Al final del algoritmo</button><p class="quiz-feedback"></p></div></section><section class="seccion" id="sec-06"><h3 class="sec-titulo"><span class="sec-num">06</span> Práctica en clase</h3><p class="parrafo">Resuelve ahora los 10 ejercicios de la Práctica N.º 1. Identifica primero la estructura que necesita cada uno y luego dibuja el diagrama completo, desde Inicio hasta Fin.</p><ul class="lista"><li>Lectura y visualización de un número: lee un número entero y muéstralo en pantalla.</li><li>Suma de dos números: lee dos números y muestra su suma.</li><li>Promedio de tres números: lee tres números y calcula su promedio.</li><li>Área y perímetro de un círculo: lee el radio y calcula área y perímetro (π = 3.1416).</li><li>Conversión de bolivianos a dólares: lee bolivianos y conviértelos (1 USD = 6.96 Bs).</li><li>Número par o impar: lee un entero y determina si es par o impar.</li><li>El mayor de dos números: lee dos números distintos y muestra cuál es mayor.</li><li>Calificación según la nota: nota entre 0 y 100 → Reprobado (&lt; 51), Aprobado (51–79) o Excelente (80–100).</li><li>Números del 1 al 10: muestra los números del 1 al 10.</li><li>Suma de 5 números: lee 5 números y calcula su suma total.</li><li>Conteo de números hasta ingresar 0: lee números hasta que se ingrese 0 y muestra cuántos se ingresaron (sin contar el 0).</li></ul><div class="box ejemplo"><span class="box-tag">EJEMPLO</span><p>Retos extra (para practicar más): promedio de N números; tabla de multiplicar de un número N; verificar si un número es positivo, negativo o cero. La misma lógica de las soluciones 5.8 y 5.10 te sirve.</p></div></section><section class="seccion" id="sec-07"><h3 class="sec-titulo"><span class="sec-num">07</span> Entregable</h3><p class="parrafo">Entrega la Práctica N.º 1 resuelta antes de la fecha indicada. Recuerda: únicamente diagramas de flujo, sin código ni pseudocódigo.</p><div class="box ejemplo"><span class="box-tag">EJEMPLO</span><p>Archivo: Practica_1_Apellido_Nombre — diagramas dibujados a mano (foto o escaneo claro) o digitales (draw.io exportado a PDF). Fecha de entrega: 18/08/2026.</p></div><ul class="lista"><li>Cada diagrama debe empezar con Inicio y terminar con Fin.</li><li>Símbolos correctos: terminal, proceso, entrada/salida y decisión.</li><li>Toda decisión con sus dos salidas rotuladas Sí y No.</li><li>Flechas claras, sin cortes ni cruces innecesarios.</li><li>El diagrama debe correr mentalmente de punta a punta sin trabas (verifica con un caso de ejemplo).</li></ul></section><section class="seccion" id="sec-08"><h3 class="sec-titulo"><span class="sec-num">08</span> Rúbrica de evaluación</h3><table class="rubrica"><thead><tr><th>Criterio</th><th>Descripción</th><th>Pts.</th></tr></thead><tbody><tr><td>Simbología</td><td>Uso correcto de terminales, procesos, entradas/salidas y decisiones.</td><td class="pts">20</td></tr><tr><td>Flujo y trazado</td><td>Flechas direccionales claras, sin cortes ni cruces innecesarios.</td><td class="pts">20</td></tr><tr><td>Estructuras de control</td><td>Selección y repetición modeladas correctamente según el problema.</td><td class="pts">30</td></tr><tr><td>Solución lógica</td><td>El algoritmo resuelve el problema para cualquier entrada válida.</td><td class="pts">20</td></tr><tr><td>Presentación</td><td>Diagramas limpios, legibles y completos (Inicio a Fin).</td><td class="pts">10</td></tr></tbody><tfoot><tr><td colspan="2">Total</td><td class="pts">100 puntos</td></tr></tfoot></table></section><section class="seccion" id="sec-09"><h3 class="sec-titulo"><span class="sec-num">09</span> Referencias</h3><ul class="lista referencias"><li>Joyanes Aguilar, L. — Fundamentos de programación: algoritmos, estructura de datos y objetos (McGraw-Hill).</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li><li>Documentación de draw.io / diagrams.net: https://app.diagrams.net</li><li>Wikipedia — Diagrama de flujo: https://es.wikipedia.org/wiki/Diagrama_de_flujo</li><li>Práctica N.º 1 · Diagramas de Flujo — Estructuras de Control Básicas (INF-220, Gestión 2026-02).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato GL02 · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script>
+// ---------- carga de Pyodide (Python en el navegador) ----------
+let _pyodide = null;
+
+async function cargarPython() {
+  if (_pyodide) return _pyodide;
+  const bar = document.getElementById('cargando-bar');
+  bar.style.display = 'block';
+  bar.textContent = 'Cargando entorno Python (primera vez tarda unos segundos)…';
+  _pyodide = await loadPyodide();
+  await _pyodide.loadPackage(['numpy', 'pandas', 'matplotlib', 'seaborn']);
+  await _pyodide.runPythonAsync(PRELUDE);
+  bar.textContent = 'Entorno Python listo. Las celdas ▶ ejecutan de verdad.';
+  setTimeout(() => { bar.style.display = 'none'; }, 2500);
+  return _pyodide;
+}
+
+const PRELUDE = `
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('module://matplotlib_pyodide.html5_canvas_backend')
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def load_iris():
+    try:
+        from sklearn.datasets import load_iris as _li
+        return _li()
+    except Exception:
+        rng = np.random.default_rng(42)
+        data = np.round(np.column_stack([
+            rng.normal(5.01, 0.35, 150), rng.normal(3.43, 0.38, 150),
+            rng.normal(3.76, 1.77, 150), rng.normal(1.20, 0.76, 150)]), 1)
+        iris = type('Iris', (), {})()
+        iris.data = data
+        iris.target = np.repeat([0, 1, 2], 50)
+        iris.target_names = np.array(['setosa', 'versicolor', 'virginica'])
+        return iris
+`;
+
+async function ejecutar(n, codigo) {
+  const cell = document.getElementById('cell-' + n);
+  const outPre = cell.querySelector('.out-pre');
+  const btn = cell.querySelector('.btn-run');
+  btn.disabled = true;
+  btn.textContent = '⏳ …';
+  outPre.textContent = 'ejecutando…';
+  const canvasAntes = new Set([...document.querySelectorAll('canvas')]);
+  try {
+    const p = await cargarPython();
+    let prints = '';
+    p.setStdout({ batched: (s) => { prints += s + '\n'; } });
+    const val = await p.runPythonAsync(codigo);
+    p.globals.set('_last', val);
+    const reprTxt = await p.runPythonAsync('repr(_last)');
+    let texto = prints;
+    if (reprTxt && String(reprTxt) !== 'None' && String(reprTxt) !== '') {
+      texto += String(reprTxt);
+    }
+    outPre.textContent = texto || '(sin salida de texto — ver figura abajo)';
+    const nuevos = [...document.querySelectorAll('canvas')].filter(c => !canvasAntes.has(c));
+    for (const c of nuevos) {
+      c.classList.add('plot-canvas');
+      cell.querySelector('.cell-out').appendChild(c);
+    }
+  } catch (e) {
+    outPre.textContent = String(e.message || e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '▶ ejecutar';
+  }
+}
+
+// ---------- copiar ----------
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('.btn-copy');
+  if (b) {
+    navigator.clipboard.writeText(b.dataset.codigo)
+      .then(() => { b.textContent = '✓ copiado'; setTimeout(() => { b.textContent = '⧉ copiar'; }, 1500); });
+  }
+});
+
+// ---------- ejecutar ----------
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('.btn-run');
+  if (b) ejecutar(Number(b.dataset.n), b.dataset.codigo);
+});
+
+// ---------- autoevaluación ----------
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('.quiz-opt');
+  if (!b || b.disabled) return;
+  const q = b.closest('.quiz');
+  const correcta = Number(q.dataset.correcta);
+  const feedback = q.querySelector('.quiz-feedback');
+  const opts = [...q.querySelectorAll('.quiz-opt')];
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === correcta) o.classList.add('correcta');
+    else if (o === b) o.classList.add('mal');
+  });
+  feedback.textContent = b.dataset.i == correcta
+    ? '✓ Correcto.'
+    : '✗ No exactamente. Revisa la teoría de esa sección y vuelve a intentarlo.';
+});
+
+// ---------- diagramas mermaid ----------
+if (window.mermaid) {
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#eef0fb',
+      primaryBorderColor: '#4F46E5',
+      primaryTextColor: '#1f2430',
+      lineColor: '#1f2430',
+      fontFamily: 'Segoe UI, sans-serif'
+    },
+    flowchart: { curve: 'basis', padding: 10, nodeSpacing: 32, rankSpacing: 40 }
+  });
+  mermaid.run({ nodes: document.querySelectorAll('.mermaid') });
+}
+
+// ---------- scrollspy del índice ----------
+const enlaces = [...document.querySelectorAll('nav.toc a')];
+const secciones = enlaces.map(a => document.querySelector(a.getAttribute('href')));
+const obs = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) {
+      enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + e.target.id));
+    }
+  }
+}, { rootMargin: '-80px 0px -70% 0px' });
+secciones.forEach(s => s && obs.observe(s));
+</script></body></html>
