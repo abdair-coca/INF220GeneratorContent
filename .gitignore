@@ -1,0 +1,16 @@
+# Repos/carpetas separadas del curso
+inf-220-g2/
+resueltos/
+
+# Output de tooling / caches
+graphify-out/
+.atl/
+
+# Artefactos de pruebas locales
+.playwright-mcp/
+cap1_intro.png
+httpd.log
+
+# Python
+__pycache__/
+*.pyc
