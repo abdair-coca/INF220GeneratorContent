@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL01",
+    "titulo": "Los Planos del Viajero — Clases y Objetos",
+    "duracion": "3 h de laboratorio",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02"
+  },
+  "chapter": "clases_y_objetos",
+  "zone": {
+    "rows": 14,
+    "cols": 20,
+    "map": [
+      "TTTTTTTTTTTTTTTTTTTT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPDPPPPPPPPT",
+      "TGGGGGGGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGGGGGGGGT",
+      "TTTTTTTTTTTTTTTTTTTT"
+    ],
+    "flags": {
+      "fogataLit": false,
+      "tiendaArmada": false,
+      "campamentoListo": false,
+      "senderoAbierto": false
+    },
+    "npcs": [
+      {
+        "id": "alizon",
+        "x": 128,
+        "y": 224,
+        "w": 26,
+        "h": 28,
+        "sprite": "alizon",
+        "asset": "npc_alizon",
+        "name": "Alizon",
+        "style": "blue",
+        "dialogue": [
+          "¡Hola! Soy Alizon, tu compañera de expedición.",
+          "Yo recogeré los recursos mientras tú escribes los planos.",
+          "Juntos convertiremos este claro en un hogar."
+        ]
+      },
+      {
+        "id": "sabio",
+        "x": 176,
+        "y": 288,
+        "w": 26,
+        "h": 28,
+        "sprite": "guardabosques",
+        "asset": "npc_guardabosques",
+        "name": "El Guardabosques",
+        "style": "green",
+        "dialogue": [
+          "Bienvenido al bosque, viajero.",
+          "Aquí no hay botones mágicos. Para dormir seguro hay que construir un campamento.",
+          "Cada cosa se construye con un plano: una Clase. Y cada plano cobra vida cuando lo instancias: un Objeto.",
+          "Empecemos por lo esencial: el calor. Acércate al círculo de piedras."
+        ]
+      }
+    ],
+    "interactables": [
+      {
+        "id": "fogata01",
+        "type": "fogata",
+        "asset": "campfire",
+        "x": 304,
+        "y": 76,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge1",
+        "solid": { "x": 5, "y": 20, "w": 22, "h": 12 },
+        "sortOffset": 30
+      },
+      {
+        "id": "tienda01",
+        "type": "tienda",
+        "asset": "tent_blue",
+        "x": 148,
+        "y": 150,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge2",
+        "solid": { "x": -18, "y": 21, "w": 68, "h": 18 },
+        "sortOffset": 39
+      },
+      {
+        "id": "campamento01",
+        "type": "campamento",
+        "asset": "workbench",
+        "x": 484,
+        "y": 162,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge3",
+        "solid": { "x": -20, "y": 14, "w": 72, "h": 25 },
+        "sortOffset": 39
+      }
+    ],
+    "decor": [
+      { "kind": "bush", "asset": "bush_flowers", "x": 116, "y": 73, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 },
+      { "kind": "bush", "asset": "bush_flowers", "x": 198, "y": 76, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 94, "y": 323, "w": 34, "h": 30, "seed": 1 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 500, "y": 318, "w": 34, "h": 30, "seed": 2 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 75, "y": 220, "w": 24, "h": 18, "seed": 3 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 250, "y": 94, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 414, "y": 111, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 357, "y": 303, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 211, "y": 353, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 531, "y": 236, "w": 14, "h": 12 }
+    ],
+    "doors": [
+      { "id": "sendero", "x": 320, "y": 320, "tileRow": 10, "tileCol": 10 }
+    ]
+  },
+  "lesson": {
+    "id": "planos_del_viajero",
+    "title": "Capítulo 1 · Los Planos del Viajero",
+    "concept": "clases_objetos",
+    "zone": "claro_del_bosque",
+    "story": [
+      "Capítulo 1 — Los Planos del Viajero.",
+      "No basta con desear un refugio: hay que entender su diseño estructural. Aquí escribes Clases (los planos) e instancias Objetos (Tienda y Fogata)."
+    ],
+    "introDialogue": {
+      "speaker": "El Guardabosques",
+      "lines": [
+        "Bienvenido al bosque, viajero.",
+        "Aquí no hay botones mágicos. Para dormir seguro hay que construir un campamento.",
+        "Cada cosa se construye con un plano: una Clase. Y el plano cobra vida cuando lo instancias: un Objeto.",
+        "Empecemos por el calor. Acércate al círculo de piedras."
+      ]
+    },
+    "objectives": {
+      "intro": "Habla con El Guardabosques.",
+      "challenge1": "Define la clase Fogata con su método encender().",
+      "challenge2": "Define la clase Tienda con sus atributos y método armar().",
+      "challenge3": "Define la clase Campamento que compone Fogata y Tienda."
+    },
+    "challenges": [
+      {
+        "id": "challenge1",
+        "title": "El Fuego Inicial",
+        "target": "fogata01",
+        "objective": "Necesitamos calor. Define una clase 'Fogata' con un método 'encender(self)' que devuelva 'Fuego encendido'. Instancia un objeto y llama a su método.",
+        "example": "class Fogata:\n    def encender(self):\n        return \"Fuego encendido\"\nmi_fuego = Fogata()\nmi_fuego.encender()",
+        "starterCode": "",
+        "hints": [
+          "Usa la palabra clave class para definir Fogata.",
+          "Dentro, define def encender(self):",
+          "Instancia con mi_fuego = Fogata()"
+        ],
+        "validator": { "kind": "structure" },
+        "requirements": {
+          "classes": [
+            { "name": "Fogata", "methods": [ { "name": "encender", "returnText": "Fuego encendido" } ] }
+          ],
+          "instantiate": [ "Fogata" ],
+          "calls": [ "encender" ]
+        },
+        "successAction": { "kind": "fogata", "id": "fogata01" },
+        "successDialogue": [
+          "Las ramas crujen y una luz cálida ilumina el claro.",
+          "El Guardabosques asiente: \"Las clases son los planos de supervivencia.\""
+        ],
+        "concepts": [ "clases", "objetos", "metodos" ]
+      },
+      {
+        "id": "challenge2",
+        "title": "La Tienda del Viajero",
+        "target": "tienda01",
+        "objective": "Con calor basta, pero no para dormir. Define una clase 'Tienda' con atributos (self.tela y self.piedras) y un método 'armar(self)' que devuelva 'Tienda armada'. Instancia un objeto.",
+        "example": "class Tienda:\n    def __init__(self, tela, piedras):\n        self.tela = tela\n        self.piedras = piedras\n    def armar(self):\n        return \"Tienda armada\"\nmi_tienda = Tienda(5, 4)\nmi_tienda.armar()",
+        "starterCode": "",
+        "hints": [
+          "Usa __init__ para definir los atributos con self.",
+          "Define self.tela y self.piedras.",
+          "El método armar(self) devuelve 'Tienda armada'."
+        ],
+        "validator": { "kind": "structure" },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Tienda",
+              "attrs": [ "tela", "piedras" ],
+              "methods": [ { "name": "__init__" }, { "name": "armar", "returnText": "Tienda armada" } ]
+            }
+          ],
+          "instantiate": [ "Tienda" ],
+          "calls": [ "armar" ]
+        },
+        "successAction": { "kind": "tienda", "id": "tienda01" },
+        "successDialogue": [
+          "La tienda se yergue firme entre los árboles.",
+          "Alizon sonríe: \"Ese es un plano bien hecho.\""
+        ],
+        "concepts": [ "clases", "atributos", "init", "metodos" ]
+      },
+      {
+        "id": "challenge3",
+        "title": "El Campamento",
+        "target": "campamento01",
+        "objective": "Último paso: define una clase 'Campamento' que reciba una Fogata y una Tienda (composición), las guarde en self.fogata y self.tienda, y tenga un método 'armar(self)'. Instancia el campamento.",
+        "example": "class Fogata:\n    def encender(self):\n        return \"Fuego encendido\"\nclass Tienda:\n    def armar(self):\n        return \"Tienda armada\"\nclass Campamento:\n    def __init__(self, fogata, tienda):\n        self.fogata = fogata\n        self.tienda = tienda\n    def armar(self):\n        return self.fogata.encender() + \" y \" + self.tienda.armar()\nmi_fuego = Fogata()\nmi_tienda = Tienda()\ncampo = Campamento(mi_fuego, mi_tienda)\ncampo.armar()",
+        "starterCode": "",
+        "hints": [
+          "Un Campamento contiene objetos: eso es composición.",
+          "Guarda los objetos en self.fogata y self.tienda.",
+          "Instancia con campo = Campamento(mi_fuego, mi_tienda)"
+        ],
+        "validator": { "kind": "structure" },
+        "requirements": {
+          "classes": [
+            { "name": "Fogata", "methods": [ { "name": "encender" } ] },
+            { "name": "Tienda", "methods": [ { "name": "armar" } ] },
+            {
+              "name": "Campamento",
+              "attrs": [ "fogata", "tienda" ],
+              "methods": [ { "name": "__init__" }, { "name": "armar" } ]
+            }
+          ],
+          "instantiate": [ "Campamento" ],
+          "calls": [ "armar" ]
+        },
+        "successAction": { "kind": "campamento", "id": "campamento01" },
+        "successDialogue": [
+          "El campamento está completo: fuego y refugio, unidos por tu lógica.",
+          "El Guardabosques sonríe: \"Planos (Clases) y construcciones (Objetos). Así se sobrevive en este bosque.\"",
+          "Has dominado el Capítulo 1. El sendero hacia lo profundo se abre."
+        ],
+        "concepts": [ "clases", "objetos", "composicion" ]
+      }
+    ]
+  },
+  "book_pages": [
+    {
+      "id": "clases",
+      "title": "Clases (POO)",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Un plano de supervivencia: define qué atributos y métodos tendrá cada objeto.",
+      "syntax": "class Fogata:\n    def encender(self):\n        return \"Fuego encendido\"",
+      "example": "mi_fuego = Fogata()\nmi_fuego.encender()",
+      "commonError": "Olvidar el self.",
+      "tip": "Las clases son los moldes."
+    },
+    {
+      "id": "objetos",
+      "title": "Objetos",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Instanciar una clase crea un objeto: una construcción real a partir del plano.",
+      "syntax": "mi_fuego = Fogata()\nmi_tienda = Tienda(5, 4)",
+      "example": "campo = Campamento(mi_fuego, mi_tienda)",
+      "commonError": "Olvidar los paréntesis al instanciar.",
+      "tip": "Instanciar = construir."
+    },
+    {
+      "id": "atributos",
+      "title": "Atributos",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Los datos que describe el plano, definidos en __init__ con self.",
+      "syntax": "class Tienda:\n    def __init__(self, tela, piedras):\n        self.tela = tela\n        self.piedras = piedras",
+      "example": "mi_tienda = Tienda(5, 4)",
+      "commonError": "Olvidar self. al guardar el atributo.",
+      "tip": "self. guarda el dato dentro del objeto."
+    },
+    {
+      "id": "metodos",
+      "title": "Métodos",
+      "unlockedBy": "planos_del_viajero",
+      "what": "El comportamiento del objeto: las acciones que puede hacer.",
+      "syntax": "def encender(self):\n    return \"Fuego encendido\"",
+      "example": "mi_fuego.encender()",
+      "commonError": "Olvidar self como primer parámetro.",
+      "tip": "Los métodos describen qué hace el objeto."
+    },
+    {
+      "id": "composicion",
+      "title": "Composición",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Una clase puede contener otros objetos: un Campamento tiene una Fogata y una Tienda.",
+      "syntax": "class Campamento:\n    def __init__(self, fogata, tienda):\n        self.fogata = fogata\n        self.tienda = tienda",
+      "example": "campo = Campamento(mi_fuego, mi_tienda)",
+      "commonError": "No guardar los objetos en self.",
+      "tip": "Componer = un objeto dentro de otro."
+    }
+  ]
+}

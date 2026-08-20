@@ -1,0 +1,271 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL02",
+    "titulo": "El Taller del Refugio — Funciones",
+    "duracion": "3 h de laboratorio",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02"
+  },
+  "chapter": "clases_y_objetos",
+  "zone": {
+    "rows": 14,
+    "cols": 20,
+    "map": [
+      "TTTTTTTTTTTTTTTTTTTT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPPPPPPPPPPT",
+      "TPPPPPPPPPDPPPPPPPPT",
+      "TGGGGGGGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGGGGGGGGT",
+      "TTTTTTTTTTTTTTTTTTTT"
+    ],
+    "flags": {
+      "fogataLit": false,
+      "tiendaArmada": false,
+      "campamentoListo": false,
+      "senderoAbierto": false
+    },
+    "npcs": [
+      {
+        "id": "alizon",
+        "x": 128,
+        "y": 224,
+        "w": 26,
+        "h": 28,
+        "sprite": "alizon",
+        "asset": "npc_alizon",
+        "name": "Alizon",
+        "style": "blue",
+        "dialogue": [
+          "El campamento está en pie, pero el invierno no espera.",
+          "Todo lo que fabricamos aquí se hace con funciones: una receta que recibe ingredientes y devuelve un resultado.",
+          "El Guardabosques te enseñará las tres funciones del taller."
+        ]
+      },
+      {
+        "id": "sabio",
+        "x": 176,
+        "y": 288,
+        "w": 26,
+        "h": 28,
+        "sprite": "guardabosques",
+        "asset": "npc_guardabosques",
+        "name": "El Guardabosques",
+        "style": "green",
+        "dialogue": [
+          "Bienvenido de nuevo, viajero. El campamento está en pie y el fuego crepita.",
+          "Ahora aprenderás a fabricar herramientas con funciones: reciben parámetros y devuelven resultados con return.",
+          "Empieza por la más simple: una función que saluda y despierta el fuego. Acércate al hogar."
+        ]
+      }
+    ],
+    "interactables": [
+      {
+        "id": "fogata01",
+        "type": "fogata",
+        "asset": "campfire",
+        "x": 304,
+        "y": 76,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge1",
+        "solid": { "x": 5, "y": 20, "w": 22, "h": 12 },
+        "sortOffset": 30
+      },
+      {
+        "id": "tienda01",
+        "type": "tienda",
+        "asset": "tent_blue",
+        "x": 148,
+        "y": 150,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge2",
+        "solid": { "x": -18, "y": 21, "w": 68, "h": 18 },
+        "sortOffset": 39
+      },
+      {
+        "id": "campamento01",
+        "type": "campamento",
+        "asset": "workbench",
+        "x": 484,
+        "y": 162,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge3",
+        "solid": { "x": -20, "y": 14, "w": 72, "h": 25 },
+        "sortOffset": 39
+      }
+    ],
+    "decor": [
+      { "kind": "bush", "asset": "bush_flowers", "x": 116, "y": 73, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 },
+      { "kind": "bush", "asset": "bush_flowers", "x": 198, "y": 76, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 94, "y": 323, "w": 34, "h": 30, "seed": 1 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 500, "y": 318, "w": 34, "h": 30, "seed": 2 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 75, "y": 220, "w": 24, "h": 18, "seed": 3 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 250, "y": 94, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 414, "y": 111, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 357, "y": 303, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 211, "y": 353, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 531, "y": 236, "w": 14, "h": 12 }
+    ],
+    "doors": [
+      { "id": "sendero", "x": 320, "y": 320, "tileRow": 10, "tileCol": 10 }
+    ]
+  },
+  "lesson": {
+    "id": "funciones_01",
+    "title": "Capítulo 2 · El Taller del Refugio",
+    "concept": "funciones",
+    "zone": "claro_del_bosque",
+    "story": [
+      "Capítulo 2 — El Taller del Refugio.",
+      "El campamento está en pie. Para sobrevivir al invierno, todo se fabrica con funciones: recetas que reciben ingredientes (parámetros) y devuelven un resultado (return)."
+    ],
+    "introDialogue": {
+      "speaker": "El Guardabosques",
+      "lines": [
+        "Bienvenido de nuevo al claro, viajero. El campamento está en pie y el fuego crepita.",
+        "Ahora aprenderás a fabricar herramientas con funciones: reciben parámetros entre paréntesis y devuelven con return.",
+        "Todo lo que el taller necesita se describe con funciones. Tres funciones, como las tres piezas del refugio.",
+        "La primera es la más simple: una función que saluda y despierta el fuego. Ve al hogar."
+      ]
+    },
+    "objectives": {
+      "intro": "Habla con El Guardabosques.",
+      "challenge1": "Define la función encender(nombre) para despertar el hogar del campamento.",
+      "challenge2": "Define calcular_area_rectangulo(base, altura) para fabricar la lona de la tienda.",
+      "challenge3": "Define es_par(n) para encender el corazón del taller."
+    },
+    "challenges": [
+      {
+        "id": "challenge1",
+        "title": "El Hogar Dormido",
+        "target": "fogata01",
+        "objective": "El hogar no arde desde que llegó el invierno. Define la función encender(nombre) que reciba un nombre y devuelva un saludo que lo incluya, para despertar el fuego.",
+        "example": "def encender(nombre):\n    return \"Hola, \" + nombre + \"!\"",
+        "starterCode": "",
+        "hints": [
+          "Una función se define con def, luego el nombre y los parámetros entre paréntesis, y termina con dos puntos.",
+          "Para devolver un valor se usa return.",
+          "Tu return debe incluir el parámetro nombre: return \"Hola, \" + nombre + \"!\""
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "encender",
+          "params": [ "nombre" ],
+          "sampleArgs": [ "Aprendiz" ],
+          "contains": "Aprendiz"
+        },
+        "successAction": { "kind": "fogata", "id": "fogata01" },
+        "successDialogue": [
+          "El hogar parpadea y despierta con un destello: \"¡Hola, Aprendiz!\" — el fuego vuelve a respirar.",
+          "El Guardabosques asiente: \"Bien. La primera función del refugio vuelve a vivir.\""
+        ],
+        "concepts": [ "funciones", "def", "return" ]
+      },
+      {
+        "id": "challenge2",
+        "title": "La Lona del Refugio",
+        "target": "tienda01",
+        "objective": "El invierno exige reparar la tienda. Define la función calcular_area_rectangulo(base, altura) que reciba dos números y devuelva su área (base × altura), para saber cuánta lona necesitas.",
+        "example": "def calcular_area_rectangulo(base, altura):\n    return base * altura",
+        "starterCode": "",
+        "hints": [
+          "Recibe dos parámetros: base y altura.",
+          "Dentro de la función multiplica: base * altura.",
+          "Devuelve el resultado con return."
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "calcular_area_rectangulo",
+          "params": [ "base", "altura" ],
+          "sampleArgs": [ 5, 4 ],
+          "expected": "20"
+        },
+        "successAction": { "kind": "tienda", "id": "tienda01" },
+        "successDialogue": [
+          "La tienda se yergue firme: su lona mide exactamente 20 unidades de área.",
+          "Alizon sonríe: \"Así se hace. Con parámetros y retorno, el refugio fabrica lo que necesita.\""
+        ],
+        "concepts": [ "funciones", "parametros", "return" ]
+      },
+      {
+        "id": "challenge3",
+        "title": "El Corazón del Taller",
+        "target": "campamento01",
+        "objective": "El taller solo acepta piezas pares. Define la función es_par(n) que devuelva True si el número es par, o False si es impar, para encender su corazón.",
+        "example": "def es_par(n):\n    return n % 2 == 0",
+        "starterCode": "",
+        "hints": [
+          "Usa el operador % (módulo): n % 2 da 0 si n es par.",
+          "Compara con == para devolver True o False.",
+          "return n % 2 == 0"
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "es_par",
+          "params": [ "n" ],
+          "sampleArgs": [ 4 ],
+          "expected": "True"
+        },
+        "successAction": { "kind": "campamento", "id": "campamento01" },
+        "successDialogue": [
+          "El taller se enciende por completo: un destello dorado cruza el claro.",
+          "El Guardabosques posa la mano en tu hombro: \"Hoy escribiste las funciones del refugio, aprendiz.\"",
+          "Mira a lo lejos. \"Pero las funciones sueltas no bastan... Los planos que las agrupan te esperan en lo profundo del bosque. Los Objetos.\""
+        ],
+        "concepts": [ "funciones", "return", "operadores", "booleano" ]
+      }
+    ]
+  },
+  "book_pages": [
+    {
+      "id": "funciones",
+      "title": "Funciones",
+      "unlockedBy": "funciones_01",
+      "what": "Una función es una receta reutilizable: agrupa código con un nombre para poder llamarlo muchas veces.",
+      "syntax": "def nombre(parametros):\n    # cuerpo\n    return resultado",
+      "example": "def saludar(nombre):\n    return \"Hola, \" + nombre + \"!\"\nprint(saludar(\"Ana\"))",
+      "commonError": "Olvidar los dos puntos ':' después del paréntesis, o no indentar el cuerpo.",
+      "tip": "El cuerpo de la función se escribe indentado con 4 espacios."
+    },
+    {
+      "id": "parametros",
+      "title": "Parámetros",
+      "unlockedBy": "funciones_01",
+      "what": "Los parámetros son los valores de entrada que la función recibe entre paréntesis.",
+      "syntax": "def calcular(base, altura):\n    return base * altura",
+      "example": "def calcular_area(base, altura):\n    return base * altura\nprint(calcular_area(5, 4))",
+      "commonError": "Llamar a la función sin pasarle los argumentos que pide.",
+      "tip": "Los parámetros son locales: solo existen dentro de la función."
+    },
+    {
+      "id": "return",
+      "title": "return",
+      "unlockedBy": "funciones_01",
+      "what": "return termina la función y devuelve un resultado al punto donde fue llamada.",
+      "syntax": "return valor",
+      "example": "def es_par(n):\n    return n % 2 == 0\nprint(es_par(4))",
+      "commonError": "Creer que una función sin return 'devuelve' algo: sin return devuelve None.",
+      "tip": "Si una función no necesita devolver nada, no hace falta return."
+    },
+    {
+      "id": "ambito",
+      "title": "Ámbito (scope)",
+      "unlockedBy": "funciones_01",
+      "what": "El ámbito define dónde vive una variable. Una variable creada dentro de una función es local y no existe fuera.",
+      "syntax": "x = 10  # global\ndef f():\n    y = 5  # local\n    return x + y",
+      "example": "mensaje = \"Hola\"\ndef mostrar():\n    local = \"mundo\"\n    print(mensaje, local)\nmostrar()",
+      "commonError": "Intentar usar una variable local fuera de la función.",
+      "tip": "Mantén las variables locales dentro de las funciones para no ensuciar el programa."
+    }
+  ]
+}
