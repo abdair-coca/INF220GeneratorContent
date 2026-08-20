@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'; frame-src 'none'; img-src data:; media-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>JuegoArt — El Pueblo de Programadores</title>
+<style>
+:root {
+  --bg: #12101c;
+  --panel: #201c33;
+  --panel-border: #4a3f6b;
+  --accent: #ffd166;
+  --accent2: #4dd0e1;
+  --ok: #18d6a0;
+  --err: #ff6b6b;
+  --text: #efeaff;
+  --text-dim: #b6adcf;
+  font-family: 'Courier New', 'Consolas', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: var(--bg); color: var(--text);
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  touch-action: none;
+}
+
+#appRoot {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+/* ---------------- HUD superior ---------------- */
+#hud {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(#241f3a, #1a1729);
+  border-bottom: 3px solid var(--panel-border);
+  z-index: 20;
+  flex-shrink: 0;
+}
+#hudLeft { display: flex; flex-direction: column; gap: 2px; }
+#missionTitleText { font-size: 13px; color: var(--accent); font-weight: bold; letter-spacing: 0.5px; }
+#objectiveRow { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+#objectiveRow::before { content: "🎯"; }
+#progressDots { display: flex; gap: 4px; }
+.progress-dot {
+  width: 9px; height: 9px; border-radius: 2px;
+  background: #33304a; border: 1px solid var(--panel-border);
+}
+.progress-dot.filled { background: var(--ok); border-color: var(--ok); }
+
+#bookBtn {
+  background: var(--panel); border: 2px solid var(--panel-border);
+  color: var(--accent); font-size: 18px; padding: 6px 10px;
+  cursor: pointer; border-radius: 6px;
+}
+#bookBtn:active { transform: scale(0.95); }
+
+#demoBadge {
+  position: absolute; top: 6px; right: 12px;
+  background: var(--accent2); color: #10202a; font-size: 9px; font-weight: bold;
+  padding: 2px 8px; border-radius: 4px; z-index: 25; letter-spacing: 0.5px;
+}
+#demoBadge.hidden { display: none; }
+
+/* ---------------- Canvas ---------------- */
+#canvasWrap {
+  position: relative; flex: 1; min-height: 0; background: #000;
+}
+#gameCanvas {
+  display: block; width: 100%; height: 100%;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+/* ---------------- Diálogo ---------------- */
+#dialogueBox {
+  position: absolute; left: 3%; right: 3%; bottom: 90px;
+  background: var(--panel); border: 3px solid var(--panel-border);
+  border-radius: 8px; padding: 10px 14px; cursor: pointer;
+  z-index: 30; max-width: 640px; margin: 0 auto;
+}
+#dialogueBox.hidden { display: none; }
+#dialogueSpeaker { color: var(--accent); font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+#dialogueText { font-size: 13px; line-height: 1.4; }
+#dialogueBox::after { content: "▶ toca para continuar"; display: block; font-size: 9px; color: var(--text-dim); margin-top: 6px; text-align: right; }
+
+/* ---------------- Controles móviles ---------------- */
+#mobileControls {
+  position: absolute; bottom: 14px; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 18px; pointer-events: none; z-index: 25;
+}
+#joystickBase {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 2px solid var(--panel-border);
+  pointer-events: all; position: relative;
+}
+#joystickKnob {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--accent); position: absolute; top: 27px; left: 27px;
+  transition: transform 0.03s linear;
+}
+#interactBtn {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--ok); color: #0c2a20; font-weight: bold; font-size: 13px;
+  border: 2px solid #0f8f6c; pointer-events: all;
+}
+@media (min-width: 900px) and (pointer: fine) {
+  #mobileControls { display: none; }
+}
+
+/* ---------------- Toast ---------------- */
+#toast {
+  position: absolute; top: 56px; left: 50%; transform: translateX(-50%) translateY(-8px);
+  background: #2a2440; border: 2px solid var(--accent); color: var(--text);
+  padding: 6px 14px; border-radius: 6px; font-size: 11px; z-index: 40;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------------- Modal genérico ---------------- */
+.modal-overlay {
+  position: absolute; inset: 0; background: rgba(5,3,15,0.78);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50; padding: 12px;
+}
+.modal-overlay.hidden { display: none; }
+
+/* ---------------- Editor (Mini VS Code) ---------------- */
+#editorModal .modal-panel {
+  width: 100%; max-width: 560px; max-height: 92vh; overflow: auto;
+  background: #1a1729; border: 3px solid var(--panel-border); border-radius: 10px;
+  display: flex; flex-direction: column;
+}
+.editor-titlebar {
+  background: #14111f; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 2px solid var(--panel-border);
+}
+.editor-titlebar span { font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
+.editor-titlebar button {
+  background: none; border: none; color: var(--text-dim); font-size: 16px; cursor: pointer;
+}
+.editor-brief { padding: 10px 14px; border-bottom: 1px dashed var(--panel-border); }
+.editor-brief h4 { margin: 0 0 4px; color: var(--accent); font-size: 12px; }
+.editor-brief p { margin: 0 0 6px; font-size: 12px; line-height: 1.4; }
+.editor-brief pre {
+  background: #0f0d18; padding: 6px 8px; border-radius: 4px; font-size: 11px; color: var(--accent2);
+  margin: 0; overflow-x: auto;
+}
+.code-editor-wrap {
+  position: relative; display: flex; background: #0f0d18; margin: 10px 14px; border-radius: 6px;
+  border: 1px solid var(--panel-border); overflow: hidden; height: 130px;
+}
+#editorLineNumbers {
+  padding: 8px 6px; text-align: right; color: #514a72; font-size: 13px; line-height: 1.5;
+  white-space: pre; user-select: none; background: #100e1a; min-width: 26px;
+}
+.code-editor-inner { position: relative; flex: 1; overflow: hidden; }
+#editorHighlight, #editorTextarea {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  margin: 0; padding: 8px; font-size: 13px; line-height: 1.5; font-family: 'Consolas','Courier New',monospace;
+  white-space: pre; overflow: auto; box-sizing: border-box;
+}
+#editorHighlight { color: var(--text); pointer-events: none; }
+#editorTextarea {
+  background: transparent; color: transparent; caret-color: var(--accent);
+  border: none; resize: none; outline: none; z-index: 2;
+}
+.tok-kw { color: #ff8fb3; font-weight: bold; }
+.tok-str { color: #a4e07f; }
+.tok-num { color: #7cc7ff; }
+.tok-id { color: #efeaff; }
+.tok-com { color: #6a628a; font-style: italic; }
+
+#editorHintText {
+  margin: 0 14px 8px; font-size: 11px; color: var(--accent2); background: #0f2a30;
+  padding: 6px 8px; border-radius: 4px; border-left: 3px solid var(--accent2);
+}
+#editorHintText.hidden { display: none; }
+
+#editorOutput { margin: 0 14px 10px; min-height: 20px; font-size: 12px; }
+.out-line { padding: 2px 0; }
+.out-ok { color: var(--ok); }
+.out-err { color: var(--err); font-weight: bold; }
+.out-hint { color: var(--accent); }
+
+.editor-actions {
+  display: flex; gap: 8px; padding: 10px 14px 14px; border-top: 1px solid var(--panel-border);
+}
+.btn {
+  flex: 1; padding: 9px 10px; border-radius: 6px; border: 2px solid var(--panel-border);
+  background: #241f3a; color: var(--text); font-family: inherit; font-size: 11px; cursor: pointer; font-weight: bold;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--ok); color: #0c2a20; border-color: #0f8f6c; flex: 1.4; }
+.btn-secondary { background: var(--accent); color: #3a2a00; border-color: #c9a04e; }
+
+/* ---------------- Libro de Python ---------------- */
+#bookModal .modal-panel {
+  width: 100%; max-width: 560px; max-height: 88vh;
+  background: #1a1729; border: 3px solid var(--panel-border); border-radius: 10px;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.book-header {
+  display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;
+  border-bottom: 2px solid var(--panel-border); background: #14111f;
+}
+.book-header h3 { margin: 0; font-size: 13px; color: var(--accent); }
+.book-header button { background: none; border: none; color: var(--text-dim); font-size: 16px; cursor: pointer; }
+.book-body { display: flex; flex: 1; overflow: hidden; }
+#bookPagesList { width: 130px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--panel-border); padding: 6px; }
+.book-page-item { font-size: 10px; padding: 7px 6px; border-radius: 4px; cursor: pointer; margin-bottom: 3px; color: var(--text-dim); }
+.book-page-item:hover { background: #2a2440; }
+.book-page-item.locked { opacity: 0.4; cursor: default; }
+#bookDetail { flex: 1; overflow-y: auto; padding: 12px 14px; font-size: 12px; line-height: 1.5; }
+#bookDetail h3 { color: var(--accent); margin: 0 0 8px; }
+.book-label { color: var(--accent2); font-size: 10px; text-transform: uppercase; margin: 8px 0 2px; letter-spacing: 0.5px; }
+#bookDetail pre { background: #0f0d18; padding: 6px 8px; border-radius: 4px; margin: 0; font-size: 11px; color: var(--accent2); white-space: pre-wrap; }
+
+/* ---------------- Pantalla de finalización ---------------- */
+#completionScreen .modal-panel {
+  width: 100%; max-width: 380px; background: #1a1729; border: 3px solid var(--accent);
+  border-radius: 10px; padding: 18px; text-align: center;
+}
+#completionScreen h2 { margin: 0 0 4px; color: var(--accent); font-size: 16px; }
+.score-big { font-size: 34px; font-weight: bold; color: var(--ok); margin: 10px 0; }
+.stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px dashed #332e4d; }
+.concepts-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+.concept-chip { background: #0f2a30; color: var(--ok); font-size: 10px; padding: 3px 8px; border-radius: 10px; }
+
+/* ---------------- Selector de misión (Demo Mode) ---------------- */
+#missionSelectorModal .modal-panel {
+  width: 100%; max-width: 380px; background: #1a1729; border: 3px solid var(--panel-border);
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+#missionSelectorModal h2 { color: var(--accent); font-size: 15px; margin: 0 0 4px; }
+#missionSelectorModal p { color: var(--text-dim); font-size: 11px; margin: 0 0 12px; }
+#missionSelectorList { display: flex; flex-direction: column; gap: 8px; }
+.mission-pick-btn {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  background: #241f3a; border: 2px solid var(--panel-border); border-radius: 6px;
+  color: var(--text); padding: 10px 12px; cursor: pointer; font-family: inherit;
+}
+.mission-pick-btn span { font-size: 10px; color: var(--accent2); }
+
+.hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+  <div id="appRoot">
+    <span id="demoBadge" class="hidden">MODO DEMO</span>
+
+    <header id="hud">
+      <div id="hudLeft">
+        <div id="missionTitleText">JuegoArt</div>
+        <div id="objectiveRow"><span id="objectiveText">Cargando...</span></div>
+      </div>
+      <div id="progressDots"></div>
+      <button id="bookBtn" title="Libro de Python">📖</button>
+    </header>
+
+    <div id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <div id="dialogueBox" class="hidden">
+        <div id="dialogueSpeaker">—</div>
+        <div id="dialogueText">...</div>
+      </div>
+
+      <div id="mobileControls">
+        <div id="joystickBase"><div id="joystickKnob"></div></div>
+        <button id="interactBtn">E</button>
+      </div>
+
+      <div id="toast"></div>
+    </div>
+
+    <!-- Mini VS Code -->
+    <div id="editorModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="editor-titlebar">
+          <span id="editorTerminalLabel">TERMINAL</span>
+          <button id="btnCloseEditor">✕</button>
+        </div>
+        <div class="editor-brief">
+          <h4 id="editorTitle">Desafío</h4>
+          <p id="editorObjective">Objetivo</p>
+          <p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p>
+          <pre id="editorExample"></pre>
+        </div>
+        <div class="code-editor-wrap">
+          <div id="editorLineNumbers">1</div>
+          <div class="code-editor-inner">
+            <pre id="editorHighlight"></pre>
+            <textarea id="editorTextarea" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+          </div>
+        </div>
+        <div id="editorHintText" class="hidden"></div>
+        <div id="editorOutput"></div>
+        <div class="editor-actions">
+          <button class="btn" id="btnBookInEditor">Libro</button>
+          <button class="btn btn-secondary" id="btnHint">Pista</button>
+          <button class="btn btn-primary" id="btnRun">▶ Ejecutar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Libro de Python -->
+    <div id="bookModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="book-header">
+          <h3>📖 Libro de Python</h3>
+          <button id="bookCloseBtn">✕</button>
+        </div>
+        <div class="book-body">
+          <div id="bookPagesList"></div>
+          <div id="bookDetail"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de finalización -->
+    <div id="completionScreen" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <h2>MISIÓN COMPLETADA</h2>
+        <div id="completionStats"></div>
+        <button class="btn btn-primary" id="btnContinueAfterComplete" style="margin-top:14px; width:100%;">Continuar</button>
+      </div>
+    </div>
+
+    <!-- Selector de misión (Demo Mode) -->
+    <div id="missionSelectorModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <h2>Modo Demo — JuegoArt</h2>
+        <p>No se detectó a Titi. Elige una misión para probar (solo desarrollo/testing).</p>
+        <div id="missionSelectorList"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================================================================
+   JuegoArt — RPG educativo 2D (Pueblo de Programadores)
+   Motor propio, vanilla JS + Canvas 2D. Sin dependencias externas.
+   ========================================================================= */
+(function () {
+"use strict";
+
+const TILE = 32;               // tamaño lógico de tile / sprite base
+const MAX_EXECUTION_STEPS = 1000; // límite de seguridad del mini intérprete
+
+/* -------------------------------------------------------------------------
+   GameState — estado centralizado de la aplicación
+   ------------------------------------------------------------------------- */
+const GameState = {
+  lesson: null,        // definición de la misión activa (LessonManager)
+  player: {
+    x: 5 * TILE, y: 5 * TILE, dir: "down", moving: false, frame: 0,
+    skin: "default"
+  },
+  world: {
+    zoneId: "plaza_comunicacion",
+    flags: {}           // banderas mutadas por WorldActions (puertas, luces, etc.)
+  },
+  challenges: {
+    currentIndex: 0,
+    attempts: 0,
+    errors: 0,
+    hintsUsed: 0,
+    hintLevel: 0,
+    startedAt: 0
+  },
+  statistics: {
+    missionStartedAt: 0,
+    perChallenge: []    // {id, attempts, errors, hintsUsed, timeMs}
+  },
+  settings: {
+    sound: true,
+    demoMode: true
+  },
+  meta: {
+    unlockedConcepts: [] // ids de conceptos desbloqueados para el Libro
+  }
+};
+
+/* -------------------------------------------------------------------------
+   InputManager — teclado + controles táctiles (joystick virtual)
+   ------------------------------------------------------------------------- */
+class InputManager {
+  constructor() {
+    this.keys = Object.create(null);
+    this.justPressed = Object.create(null);
+    this.touchVector = { x: 0, y: 0 };
+    this.touchInteract = false;
+    this._bindKeyboard();
+  }
+
+  _bindKeyboard() {
+    window.addEventListener("keydown", (e) => {
+      const tag = document.activeElement && document.activeElement.tagName;
+      const isTyping = tag === "TEXTAREA" || tag === "INPUT";
+      if (isTyping) {
+        // El jugador está escribiendo código: no interceptar nada excepto Escape,
+        // y jamás bloquear espacio o flechas (se necesitan para escribir y mover el cursor).
+        if (e.code === "Escape") { if (!this.keys[e.code]) this.justPressed[e.code] = true; this.keys[e.code] = true; }
+        return;
+      }
+      if (!this.keys[e.code]) this.justPressed[e.code] = true;
+      this.keys[e.code] = true;
+      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+    window.addEventListener("keyup", (e) => { this.keys[e.code] = false; });
+  }
+
+  update() {
+    // limpiar "justPressed" al final de cada frame (llamado desde Game.update)
+    this.justPressed = Object.create(null);
+  }
+
+  isDown(...codes) { return codes.some(c => this.keys[c]); }
+  pressed(...codes) { return codes.some(c => this.justPressed[c]); }
+
+  getMoveVector() {
+    let x = 0, y = 0;
+    if (this.isDown("KeyA", "ArrowLeft")) x -= 1;
+    if (this.isDown("KeyD", "ArrowRight")) x += 1;
+    if (this.isDown("KeyW", "ArrowUp")) y -= 1;
+    if (this.isDown("KeyS", "ArrowDown")) y += 1;
+    if (x === 0 && y === 0) {
+      x = this.touchVector.x; y = this.touchVector.y;
+    }
+    const len = Math.hypot(x, y);
+    if (len > 1) { x /= len; y /= len; }
+    return { x, y };
+  }
+
+  wantsInteract() {
+    const kb = this.pressed("KeyE", "Space");
+    const touch = this.touchInteract;
+    this.touchInteract = false;
+    return kb || touch;
+  }
+
+  wantsClose() { return this.pressed("Escape"); }
+}
+
+/* -------------------------------------------------------------------------
+   Camera — sigue al jugador suavemente
+   ------------------------------------------------------------------------- */
+class Camera {
+  constructor(viewW, viewH) {
+    this.x = 0; this.y = 0;
+    this.viewW = viewW; this.viewH = viewH;
+    this.targetX = 0; this.targetY = 0;
+  }
+  resize(w, h) { this.viewW = w; this.viewH = h; }
+  follow(entity, worldPxW, worldPxH) {
+    this.targetX = entity.x - this.viewW / 2;
+    this.targetY = entity.y - this.viewH / 2;
+    if (worldPxW <= this.viewW) {
+      // Mundo más angosto que la vista: centrar en X (offset = (vista - mundo) / 2)
+      this.targetX = -(this.viewW - worldPxW) / 2;
+    } else {
+      this.targetX = Math.max(0, Math.min(this.targetX, worldPxW - this.viewW));
+    }
+    if (worldPxH <= this.viewH) {
+      // Mundo más bajo que la vista: centrar en Y
+      this.targetY = -(this.viewH - worldPxH) / 2;
+    } else {
+      this.targetY = Math.max(0, Math.min(this.targetY, worldPxH - this.viewH));
+    }
+  }
+  update(dt) {
+    const lerp = Math.min(1, dt * 6);
+    this.x += (this.targetX - this.x) * lerp;
+    this.y += (this.targetY - this.y) * lerp;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Paleta de color + utilitario de "sprites" pixel-art procedurales
+   Cada sprite es una matriz de índices de paleta (0 = transparente).
+   Se dibuja escalando cada celda como un rectángulo -> look pixel-art
+   sin necesitar imágenes externas.
+   ------------------------------------------------------------------------- */
+const PALETTE = {
+  0: null,
+  1: "#2b2140", 2: "#4a3f6b", 3: "#8a7ab5", 4: "#c9bde0",
+  5: "#f4d9a5", 6: "#e0ab6b", 7: "#9c6b3f", 8: "#5c3a21",
+  9: "#3fae5a", 10: "#2c7a40", 11: "#1f5c30",
+  12: "#3fa7c9", 13: "#276f8a", 14: "#bdeaf5",
+  15: "#e05a4e", 16: "#ffffff", 17: "#ffd166", 18: "#06d6a0",
+  19: "#222222", 20: "#ff6b6b", 21: "#4dd0e1", 22: "#7c4dff"
+};
+
+function drawSprite(ctx, grid, dx, dy, cell) {
+  for (let r = 0; r < grid.length; r++) {
+    const row = grid[r];
+    for (let c = 0; c < row.length; c++) {
+      const idx = row[c];
+      const color = PALETTE[idx];
+      if (!color) continue;
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(dx + c * cell), Math.round(dy + r * cell), cell, cell);
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   AudioManager — arquitectura lista, sin dependencia de assets externos.
+   Si no hay audio disponible el juego funciona perfecto en silencio.
+   ------------------------------------------------------------------------- */
+class AudioManager {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+  }
+  _ensureCtx() {
+    if (this.ctx) return this.ctx;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = AC ? new AC() : null;
+    } catch (e) { this.ctx = null; }
+    return this.ctx;
+  }
+  // beep sintético minimalista para feedback (sin archivos externos)
+  play(kind) {
+    if (!this.enabled) return;
+    const ctx = this._ensureCtx();
+    if (!ctx) return;
+    try {
+      const freqMap = { success: 660, error: 180, click: 420, hint: 520, open: 300, complete: 880 };
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.frequency.value = freqMap[kind] || 400;
+      o.type = "square";
+      g.gain.value = 0.03;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+      o.stop(ctx.currentTime + 0.16);
+    } catch (e) { /* silencioso si el navegador bloquea audio */ }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   ParticleSystem — partículas ligeras (texto flotante, brotes, chispas)
+   ------------------------------------------------------------------------- */
+class ParticleSystem {
+  constructor() { this.particles = []; }
+  spawnText(x, y, text, color) {
+    this.particles.push({ type: "text", x, y, vy: -22, life: 1.1, maxLife: 1.1, text, color: color || "#ffffff" });
+  }
+  spawnBurst(x, y, color, count) {
+    count = count || 8;
+    for (let i = 0; i < count; i++) {
+      const ang = (Math.PI * 2 * i) / count;
+      this.particles.push({
+        type: "spark", x, y, vx: Math.cos(ang) * 40, vy: Math.sin(ang) * 40,
+        life: 0.5, maxLife: 0.5, color: color || "#ffd166"
+      });
+    }
+  }
+  spawnEmoji(x, y, emoji) {
+    this.particles.push({ type: "emoji", x, y, vy: -14, life: 1.3, maxLife: 1.3, emoji });
+  }
+  update(dt) {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.life -= dt;
+      p.x += (p.vx || 0) * dt;
+      p.y += (p.vy || 0) * dt;
+      if (p.life <= 0) this.particles.splice(i, 1);
+    }
+  }
+  render(ctx, camera) {
+    for (const p of this.particles) {
+      const alpha = Math.max(0, p.life / p.maxLife);
+      const sx = p.x - camera.x, sy = p.y - camera.y;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (p.type === "text") {
+        ctx.fillStyle = p.color;
+        ctx.font = "bold 12px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(p.text, sx, sy);
+      } else if (p.type === "emoji") {
+        ctx.font = "18px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(p.emoji, sx, sy);
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(sx - 2, sy - 2, 4, 4);
+      }
+      ctx.restore();
+    }
+  }
+}
+
+window.__JuegoArt = window.__JuegoArt || {};
+Object.assign(window.__JuegoArt, {
+  TILE, MAX_EXECUTION_STEPS, GameState, InputManager, Camera, PALETTE, drawSprite,
+  AudioManager, ParticleSystem
+});
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const { TILE, drawSprite } = NS;
+
+/* -------------------------------------------------------------------------
+   Sprites pixel-art (16x16 lógico, se escalan a TILE)
+   ------------------------------------------------------------------------- */
+const SPR = {
+  playerDown: [
+    [0,0,1,1,1,1,0,0],
+    [0,1,5,5,5,5,1,0],
+    [0,1,5,19,5,19,1,0],
+    [0,1,5,5,5,5,1,0],
+    [0,0,22,22,22,22,0,0],
+    [0,22,4,22,22,4,22,0],
+    [0,22,4,22,22,4,22,0],
+    [0,0,7,0,0,7,0,0]
+  ],
+  playerUp: [
+    [0,0,1,1,1,1,0,0],
+    [0,1,1,1,1,1,1,0],
+    [0,1,5,5,5,5,1,0],
+    [0,1,5,5,5,5,1,0],
+    [0,0,22,22,22,22,0,0],
+    [0,22,4,22,22,4,22,0],
+    [0,22,4,22,22,4,22,0],
+    [0,0,7,0,0,7,0,0]
+  ],
+  playerSide: [
+    [0,1,1,1,1,0,0,0],
+    [0,1,5,5,5,1,0,0],
+    [0,1,5,19,5,1,0,0],
+    [0,0,5,5,5,0,0,0],
+    [0,0,22,22,22,0,0,0],
+    [0,22,4,22,4,0,0,0],
+    [0,22,4,22,4,0,0,0],
+    [0,0,7,0,7,0,0,0]
+  ],
+  npcSage: [
+    [0,0,3,3,3,3,0,0],
+    [0,3,5,5,5,5,3,0],
+    [0,3,5,19,5,19,3,0],
+    [0,3,5,5,5,5,3,0],
+    [0,0,2,2,2,2,0,0],
+    [0,2,17,2,2,17,2,0],
+    [0,2,17,2,2,17,2,0],
+    [0,0,8,0,0,8,0,0]
+  ],
+  tree: [
+    [0,0,10,10,10,10,0,0],
+    [0,10,11,10,10,11,10,0],
+    [10,11,9,9,9,9,11,10],
+    [10,9,9,18,9,9,9,10],
+    [0,10,9,9,9,9,10,0],
+    [0,0,10,10,10,10,0,0],
+    [0,0,0,8,8,0,0,0],
+    [0,0,0,8,8,0,0,0]
+  ],
+  flower: [
+    [0,0,0,0,0,0,0,0],
+    [0,0,15,0,17,0,0,0],
+    [0,0,0,16,0,0,0,0],
+    [0,0,0,9,0,0,0,0],
+    [0,0,0,9,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ],
+  terminalOff: [
+    [2,2,2,2,2,2,2,2],
+    [2,1,1,1,1,1,1,2],
+    [2,1,19,19,19,1,2],
+    [2,1,19,19,19,1,2],
+    [2,1,1,1,1,1,1,2],
+    [2,2,2,2,2,2,2,2],
+    [0,2,2,2,2,2,2,0],
+    [0,0,2,2,2,2,0,0]
+  ],
+  terminalOn: [
+    [2,2,2,2,2,2,2,2],
+    [2,1,1,1,1,1,1,2],
+    [2,1,18,18,18,1,2],
+    [2,1,18,18,18,1,2],
+    [2,1,1,1,1,1,1,2],
+    [2,2,2,2,2,2,2,2],
+    [0,2,2,2,2,2,2,0],
+    [0,0,2,2,2,2,0,0]
+  ],
+  antennaOff: [
+    [0,0,0,19,0,0,0,0],
+    [0,0,19,19,19,0,0,0],
+    [0,0,0,19,0,0,0,0],
+    [0,0,0,19,0,0,0,0],
+    [0,2,2,2,2,2,0,0],
+    [0,2,1,1,1,2,0,0],
+    [0,2,1,1,1,2,0,0],
+    [0,0,8,8,8,0,0,0]
+  ],
+  antennaOn: [
+    [0,0,0,17,0,0,0,0],
+    [0,0,17,19,17,0,0,0],
+    [0,0,0,19,0,0,0,0],
+    [0,0,0,19,0,0,0,0],
+    [0,2,2,2,2,2,0,0],
+    [0,2,18,18,18,2,0,0],
+    [0,2,18,18,18,2,0,0],
+    [0,0,8,8,8,0,0,0]
+  ],
+  doorClosed: [
+    [8,8,8,8,8,8,8,8],
+    [8,7,7,7,7,7,7,8],
+    [8,7,1,1,1,1,7,8],
+    [8,7,1,17,1,1,7,8],
+    [8,7,1,1,1,1,7,8],
+    [8,7,1,1,1,1,7,8],
+    [8,7,7,7,7,7,7,8],
+    [8,8,8,8,8,8,8,8]
+  ]
+};
+
+function sprite(ctx, name, dx, dy, cell) {
+  const g = SPR[name];
+  if (g) drawSprite(ctx, g, dx, dy, cell);
+}
+
+/* -------------------------------------------------------------------------
+   World — mapa por tiles + entidades + interactuables de la zona actual
+   ------------------------------------------------------------------------- */
+const TILE_DEF = {
+  G: { walkable: true, base: "#3fae5a" },
+  g: { walkable: true, base: "#379b4f" }, // variante de pasto
+  P: { walkable: true, base: "#c9a876" },
+  W: { walkable: false, base: "#276f8a" },
+  T: { walkable: false, base: "#3fae5a", deco: "tree" },
+  F: { walkable: true, base: "#3fae5a", deco: "flower" },
+  H: { walkable: false, base: "#8a7a6a" },
+  D: { walkable: false, base: "#c9a876", deco: "door" } // se vuelve walkable si está abierta
+};
+
+// Mapa de la Plaza de Comunicación (20x14 tiles)
+const MAP_ROWS = [
+  "TTTTTTTTTTTTTTTTTTTT",
+  "TGGGGGGGGGGGGGGGGGGT",
+  "TGGGFGGGGPPPPGGGGGGT",
+  "TGGGGGGGGPGGPGGHHHHT",
+  "TGGPPPPPPPGGPGGHDHHT",
+  "TGGPGGGGGGGGPGGHHHHT",
+  "TGGPGGHHHHGGPPPPPPPT",
+  "TGGPGGHNHHGGGGGGGGGT",
+  "TGGPGGHHHHGGGGFGGGGT",
+  "TGGPPPPPPPPPPGGGGGGT",
+  "TGGGGGGGGGGGGGGGGGGT",
+  "TGGGGFGGGGGGGGGGGGGT",
+  "TGGGGGGGGGGGGGGGGGGT",
+  "TTTTTTTTTTTTTTTTTTTT"
+];
+// 'N' = posición inicial de la terminal (interactuable especial, no bloquea)
+
+class World {
+  constructor() {
+    this.rows = MAP_ROWS.length;
+    this.cols = MAP_ROWS[0].length;
+    this.tiles = MAP_ROWS.map(row => row.split(""));
+    this.flags = { doorOpen: false, terminalLit: false, antennaActive: false, plazaLit: false };
+
+    this.npcs = [
+      {
+        id: "sabio", x: 6 * TILE, y: 7 * TILE, w: TILE, h: TILE, sprite: "npcSage",
+        name: "Elder Byte",
+        dialogue: [
+          "Bienvenido al Pueblo de Programadores, aprendiz.",
+          "Nuestro sistema de comunicación dejó de funcionar...",
+          "Acércate a la terminal y ayúdame a restaurarlo con Python."
+        ]
+      }
+    ];
+
+    this.interactables = [
+      { id: "terminal01", type: "terminal", x: 13 * TILE, y: 3 * TILE, w: TILE, h: TILE, missionNode: "challenge1" },
+      { id: "antena01", type: "antenna", x: 13 * TILE, y: 6 * TILE, w: TILE, h: TILE, missionNode: "challenge2" },
+      { id: "terminalFinal", type: "terminal", x: 13 * TILE, y: 9 * TILE, w: TILE, h: TILE, missionNode: "challenge3" }
+    ];
+
+    this.doors = [
+      { id: "puertaPlaza", x: 16 * TILE, y: 4 * TILE, tileRow: 4, tileCol: 16 }
+    ];
+  }
+
+  tileAt(col, row) {
+    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) return "T";
+    return this.tiles[row][col];
+  }
+
+  isWalkable(px, py) {
+    const col = Math.floor(px / TILE);
+    const row = Math.floor(py / TILE);
+    const t = this.tileAt(col, row);
+    if (t === "D") return this.flags.doorOpen;
+    const def = TILE_DEF[t] || TILE_DEF.T;
+    return def.walkable;
+  }
+
+  pixelWidth() { return this.cols * TILE; }
+  pixelHeight() { return this.rows * TILE; }
+
+  openDoor(id) {
+    this.flags.doorOpen = true;
+    for (const d of this.doors) {
+      if (!id || d.id === id) this.tiles[d.tileRow][d.tileCol] = "P";
+    }
+  }
+
+  lightTerminal(id) {
+    this.flags.terminalLit = true;
+    const t = this.interactables.find(i => i.id === id);
+    if (t) t.lit = true;
+  }
+
+  activateAntenna(id) {
+    this.flags.antennaActive = true;
+    const t = this.interactables.find(i => i.id === id);
+    if (t) t.active = true;
+  }
+
+  illuminatePlaza() { this.flags.plazaLit = true; }
+}
+
+/* -------------------------------------------------------------------------
+   CollisionSystem — resolución simple AABB contra el tilemap
+   ------------------------------------------------------------------------- */
+class CollisionSystem {
+  static resolveMove(world, entity, dx, dy) {
+    const w = entity.w, h = entity.h;
+    // eje X
+    let nx = entity.x + dx;
+    if (dx !== 0) {
+      const corners = dx > 0
+        ? [[nx + w - 1, entity.y + 2], [nx + w - 1, entity.y + h - 2]]
+        : [[nx, entity.y + 2], [nx, entity.y + h - 2]];
+      if (corners.every(([px, py]) => world.isWalkable(px, py))) entity.x = nx;
+    }
+    // eje Y
+    let ny = entity.y + dy;
+    if (dy !== 0) {
+      const corners = dy > 0
+        ? [[entity.x + 2, ny + h - 1], [entity.x + w - 2, ny + h - 1]]
+        : [[entity.x + 2, ny], [entity.x + w - 2, ny]];
+      if (corners.every(([px, py]) => world.isWalkable(px, py))) entity.y = ny;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Player
+   ------------------------------------------------------------------------- */
+class Player {
+  constructor() {
+    this.x = 5 * TILE; this.y = 5 * TILE;
+    this.w = TILE - 6; this.h = TILE - 4;
+    this.speed = 105; // px/seg
+    this.dir = "down";
+    this.moving = false;
+    this.animTime = 0;
+    this.frame = 0;
+  }
+  update(dt, moveVec, world) {
+    this.moving = moveVec.x !== 0 || moveVec.y !== 0;
+    if (this.moving) {
+      if (Math.abs(moveVec.x) > Math.abs(moveVec.y)) this.dir = moveVec.x > 0 ? "right" : "left";
+      else this.dir = moveVec.y > 0 ? "down" : "up";
+      CollisionSystem.resolveMove(world, this, moveVec.x * this.speed * dt, moveVec.y * this.speed * dt);
+      this.animTime += dt;
+      if (this.animTime > 0.15) { this.animTime = 0; this.frame = (this.frame + 1) % 2; }
+    } else {
+      this.frame = 0;
+    }
+  }
+  center() { return { x: this.x + this.w / 2, y: this.y + this.h / 2 }; }
+}
+
+/* -------------------------------------------------------------------------
+   Renderer — dibuja tiles, decoraciones, entidades e interactuables
+   ------------------------------------------------------------------------- */
+class Renderer {
+  constructor(ctx) { this.ctx = ctx; }
+
+  renderWorld(world, camera, canvasW, canvasH) {
+    const ctx = this.ctx;
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = "#12101c";
+    ctx.fillRect(0, 0, canvasW, canvasH);
+
+    const startCol = Math.max(0, Math.floor(camera.x / TILE));
+    const endCol = Math.min(world.cols, Math.ceil((camera.x + canvasW) / TILE) + 1);
+    const startRow = Math.max(0, Math.floor(camera.y / TILE));
+    const endRow = Math.min(world.rows, Math.ceil((camera.y + canvasH) / TILE) + 1);
+
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = startCol; col < endCol; col++) {
+        const t = world.tiles[row][col];
+        const def = TILE_DEF[t] || TILE_DEF.T;
+        const sx = col * TILE - camera.x, sy = row * TILE - camera.y;
+        let base = def.base;
+        if (t === "D" && world.flags.doorOpen) base = TILE_DEF.P.base;
+        ctx.fillStyle = base;
+        ctx.fillRect(sx, sy, TILE, TILE);
+        if ((row + col) % 5 === 0 && (t === "G" || t === "F")) {
+          ctx.fillStyle = "rgba(255,255,255,0.04)";
+          ctx.fillRect(sx + 4, sy + 4, 4, 4);
+        }
+        if (t === "T") sprite(ctx, "tree", sx, sy, TILE / 8);
+        if (t === "F") sprite(ctx, "flower", sx, sy, TILE / 8);
+        if (t === "D" && !world.flags.doorOpen) sprite(ctx, "doorClosed", sx, sy, TILE / 8);
+      }
+    }
+
+    // plaza iluminada (overlay sutil cuando se completa la misión)
+    if (world.flags.plazaLit) {
+      ctx.save();
+      ctx.globalAlpha = 0.10;
+      ctx.fillStyle = "#ffd166";
+      ctx.fillRect(0, 0, canvasW, canvasH);
+      ctx.restore();
+    }
+
+    // interactuables
+    for (const it of world.interactables) {
+      const sx = it.x - camera.x, sy = it.y - camera.y;
+      if (it.type === "terminal") sprite(ctx, it.lit ? "terminalOn" : "terminalOff", sx, sy, TILE / 8);
+      if (it.type === "antenna") sprite(ctx, it.active ? "antennaOn" : "antennaOff", sx, sy, TILE / 8);
+    }
+
+    // NPCs
+    for (const npc of world.npcs) {
+      sprite(ctx, npc.sprite, npc.x - camera.x, npc.y - camera.y, TILE / 8);
+    }
+  }
+
+  renderPlayer(player, camera) {
+    const ctx = this.ctx;
+    let name = "playerDown";
+    if (player.dir === "up") name = "playerUp";
+    else if (player.dir === "left" || player.dir === "right") name = "playerSide";
+    const sx = player.x - camera.x - 4, sy = player.y - camera.y - 8;
+    ctx.save();
+    if (player.dir === "left") {
+      ctx.translate(sx + TILE, sy);
+      ctx.scale(-1, 1);
+      sprite(ctx, name, 0, 0, TILE / 8);
+    } else {
+      sprite(ctx, name, sx, sy, TILE / 8);
+    }
+    ctx.restore();
+    // pequeña sombra
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.beginPath();
+    ctx.ellipse(player.x - camera.x + player.w / 2, player.y - camera.y + player.h + 2, 10, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  renderInteractPrompt(ctx, x, y, camera) {
+    ctx.save();
+    ctx.font = "bold 10px monospace";
+    ctx.fillStyle = "#111";
+    ctx.strokeStyle = "#ffd166";
+    ctx.lineWidth = 2;
+    const sx = x - camera.x, sy = y - camera.y;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(sx - 14, sy - 14, 28, 16, 4) : ctx.rect(sx - 14, sy - 14, 28, 16);
+    ctx.fillStyle = "#ffd166";
+    ctx.fill();
+    ctx.fillStyle = "#111";
+    ctx.textAlign = "center";
+    ctx.fillText("E", sx, sy - 2);
+    ctx.restore();
+  }
+}
+
+Object.assign(NS, { World, CollisionSystem, Player, Renderer, TILE_DEF, MAP_ROWS });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const { MAX_EXECUTION_STEPS } = NS;
+
+/* =========================================================================
+   PythonEngine — mini intérprete del subconjunto educativo de Python.
+   Nivel 2 del sistema (sección 13). Soporta hoy: print(), strings, números,
+   variables simples y concatenación básica. Arquitectura lista para
+   extender con if/for/while/funciones en próximas lecciones.
+   ========================================================================= */
+class PythonEngine {
+  constructor() {
+    this.output = [];
+    this.calls = [];     // llamadas detectadas tipo funcion(args) -> {name, args}
+    this.vars = {};
+    this.steps = 0;
+  }
+
+  /** Ejecuta código fuente. Devuelve {ok, output, calls, error} */
+  run(code) {
+    this.output = []; this.calls = []; this.vars = {}; this.steps = 0;
+    try {
+      const lines = code.replace(/\r\n/g, "\n").split("\n");
+      for (const rawLine of lines) {
+        this.steps++;
+        if (this.steps > MAX_EXECUTION_STEPS) {
+          return this._err("RuntimeError", "Tu código superó el límite de pasos seguros. Revisa si tienes un bucle infinito.", null);
+        }
+        const line = rawLine.trim();
+        if (line === "" || line.startsWith("#")) continue;
+        const res = this._execLine(line);
+        if (res && res.error) return res;
+      }
+      return { ok: true, output: this.output, calls: this.calls, error: null };
+    } catch (e) {
+      return this._err("RuntimeError", "Ocurrió un error inesperado al ejecutar tu código.", null);
+    }
+  }
+
+  _err(type, message, hint) {
+    return { ok: false, output: this.output, calls: this.calls, error: { type, message, hint } };
+  }
+
+  _execLine(line) {
+    // Asignación de variable:  nombre = expresion
+    const assign = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/);
+    if (assign && !/^==/.test(assign[2])) {
+      const [, name, exprSrc] = assign;
+      const val = this._evalExpr(exprSrc);
+      if (val && val.error) return val;
+      this.vars[name] = val.value;
+      return null;
+    }
+
+    // Llamada tipo funcion(args) — incluye print() y llamadas simbólicas
+    // como robot.move(), door.open() (sección 15, no se evalúan aún).
+    const call = line.match(/^([A-Za-z_][A-Za-z0-9_.]*)\s*\((.*)\)\s*$/);
+    if (call) {
+      const [, name, argsSrc] = call;
+      if (name.toLowerCase() === "print" && name !== "print") {
+        return this._err("SyntaxError",
+          "Python distingue mayúsculas y minúsculas: '" + name + "' no es lo mismo que 'print'.",
+          "Escribe la función en minúsculas: print(...)");
+      }
+      if (!line.endsWith(")")) {
+        return this._err("SyntaxError",
+          "Parece que te falta un paréntesis de cierre ')'.",
+          "Toda llamada a una función debe abrir y cerrar paréntesis: print(\"Hola\")");
+      }
+      const args = this._parseArgs(argsSrc);
+      if (args && args.error) return args;
+
+      if (name === "print") {
+        const text = args.values.map(v => String(v)).join(" ");
+        this.output.push(text);
+      }
+      this.calls.push({ name, args: args.values });
+      return null;
+    }
+
+    // Detectar errores comunes para dar retroalimentación educativa
+    if (/^print\s+["']/.test(line)) {
+      return this._err("SyntaxError",
+        "A print() le faltan los paréntesis.",
+        "En Python 3, se escribe así: print(\"Hola\") — con paréntesis.");
+    }
+    if (/^print\(.*[^)]$/.test(line)) {
+      return this._err("SyntaxError",
+        "Tu línea con print() no cierra el paréntesis.",
+        "Revisa que cada '(' tenga su ')' correspondiente.");
+    }
+    return this._err("SyntaxError",
+      "No reconozco esta instrucción todavía.",
+      "En esta misión solo necesitas usar print(\"tu mensaje\").");
+  }
+
+  _parseArgs(argsSrc) {
+    const src = argsSrc.trim();
+    if (src === "") return { values: [] };
+    // división simple por comas de nivel superior (sin anidar estructuras complejas)
+    const parts = this._splitTopLevel(src, ",");
+    const values = [];
+    for (const part of parts) {
+      const v = this._evalExpr(part.trim());
+      if (v && v.error) return v;
+      values.push(v.value);
+    }
+    return { values };
+  }
+
+  _splitTopLevel(src, sep) {
+    const parts = [];
+    let depth = 0, inStr = false, strCh = "", current = "";
+    for (let i = 0; i < src.length; i++) {
+      const ch = src[i];
+      if (inStr) {
+        current += ch;
+        if (ch === strCh && src[i - 1] !== "\\") inStr = false;
+        continue;
+      }
+      if (ch === '"' || ch === "'") { inStr = true; strCh = ch; current += ch; continue; }
+      if (ch === "(" || ch === "[") depth++;
+      if (ch === ")" || ch === "]") depth--;
+      if (ch === sep && depth === 0) { parts.push(current); current = ""; continue; }
+      current += ch;
+    }
+    if (current.trim() !== "" || parts.length > 0) parts.push(current);
+    return parts;
+  }
+
+  _evalExpr(src) {
+    const s = src.trim();
+    // string literal
+    const strMatch = s.match(/^(["'])(.*)\1$/s);
+    if (strMatch) return { value: strMatch[2] };
+    // detectar comillas sin cerrar
+    if (/^["']/.test(s) && !strMatch) {
+      return this._err("SyntaxError",
+        "Falta cerrar las comillas en tu texto.",
+        "Todo texto debe empezar y terminar con el mismo tipo de comillas: \"como esto\".");
+    }
+    // número
+    if (/^-?\d+(\.\d+)?$/.test(s)) return { value: s.includes(".") ? parseFloat(s) : parseInt(s, 10) };
+    // booleano
+    if (s === "True") return { value: true };
+    if (s === "False") return { value: false };
+    // variable conocida
+    if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(s)) {
+      if (Object.prototype.hasOwnProperty.call(this.vars, s)) return { value: this.vars[s] };
+      return this._err("NameError",
+        `La variable "${s}" no existe todavía.`,
+        "Asegúrate de haberla creado antes con: " + s + " = ...");
+    }
+    // concatenación simple con '+'
+    if (s.includes("+")) {
+      const parts = this._splitTopLevel(s, "+");
+      if (parts.length > 1) {
+        let acc = "";
+        for (const p of parts) {
+          const v = this._evalExpr(p.trim());
+          if (v && v.error) return v;
+          acc += String(v.value);
+        }
+        return { value: acc };
+      }
+    }
+    return this._err("SyntaxError",
+      "No entendí esta expresión.",
+      "Prueba con texto entre comillas, un número, o una variable ya creada.");
+  }
+}
+
+/* =========================================================================
+   PythonValidator — Nivel 1: validación estructural por desafío
+   (no compara strings exactos; entiende equivalencias razonables).
+   ========================================================================= */
+const PythonValidator = {
+  /**
+   * Valida una llamada a print() de forma estructural.
+   * options.expectedText: string exacta esperada (case-insensitive, trim) o null (cualquier texto no vacío)
+   */
+  validatePrintCall(runResult, expectedText) {
+    if (!runResult.ok) return { valid: false, error: runResult.error };
+    const printCalls = runResult.calls.filter(c => c.name === "print");
+    if (printCalls.length === 0) {
+      return {
+        valid: false,
+        error: { type: "LogicError", message: "Tu código no contiene ninguna llamada a print().",
+          hint: "Usa print(\"...\") para mostrar un mensaje en la terminal." }
+      };
+    }
+    const last = printCalls[printCalls.length - 1];
+    const text = String(last.args[0] ?? "").trim();
+    if (text === "") {
+      return { valid: false, error: { type: "LogicError", message: "Tu print() está vacío.",
+        hint: "Escribe un mensaje dentro de las comillas." } };
+    }
+    if (expectedText != null) {
+      if (text.toLowerCase() !== expectedText.toLowerCase()) {
+        return {
+          valid: false,
+          error: {
+            type: "LogicError",
+            message: `Casi. Se esperaba un mensaje como "${expectedText}", pero imprimiste "${text}".`,
+            hint: `Prueba con: print("${expectedText}")`
+          }
+        };
+      }
+    }
+    return { valid: true, printedText: text };
+  }
+};
+
+/* =========================================================================
+   WorldActions — capa que traduce resultados de Python en mutaciones
+   visibles del mundo (sección 14). PythonEngine -> WorldActions -> World.
+   ========================================================================= */
+class WorldActions {
+  constructor(world, particles, audio) {
+    this.world = world;
+    this.particles = particles;
+    this.audio = audio;
+  }
+  lightTerminal(id, worldX, worldY) {
+    this.world.lightTerminal(id);
+    this.particles.spawnBurst(worldX, worldY, "#18d6a0", 10);
+    this.particles.spawnText(worldX, worldY - 10, "¡Terminal encendida!", "#18d6a0");
+    this.audio.play("success");
+  }
+  activateAntenna(id, worldX, worldY) {
+    this.world.activateAntenna(id);
+    this.particles.spawnEmoji(worldX, worldY - 10, "📡");
+    this.particles.spawnText(worldX, worldY - 24, "Señal transmitida", "#4dd0e1");
+    this.audio.play("success");
+  }
+  openDoor(id, worldX, worldY) {
+    this.world.openDoor(id);
+    this.particles.spawnBurst(worldX, worldY, "#ffd166", 12);
+    this.audio.play("open");
+  }
+  illuminatePlaza(worldX, worldY) {
+    this.world.illuminatePlaza();
+    this.particles.spawnText(worldX, worldY - 20, "¡La plaza se iluminó!", "#ffd166");
+    this.audio.play("complete");
+  }
+}
+
+/* =========================================================================
+   DialogueSystem
+   ========================================================================= */
+class DialogueSystem {
+  constructor(ui) {
+    this.ui = ui;
+    this.queue = [];
+    this.active = false;
+    this.speaker = "";
+    this.onComplete = null;
+  }
+  start(speaker, lines, onComplete) {
+    this.speaker = speaker;
+    this.queue = lines.slice();
+    this.active = true;
+    this.onComplete = onComplete || null;
+    this._showNext();
+  }
+  _showNext() {
+    if (this.queue.length === 0) {
+      this.active = false;
+      this.ui.hideDialogue();
+      if (this.onComplete) { const cb = this.onComplete; this.onComplete = null; cb(); }
+      return;
+    }
+    const line = this.queue.shift();
+    this.ui.showDialogue(this.speaker, line);
+  }
+  advance() {
+    if (this.active) this._showNext();
+  }
+}
+
+/* =========================================================================
+   InteractionSystem — detecta proximidad del jugador con interactuables
+   ========================================================================= */
+class InteractionSystem {
+  constructor(world) { this.world = world; this.range = 40; }
+
+  findNearby(player) {
+    const c = player.center();
+    let best = null, bestDist = this.range;
+    for (const npc of this.world.npcs) {
+      const d = Math.hypot(c.x - (npc.x + 16), c.y - (npc.y + 16));
+      if (d < bestDist) { best = { kind: "npc", ref: npc }; bestDist = d; }
+    }
+    for (const it of this.world.interactables) {
+      const d = Math.hypot(c.x - (it.x + 16), c.y - (it.y + 16));
+      if (d < bestDist) { best = { kind: "interactable", ref: it }; bestDist = d; }
+    }
+    for (const door of this.world.doors) {
+      const dx = door.tileCol * 32 + 16, dy = door.tileRow * 32 + 16;
+      const d = Math.hypot(c.x - dx, c.y - dy);
+      if (d < bestDist && !this.world.flags.doorOpen) { best = { kind: "door", ref: door }; bestDist = d; }
+    }
+    return best;
+  }
+}
+
+Object.assign(NS, { PythonEngine, PythonValidator, WorldActions, DialogueSystem, InteractionSystem });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const { PythonValidator } = NS;
+
+/* =========================================================================
+   LessonManager — diseño data-driven (sección 33). Las misiones futuras
+   (variables, tipos, operadores, input, if, for, while, funciones) se
+   agregan como nuevas entradas de LESSONS reutilizando la misma estructura.
+   ========================================================================= */
+const LESSONS = {
+  print_01: {
+    id: "print_01",
+    title: "La voz del pueblo",
+    concept: "print",
+    zone: "plaza_comunicacion",
+    story: [
+      "Capítulo 1 — El pueblo perdió su sistema de comunicación.",
+      "Elder Byte necesita tu ayuda para restaurarlo usando Python."
+    ],
+    introDialogue: {
+      speaker: "Elder Byte",
+      lines: [
+        "Bienvenido al Pueblo de Programadores, aprendiz.",
+        "Hace unos días, todo nuestro sistema de comunicación dejó de funcionar: nadie puede hablar entre barrios.",
+        "Si reparas la terminal, la antena y el sistema central usando print(), el pueblo podrá comunicarse de nuevo.",
+        "Empecemos por la terminal del taller. ¡Ve y enciéndela!"
+      ]
+    },
+    objectives: {
+      intro: "Habla con Elder Byte para saber qué pasó en el pueblo.",
+      challenge1: "Enciende la terminal del taller para que el pueblo vuelva a escuchar.",
+      challenge2: "Envía tu propio mensaje para que la señal llegue a otros barrios.",
+      challenge3: "Escribe el mensaje final para reiniciar el sistema central."
+    },
+    challenges: [
+      {
+        id: "challenge1",
+        title: "Terminal del Comunicador",
+        target: "terminal01",
+        objective: 'La terminal está apagada. Escribe print("Hello") para encenderla y que el pueblo vuelva a escuchar.',
+        example: 'print("Hola")',
+        starterCode: "",
+        hints: [
+          'La función print() muestra texto en pantalla. Se usa así: print("algo").',
+          'Necesitas mostrar exactamente la palabra Hello.',
+          'print("Hello")'
+        ],
+        validate(engine, code) {
+          const run = engine.run(code);
+          return PythonValidator.validatePrintCall(run, "Hello");
+        },
+        onSuccess(worldActions, world) {
+          const t = world.interactables.find(i => i.id === "terminal01");
+          worldActions.lightTerminal("terminal01", t.x + 16, t.y);
+        },
+        successDialogue: [
+          "¡La terminal se encendió! El taller ya puede volver a escuchar.",
+          "Pero el mensaje todavía no llega a los demás barrios... necesitamos la antena."
+        ],
+        concepts: ["print", "strings"]
+      },
+      {
+        id: "challenge2",
+        title: "Antena de Transmisión",
+        target: "antena01",
+        objective: "Escribe tu propio mensaje con print() para probar que la señal llega hasta otros barrios.",
+        example: 'print("La terminal ya funciona")',
+        starterCode: "",
+        hints: [
+          "Puedes escribir el mensaje que quieras, siempre y cuando uses print().",
+          'Recuerda las comillas: print("tu mensaje aquí").',
+          'Ejemplo válido: print("Probando la señal")'
+        ],
+        validate(engine, code) {
+          const run = engine.run(code);
+          return PythonValidator.validatePrintCall(run, null);
+        },
+        onSuccess(worldActions, world) {
+          const t = world.interactables.find(i => i.id === "antena01");
+          worldActions.activateAntenna("antena01", t.x + 16, t.y);
+        },
+        successDialogue: [
+          "¡La señal llegó! Los otros barrios ya pueden escuchar mensajes de nuevo.",
+          "Solo falta una cosa: reiniciar el sistema central para que todo el pueblo despierte."
+        ],
+        concepts: ["print", "strings"]
+      },
+      {
+        id: "challenge3",
+        title: "Sistema Central",
+        target: "terminalFinal",
+        objective: 'Este es el corazón del pueblo. Escribe print("Sistema restaurado") para reiniciarlo por completo.',
+        example: 'print("Sistema restaurado")',
+        starterCode: "",
+        hints: [
+          "Este es el mensaje final que el pueblo entero necesita escuchar.",
+          "Debe decir exactamente: Sistema restaurado.",
+          'print("Sistema restaurado")'
+        ],
+        validate(engine, code) {
+          const run = engine.run(code);
+          return PythonValidator.validatePrintCall(run, "Sistema restaurado");
+        },
+        onSuccess(worldActions, world) {
+          const t = world.interactables.find(i => i.id === "terminalFinal");
+          worldActions.lightTerminal("terminalFinal", t.x + 16, t.y);
+          worldActions.openDoor("puertaPlaza", 16 * 32, 4 * 32);
+          worldActions.illuminatePlaza(10 * 32, 5 * 32);
+        },
+        successDialogue: [
+          "¡Lo lograste! El sistema central volvió a funcionar y todo el pueblo escuchó tu mensaje.",
+          "Gracias a ti, aprendiz. Esto fue solo el comienzo de tu camino con Python."
+        ],
+        concepts: ["print", "strings"]
+      }
+    ]
+  }
+};
+
+/* =========================================================================
+   BookSystem — Libro de Python (sección 16). Autodidacta, siempre disponible.
+   ========================================================================= */
+const BOOK_PAGES = [
+  {
+    id: "print", title: "print()", unlockedBy: "print_01",
+    what: "print() muestra un mensaje de texto en la terminal.",
+    syntax: 'print("tu mensaje")',
+    example: 'name = "Ana"\nprint(name)',
+    commonError: "Olvidar cerrar las comillas, o escribir Print con mayúscula.",
+    tip: "Todo lo que quieras mostrar como texto debe ir entre comillas."
+  },
+  { id: "variables", title: "Variables", locked: true },
+  { id: "tipos", title: "Tipos de datos", locked: true },
+  { id: "operadores", title: "Operadores", locked: true },
+  { id: "input", title: "input()", locked: true },
+  { id: "condicionales", title: "if / elif / else", locked: true },
+  { id: "for", title: "for", locked: true },
+  { id: "while", title: "while", locked: true },
+  { id: "funciones", title: "Funciones", locked: true }
+];
+
+class BookSystem {
+  constructor(gameState) { this.state = gameState; }
+  unlock(conceptId) {
+    if (!this.state.meta.unlockedConcepts.includes(conceptId)) {
+      this.state.meta.unlockedConcepts.push(conceptId);
+    }
+  }
+  getPages() {
+    return BOOK_PAGES.map(p => ({
+      ...p,
+      unlocked: !p.locked || this.state.meta.unlockedConcepts.includes(p.id)
+    }));
+  }
+}
+
+/* =========================================================================
+   ChallengeSystem — orquesta el flujo de desafíos de la misión activa
+   ========================================================================= */
+class ChallengeSystem {
+  constructor(lesson, engine) {
+    this.lesson = lesson;
+    this.engine = engine;
+    this.index = 0;
+    this.records = lesson.challenges.map(c => ({
+      id: c.id, attempts: 0, errors: 0, hintsUsed: 0, startedAt: 0, timeMs: 0, solved: false
+    }));
+    this.hintLevel = 0;
+  }
+  current() { return this.lesson.challenges[this.index]; }
+  currentRecord() { return this.records[this.index]; }
+  isLast() { return this.index >= this.lesson.challenges.length - 1; }
+  isDone() { return this.index >= this.lesson.challenges.length; }
+
+  start() {
+    if (this.currentRecord()) this.currentRecord().startedAt = performance.now();
+    this.hintLevel = 0;
+  }
+
+  requestHint() {
+    const ch = this.current();
+    if (!ch) return null;
+    if (this.hintLevel < ch.hints.length) {
+      const hint = ch.hints[this.hintLevel];
+      this.hintLevel++;
+      this.currentRecord().hintsUsed++;
+      return hint;
+    }
+    return null;
+  }
+
+  /** Ejecuta y valida el código para el desafío actual. */
+  submit(code, worldActions, world) {
+    const ch = this.current();
+    const rec = this.currentRecord();
+    rec.attempts++;
+    const result = ch.validate(this.engine, code);
+    if (!result.valid) {
+      rec.errors++;
+      return { success: false, error: result.error };
+    }
+    rec.timeMs = performance.now() - rec.startedAt;
+    rec.solved = true;
+    ch.onSuccess(worldActions, world);
+    return { success: true, concepts: ch.concepts };
+  }
+
+  advance() {
+    this.index++;
+    this.start();
+  }
+}
+
+/* =========================================================================
+   StatisticsSystem — cálculo de puntuación estandarizada (sección 20)
+   60 resolución correcta + 20 sintaxis + 10 lógica + 10 autonomía = 100
+   ========================================================================= */
+class StatisticsSystem {
+  constructor(lesson, challengeSystem) {
+    this.lesson = lesson;
+    this.cs = challengeSystem;
+    this.missionStartedAt = performance.now();
+  }
+
+  compute() {
+    const records = this.cs.records;
+    const total = records.length;
+    const solved = records.filter(r => r.solved).length;
+    const resolution = total > 0 ? (solved / total) * 60 : 0;
+
+    const totalAttempts = records.reduce((s, r) => s + r.attempts, 0);
+    const totalErrors = records.reduce((s, r) => s + r.errors, 0);
+    // Sintaxis: penaliza errores repetidos con suavidad, nunca castiga agresivamente
+    const syntaxRatio = totalAttempts > 0 ? Math.max(0, 1 - totalErrors / (totalAttempts + 2)) : 1;
+    const syntax = syntaxRatio * 20;
+
+    // Lógica: proporción de desafíos resueltos en <= 2 intentos
+    const logicalSolves = records.filter(r => r.solved && r.attempts <= 2).length;
+    const logic = total > 0 ? (logicalSolves / total) * 10 : 0;
+
+    // Autonomía: penaliza levemente el uso de pistas, nunca bloquea la finalización
+    const totalHints = records.reduce((s, r) => s + r.hintsUsed, 0);
+    const maxHints = total * 3;
+    const autonomyRatio = maxHints > 0 ? Math.max(0, 1 - totalHints / (maxHints + 1)) : 1;
+    const autonomy = autonomyRatio * 10;
+
+    const score = Math.round(resolution + syntax + logic + autonomy);
+    const durationMs = performance.now() - this.missionStartedAt;
+
+    const concepts = Array.from(new Set(
+      this.lesson.challenges.flatMap(c => c.concepts)
+    ));
+
+    return {
+      lessonId: this.lesson.id,
+      completed: solved === total,
+      score: Math.max(0, Math.min(100, score)),
+      syntaxScore: Math.round(syntax),
+      logicScore: Math.round(logic),
+      autonomyScore: Math.round(autonomy),
+      resolutionScore: Math.round(resolution),
+      hintsUsed: totalHints,
+      attempts: totalAttempts,
+      errors: totalErrors,
+      duration: Math.round(durationMs / 1000),
+      concepts,
+      challenges: total,
+      challengesSolved: solved
+    };
+  }
+}
+
+Object.assign(NS, { LESSONS, BOOK_PAGES, BookSystem, ChallengeSystem, StatisticsSystem });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+
+/* =========================================================================
+   SaveSystem — persistencia en memoria.
+   En el sandbox de Titi (allow-scripts SIN allow-same-origin) localStorage
+   lanza SecurityError, así que NO se usa: el progreso vive en memoria durante
+   la sesión y se reinicia al recargar. El host (Titi) persiste el score final
+   vía el contrato TITI_SCORE.
+   ========================================================================= */
+
+class SaveSystem {
+  constructor() { this._mem = null; }
+  load() { return this._mem; }
+  save(data) { this._mem = data; return true; }
+  clear() { this._mem = null; }
+}
+
+/* =========================================================================
+   TitiBridge — ÚNICA capa que conoce detalles de integración con Titi.
+   ---------------------------------------------------------------------
+   IMPORTANTE (léase antes de integrar de verdad):
+   No tuve acceso al código fuente de Titi ni a una skill de integración
+   específica al construir esta versión, así que este puente usa una
+   detección defensiva de DOS estrategias razonables y cae a "Demo Mode"
+   si ninguna aplica. Si Titi expone un contrato oficial (objeto global,
+   evento, iframe API, etc.), reemplaza el contenido de este archivo por
+   ese contrato — el resto del juego solo llama a los métodos públicos
+   de abajo (getLesson, getStudent, getGameConfig, saveProgress,
+   completeLesson, submitScore) y no necesita cambiar.
+   ========================================================================= */
+class TitiBridge {
+  constructor(saveSystem) {
+    this.saveSystem = saveSystem;
+    this.mode = "demo";       // "demo" | "titiapi" | "postmessage"
+    this.hostConfig = null;
+    this._pendingHandshake = null;
+  }
+
+  /** Debe llamarse antes de iniciar el juego. Resuelve el modo de integración. */
+  async init() {
+    // Estrategia 1: objeto global inyectado por el host (window.TitiAPI)
+    if (window.TitiAPI && typeof window.TitiAPI === "object") {
+      this.mode = "titiapi";
+      return this.mode;
+    }
+    // Estrategia 2: postMessage si estamos dentro de un iframe (Titi siempre
+    // embebe en iframe). No dependemos del handshake para el modo: dentro de
+    // un iframe asumimos postmessage y enviamos el contrato TITI_SCORE
+    // al terminar. El handshake solo enriquece hostConfig si el host responde.
+    if (window.parent && window.parent !== window) {
+      try { window.parent.postMessage({ type: 'juegoart:handshake', version: 1 }, '*'); } catch (e) {}
+      this.mode = 'postmessage';
+      return this.mode;
+    }
+    // Sin host detectado -> Demo Mode standalone
+    this.mode = 'demo';
+    return this.mode;
+  }
+
+  _tryPostMessageHandshake(timeoutMs) {
+    return new Promise((resolve) => {
+      let resolved = false;
+      const onMsg = (ev) => {
+        const d = ev.data;
+        if (d && d.type === "titi:handshake-ack") {
+          resolved = true;
+          this.hostConfig = d.config || null;
+          window.removeEventListener("message", onMsg);
+          resolve(true);
+        }
+      };
+      window.addEventListener("message", onMsg);
+      try {
+        window.parent.postMessage({ type: "juegoart:handshake", version: 1 }, "*");
+      } catch (e) { /* noop */ }
+      setTimeout(() => {
+        if (!resolved) { window.removeEventListener("message", onMsg); resolve(false); }
+      }, timeoutMs);
+    });
+  }
+
+  isDemoMode() { return this.mode === "demo"; }
+
+  /** Devuelve la lección a cargar. En Demo Mode, deja elegir entre las disponibles. */
+  getLesson(demoSelection) {
+    if (this.mode === "titiapi" && window.TitiAPI.getLesson) {
+      return window.TitiAPI.getLesson();
+    }
+    if (this.mode === "postmessage" && this.hostConfig && this.hostConfig.lesson) {
+      return this.hostConfig.lesson;
+    }
+    // Demo Mode: misión seleccionable solo para desarrollo/testing
+    return { lessonId: demoSelection || "print_01", source: "demo" };
+  }
+
+  getStudent() {
+    if (this.mode === "titiapi" && window.TitiAPI.getStudent) return window.TitiAPI.getStudent();
+    if (this.mode === "postmessage" && this.hostConfig && this.hostConfig.student) return this.hostConfig.student;
+    return { name: "Aprendiz", id: "demo-student" };
+  }
+
+  getGameConfig() {
+    if (this.mode === "titiapi" && window.TitiAPI.getGameConfig) return window.TitiAPI.getGameConfig();
+    if (this.mode === "postmessage" && this.hostConfig && this.hostConfig.gameConfig) return this.hostConfig.gameConfig;
+    return { playerSkin: "default", equippedItems: [], cosmetics: [] };
+  }
+
+  saveProgress(partial) {
+    if (this.mode === "titiapi" && window.TitiAPI.saveProgress) {
+      window.TitiAPI.saveProgress(partial); return;
+    }
+    if (this.mode === "postmessage") {
+      try { window.parent.postMessage({ type: "juegoart:saveProgress", payload: partial }, "*"); } catch (e) {}
+    }
+    // Siempre respaldamos localmente también, por resiliencia offline
+    const current = this.saveSystem.load() || {};
+    this.saveSystem.save({ ...current, ...partial, savedAt: Date.now() });
+  }
+
+  completeLesson(payload) {
+    if (this.mode === "titiapi" && window.TitiAPI.completeLesson) {
+      window.TitiAPI.completeLesson(payload); return;
+    }
+    if (this.mode === "postmessage") {
+      try { window.parent.postMessage({ type: "juegoart:completeLesson", payload }, "*"); } catch (e) {}
+    }
+    const current = this.saveSystem.load() || {};
+    const history = current.completedLessons || [];
+    history.push(payload);
+    this.saveSystem.save({ ...current, completedLessons: history, lastCompleted: payload });
+  }
+
+  submitScore(payload) {
+    if (this.mode === "titiapi" && window.TitiAPI.submitScore) {
+      window.TitiAPI.submitScore(payload); return;
+    }
+    if (this.mode === "postmessage") {
+      try {
+        window.parent.postMessage({
+          source: "titi-html",
+          type: "TITI_SCORE",
+          score: Math.max(0, Math.min(100, Math.round(Number(payload && payload.score) || 0))),
+          attemptToken: window.__TITI_ATTEMPT_TOKEN,
+        }, "*");
+      } catch (e) {}
+    }
+    // en Demo Mode, el score ya viaja dentro de completeLesson()
+  }
+}
+
+Object.assign(NS, { SaveSystem, TitiBridge });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+
+const KEYWORDS = ["print", "if", "elif", "else", "for", "in", "range", "while", "def", "return", "True", "False"];
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/** Resaltado básico de sintaxis (regex por tokens, suficiente para el subconjunto educativo). */
+function highlightPython(code) {
+  const lines = code.split("\n");
+  return lines.map(line => {
+    let out = "";
+    let i = 0;
+    while (i < line.length) {
+      const rest = line.slice(i);
+      const strMatch = rest.match(/^("([^"\\]|\\.)*"|'([^'\\]|\\.)*')/);
+      if (strMatch) { out += `<span class="tok-str">${escapeHtml(strMatch[0])}</span>`; i += strMatch[0].length; continue; }
+      const numMatch = rest.match(/^\d+(\.\d+)?/);
+      if (numMatch) { out += `<span class="tok-num">${escapeHtml(numMatch[0])}</span>`; i += numMatch[0].length; continue; }
+      const commentMatch = rest.match(/^#.*/);
+      if (commentMatch) { out += `<span class="tok-com">${escapeHtml(commentMatch[0])}</span>`; i += commentMatch[0].length; continue; }
+      const wordMatch = rest.match(/^[A-Za-z_][A-Za-z0-9_]*/);
+      if (wordMatch) {
+        const w = wordMatch[0];
+        if (KEYWORDS.includes(w)) out += `<span class="tok-kw">${escapeHtml(w)}</span>`;
+        else out += `<span class="tok-id">${escapeHtml(w)}</span>`;
+        i += w.length; continue;
+      }
+      out += escapeHtml(line[i]); i++;
+    }
+    return out || "&nbsp;";
+  }).join("\n");
+}
+
+/* =========================================================================
+   UIManager — controla todo el DOM de HUD/modales (sección 29-31)
+   ========================================================================= */
+class UIManager {
+  constructor() {
+    this.$ = (id) => document.getElementById(id);
+    this.editorChallenge = null;
+    this._toastTimer = null;
+    this._bindEditorSync();
+    this._bindGeneral();
+  }
+
+  _bindGeneral() {
+    this.$("bookBtn").addEventListener("click", () => this.onBookRequested && this.onBookRequested());
+    this.$("bookCloseBtn").addEventListener("click", () => this.closeBook());
+    this.$("btnCloseEditor").addEventListener("click", () => this.onEditorClose && this.onEditorClose());
+    this.$("dialogueBox").addEventListener("click", () => this.onDialogueAdvance && this.onDialogueAdvance());
+    this.$("btnRun").addEventListener("click", () => this.onRunCode && this.onRunCode(this.getEditorCode()));
+    this.$("btnHint").addEventListener("click", () => this.onHintRequested && this.onHintRequested());
+    this.$("btnBookInEditor").addEventListener("click", () => this.onBookRequested && this.onBookRequested());
+    this.$("btnContinueAfterComplete").addEventListener("click", () => this.onCompletionContinue && this.onCompletionContinue());
+  }
+
+  _bindEditorSync() {
+    const ta = this.$("editorTextarea");
+    const sync = () => {
+      const code = ta.value;
+      this.$("editorHighlight").innerHTML = highlightPython(code) + "\n";
+      const lineCount = code.split("\n").length;
+      let gutter = "";
+      for (let i = 1; i <= lineCount; i++) gutter += i + "\n";
+      this.$("editorLineNumbers").textContent = gutter;
+    };
+    ta.addEventListener("input", sync);
+    ta.addEventListener("scroll", () => {
+      this.$("editorHighlight").scrollTop = ta.scrollTop;
+      this.$("editorHighlight").scrollLeft = ta.scrollLeft;
+      this.$("editorLineNumbers").scrollTop = ta.scrollTop;
+    });
+    // soporte de indentación con Tab
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.slice(0, start) + "    " + ta.value.slice(end);
+        ta.selectionStart = ta.selectionEnd = start + 4;
+        sync();
+      }
+    });
+    this._syncEditor = sync;
+  }
+
+  /* ---------------- Objetivo / HUD ---------------- */
+  setObjective(text) { this.$("objectiveText").textContent = text; }
+  setMissionTitle(text) { this.$("missionTitleText").textContent = text; }
+  setProgress(current, total) {
+    const dots = this.$("progressDots");
+    dots.innerHTML = "";
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement("span");
+      d.className = "progress-dot" + (i < current ? " filled" : "");
+      dots.appendChild(d);
+    }
+  }
+
+  /* ---------------- Diálogo ---------------- */
+  showDialogue(speaker, text) {
+    this.$("dialogueBox").classList.remove("hidden");
+    this.$("dialogueSpeaker").textContent = speaker;
+    this.$("dialogueText").textContent = text;
+  }
+  hideDialogue() { this.$("dialogueBox").classList.add("hidden"); }
+
+  /* ---------------- Editor (Mini VS Code) ---------------- */
+  showEditor(challenge, terminalLabel) {
+    this.editorChallenge = challenge;
+    this.$("editorModal").classList.remove("hidden");
+    this.$("editorTerminalLabel").textContent = terminalLabel || "TERMINAL";
+    this.$("editorTitle").textContent = challenge.title;
+    this.$("editorObjective").textContent = challenge.objective;
+    this.$("editorExample").textContent = challenge.example;
+    this.$("editorTextarea").value = challenge.starterCode || "";
+    this.$("editorOutput").innerHTML = "";
+    this.$("editorHintText").classList.add("hidden");
+    this._syncEditor();
+    setTimeout(() => this.$("editorTextarea").focus(), 30);
+  }
+  hideEditor() { this.$("editorModal").classList.add("hidden"); }
+  getEditorCode() { return this.$("editorTextarea").value; }
+
+  showRunSuccess(message) {
+    this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`;
+  }
+  showRunError(error) {
+    const el = this.$("editorOutput");
+    el.innerHTML =
+      `<div class="out-line out-err">✕ ${escapeHtml(error.type)}</div>` +
+      `<div class="out-line">${escapeHtml(error.message)}</div>` +
+      (error.hint ? `<div class="out-line out-hint">💡 ${escapeHtml(error.hint)}</div>` : "");
+  }
+  showHint(text) {
+    const el = this.$("editorHintText");
+    el.classList.remove("hidden");
+    el.textContent = "💡 " + text;
+  }
+  showNoMoreHints() {
+    const el = this.$("editorHintText");
+    el.classList.remove("hidden");
+    el.textContent = "Ya usaste todas las pistas de este desafío. ¡Tú puedes lograrlo!";
+  }
+
+  /* ---------------- Libro de Python ---------------- */
+  renderBook(pages, unlockedIds) {
+    const list = this.$("bookPagesList");
+    list.innerHTML = "";
+    pages.forEach((p, idx) => {
+      const item = document.createElement("div");
+      item.className = "book-page-item" + (p.unlocked ? "" : " locked");
+      item.textContent = String(idx + 1).padStart(2, "0") + " " + (p.unlocked ? "✓ " : "🔒 ") + p.title;
+      if (p.unlocked) item.addEventListener("click", () => this.showBookDetail(p));
+      list.appendChild(item);
+    });
+    const firstUnlocked = pages.find(p => p.unlocked);
+    if (firstUnlocked) this.showBookDetail(firstUnlocked);
+  }
+  showBookDetail(page) {
+    this.$("bookDetail").innerHTML = `
+      <h3>${escapeHtml(page.title)}</h3>
+      <p class="book-label">Qué es</p><p>${escapeHtml(page.what || "")}</p>
+      <p class="book-label">Sintaxis</p><pre>${escapeHtml(page.syntax || "")}</pre>
+      <p class="book-label">Ejemplo</p><pre>${escapeHtml(page.example || "")}</pre>
+      <p class="book-label">Error común</p><p>${escapeHtml(page.commonError || "")}</p>
+      <p class="book-label">Consejo</p><p>${escapeHtml(page.tip || "")}</p>
+    `;
+  }
+  openBook() { this.$("bookModal").classList.remove("hidden"); }
+  closeBook() { this.$("bookModal").classList.add("hidden"); }
+
+  /* ---------------- Pantalla de finalización ---------------- */
+  showCompletion(stats) {
+    this.$("completionScreen").classList.remove("hidden");
+    const conceptsHtml = stats.concepts.map(c => `<div class="concept-chip">✓ ${escapeHtml(c)}</div>`).join("");
+    this.$("completionStats").innerHTML = `
+      <div class="score-big">${stats.score} / 100</div>
+      <div class="stat-row"><span>Sintaxis</span><span>${stats.syntaxScore} / 20</span></div>
+      <div class="stat-row"><span>Lógica</span><span>${stats.logicScore} / 10</span></div>
+      <div class="stat-row"><span>Autonomía</span><span>${stats.autonomyScore} / 10</span></div>
+      <div class="stat-row"><span>Desafíos</span><span>${stats.challengesSolved} / ${stats.challenges}</span></div>
+      <div class="stat-row"><span>Errores</span><span>${stats.errors}</span></div>
+      <div class="stat-row"><span>Pistas</span><span>${stats.hintsUsed}</span></div>
+      <div class="stat-row"><span>Tiempo</span><span>${formatDuration(stats.duration)}</span></div>
+      <div class="concepts-row">${conceptsHtml}</div>
+    `;
+  }
+  hideCompletion() { this.$("completionScreen").classList.add("hidden"); }
+
+  /* ---------------- Toasts ---------------- */
+  toast(text) {
+    const el = this.$("toast");
+    el.textContent = text;
+    el.classList.add("show");
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
+  }
+
+  /* ---------------- Selector de misión (Demo Mode) ---------------- */
+  showMissionSelector(lessons, onPick) {
+    const modal = this.$("missionSelectorModal");
+    const list = this.$("missionSelectorList");
+    list.innerHTML = "";
+    lessons.forEach(l => {
+      const btn = document.createElement("button");
+      btn.className = "mission-pick-btn";
+      btn.innerHTML = `<strong>${escapeHtml(l.title)}</strong><span>${escapeHtml(l.concept)}</span>`;
+      btn.addEventListener("click", () => { modal.classList.add("hidden"); onPick(l.id); });
+      list.appendChild(btn);
+    });
+    modal.classList.remove("hidden");
+  }
+
+  setDemoBadge(visible) {
+    this.$("demoBadge").classList.toggle("hidden", !visible);
+  }
+}
+
+function formatDuration(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+
+Object.assign(NS, { UIManager, highlightPython });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const {
+  TILE, GameState, InputManager, Camera, AudioManager, ParticleSystem,
+  World, Player, Renderer, PythonEngine, WorldActions, DialogueSystem,
+  InteractionSystem, LESSONS, BookSystem, ChallengeSystem, StatisticsSystem,
+  SaveSystem, TitiBridge, UIManager
+} = NS;
+
+/* =========================================================================
+   Game — bucle principal y orquestación de todos los sistemas
+   ========================================================================= */
+class Game {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.input = new InputManager();
+    this.audio = new AudioManager();
+    this.particles = new ParticleSystem();
+    this.world = new World();
+    this.player = new Player();
+    this.camera = new Camera(canvas.width, canvas.height);
+    this.renderer = new Renderer(this.ctx);
+    this.engine = new PythonEngine();
+    this.worldActions = new WorldActions(this.world, this.particles, this.audio);
+    this.dialogue = null; // se crea tras UIManager
+    this.interaction = new InteractionSystem(this.world);
+    this.book = new BookSystem(GameState);
+    this.saveSystem = new SaveSystem();
+    this.titiBridge = new TitiBridge(this.saveSystem);
+    this.ui = new UIManager();
+    this.dialogue = new DialogueSystem(this.ui);
+
+    this.lesson = null;
+    this.challengeSystem = null;
+    this.statistics = null;
+    this.nearby = null;
+    this.introDone = false;
+    this.missionComplete = false;
+    this._lastTs = 0;
+
+    this._bindUiCallbacks();
+    this._bindMobileControls();
+    this._bindResize();
+  }
+
+  /* ---------------- Arranque ---------------- */
+  async boot() {
+    const mode = await this.titiBridge.init();
+    this.ui.setDemoBadge(mode === "demo");
+
+    const available = Object.values(LESSONS).map(l => ({ id: l.id, title: l.title, concept: l.concept }));
+
+    if (mode === "demo") {
+      // Demo Mode: seleccionable únicamente para desarrollo/testing (sección 23)
+      this.ui.showMissionSelector(available, (lessonId) => this.startLesson(lessonId));
+    } else {
+      const lessonRef = this.titiBridge.getLesson();
+      const lessonId = (lessonRef && lessonRef.lessonId) || "print_01";
+      this.startLesson(lessonId);
+    }
+  }
+
+  startLesson(lessonId) {
+    this.lesson = LESSONS[lessonId] || LESSONS.print_01;
+    this.engine = new PythonEngine();
+    this.challengeSystem = new ChallengeSystem(this.lesson, this.engine);
+    this.statistics = new StatisticsSystem(this.lesson, this.challengeSystem);
+    this.challengeSystem.start();
+    GameState.lesson = this.lesson;
+
+    this.ui.setMissionTitle(this.lesson.title);
+    this.ui.setProgress(0, this.lesson.challenges.length);
+    this.ui.setObjective(this.lesson.objectives.intro);
+
+    this.introDone = false;
+    this.missionComplete = false;
+
+    requestAnimationFrame((ts) => this._loop(ts));
+
+    // Diálogo introductorio del NPC guía
+    setTimeout(() => {
+      this.dialogue.start(this.lesson.introDialogue.speaker, this.lesson.introDialogue.lines, () => {
+        this.introDone = true;
+        this.ui.setObjective(this.lesson.objectives[this.challengeSystem.current().id]);
+      });
+    }, 400);
+  }
+
+  /* ---------------- Bucle principal ---------------- */
+  _loop(ts) {
+    const dt = Math.min(0.05, (ts - (this._lastTs || ts)) / 1000);
+    this._lastTs = ts;
+    this.update(dt);
+    this.render();
+    requestAnimationFrame((t) => this._loop(t));
+  }
+
+  update(dt) {
+    const anyModalOpen = this._isModalOpen();
+    // Seguir al jugador siempre (incluso con modal/diálogo abierto): si no,
+    // tras un resize el target queda stale y el mundo se dibuja fuera de la
+    // pantalla (arriba/izquierda). follow() recalcula y recentra cada frame.
+    this.camera.follow(this.player, this.world.pixelWidth(), this.world.pixelHeight());
+    if (!anyModalOpen) {
+      const move = this.input.getMoveVector();
+      this.player.update(dt, move, this.world);
+
+      this.nearby = this.interaction.findNearby(this.player);
+
+      if (this.input.wantsInteract()) this._handleInteract();
+    } else {
+      if (this.dialogue.active && this.input.wantsInteract()) this.dialogue.advance();
+      if (this.input.wantsClose()) this._closeTopModal();
+    }
+
+    this.camera.update(dt);
+    this.particles.update(dt);
+    this.input.update();
+  }
+
+  render() {
+    this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height);
+    this.renderer.renderPlayer(this.player, this.camera);
+    this.particles.render(this.ctx, this.camera);
+    if (this.nearby && !this._isModalOpen()) {
+      const r = this.nearby.ref;
+      const x = r.x !== undefined ? r.x + 16 : r.tileCol * TILE + 16;
+      const y = r.y !== undefined ? r.y - 6 : r.tileRow * TILE - 6;
+      this.renderer.renderInteractPrompt(this.ctx, x, y, this.camera);
+    }
+  }
+
+  /* ---------------- Interacción ---------------- */
+  _handleInteract() {
+    if (!this.nearby) return;
+    if (this.nearby.kind === "npc") {
+      const npc = this.nearby.ref;
+      this.dialogue.start(npc.name, npc.dialogue);
+      return;
+    }
+    if (this.nearby.kind === "door") {
+      this.ui.toast("La puerta está cerrada. Repara el sistema para abrirla.");
+      return;
+    }
+    if (this.nearby.kind === "interactable") {
+      if (!this.introDone) { this.ui.toast("Habla primero con Elder Byte."); return; }
+      const ch = this.challengeSystem.current();
+      if (!ch) return;
+      if (this.nearby.ref.id !== ch.target) {
+        this.ui.toast("Esto no es lo que necesitas ahora mismo.");
+        return;
+      }
+      this.ui.showEditor(ch, "TERMINAL DEL COMUNICADOR");
+    }
+  }
+
+  /* ---------------- Callbacks de UI ---------------- */
+  _bindUiCallbacks() {
+    this.ui.onDialogueAdvance = () => this.dialogue.advance();
+
+    this.ui.onEditorClose = () => this.ui.hideEditor();
+
+    this.ui.onRunCode = (code) => {
+      const ch = this.challengeSystem.current();
+      const result = this.challengeSystem.submit(code, this.worldActions, this.world);
+      this.ui.setProgress(this.challengeSystem.index, this.lesson.challenges.length);
+      if (!result.success) {
+        this.audio.play("error");
+        this.ui.showRunError(result.error);
+        return;
+      }
+      this.audio.play("success");
+      this.ui.showRunSuccess("¡Correcto! El mundo reaccionó a tu código.");
+      this.book.unlock(this.lesson.concept);
+      this.titiBridge.saveProgress({
+        lessonId: this.lesson.id, challengeIndex: this.challengeSystem.index, code
+      });
+
+      setTimeout(() => {
+        this.ui.hideEditor();
+        const successLines = ch.successDialogue || [];
+        const proceedAfterDialogue = () => {
+          if (this.challengeSystem.isLast()) {
+            this._completeMission();
+          } else {
+            this.challengeSystem.advance();
+            this.ui.setObjective(this.lesson.objectives[this.challengeSystem.current().id]);
+            this.ui.setProgress(this.challengeSystem.index, this.lesson.challenges.length);
+          }
+        };
+        if (successLines.length > 0) {
+          this.dialogue.start("Elder Byte", successLines, proceedAfterDialogue);
+        } else {
+          proceedAfterDialogue();
+        }
+      }, 900);
+    };
+
+    this.ui.onHintRequested = () => {
+      const hint = this.challengeSystem.requestHint();
+      this.audio.play("hint");
+      if (hint) this.ui.showHint(hint); else this.ui.showNoMoreHints();
+    };
+
+    this.ui.onBookRequested = () => {
+      const pages = this.book.getPages();
+      this.ui.renderBook(pages);
+      this.ui.openBook();
+    };
+
+    this.ui.onCompletionContinue = () => {
+      this.ui.hideCompletion();
+      this.ui.setObjective("¡Misión completada! Vuelve a Titi para continuar tu aventura.");
+    };
+  }
+
+  _completeMission() {
+    this.missionComplete = true;
+    const stats = this.statistics.compute();
+    this.titiBridge.completeLesson(stats);
+    this.titiBridge.submitScore(stats);
+    this.ui.setObjective("¡Misión completada!");
+    this.ui.showCompletion(stats);
+  }
+
+  _isModalOpen() {
+    return this.dialogue.active ||
+      !this.ui.$("editorModal").classList.contains("hidden") ||
+      !this.ui.$("bookModal").classList.contains("hidden") ||
+      !this.ui.$("completionScreen").classList.contains("hidden") ||
+      !this.ui.$("missionSelectorModal").classList.contains("hidden");
+  }
+  _closeTopModal() {
+    if (!this.ui.$("bookModal").classList.contains("hidden")) return this.ui.closeBook();
+    if (!this.ui.$("editorModal").classList.contains("hidden")) return this.ui.hideEditor();
+  }
+
+  /* ---------------- Controles móviles (joystick virtual) ---------------- */
+  _bindMobileControls() {
+    const base = document.getElementById("joystickBase");
+    const knob = document.getElementById("joystickKnob");
+    const interactBtn = document.getElementById("interactBtn");
+    let dragging = false;
+    let originX = 0, originY = 0;
+    const maxRadius = 34;
+
+    const setKnob = (dx, dy) => {
+      knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    };
+
+    const start = (clientX, clientY) => {
+      dragging = true;
+      const rect = base.getBoundingClientRect();
+      originX = rect.left + rect.width / 2;
+      originY = rect.top + rect.height / 2;
+    };
+    const move = (clientX, clientY) => {
+      if (!dragging) return;
+      let dx = clientX - originX, dy = clientY - originY;
+      const dist = Math.hypot(dx, dy);
+      if (dist > maxRadius) { dx = (dx / dist) * maxRadius; dy = (dy / dist) * maxRadius; }
+      setKnob(dx, dy);
+      this.input.touchVector = { x: dx / maxRadius, y: dy / maxRadius };
+    };
+    const end = () => {
+      dragging = false;
+      setKnob(0, 0);
+      this.input.touchVector = { x: 0, y: 0 };
+    };
+
+    base.addEventListener("touchstart", (e) => { e.preventDefault(); const t = e.touches[0]; start(t.clientX, t.clientY); }, { passive: false });
+    base.addEventListener("touchmove", (e) => { e.preventDefault(); const t = e.touches[0]; move(t.clientX, t.clientY); }, { passive: false });
+    base.addEventListener("touchend", (e) => { e.preventDefault(); end(); }, { passive: false });
+
+    // soporte con mouse para pruebas de escritorio del layout móvil
+    base.addEventListener("mousedown", (e) => start(e.clientX, e.clientY));
+    window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
+    window.addEventListener("mouseup", () => end());
+
+    interactBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      this.input.touchInteract = true;
+      if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance();
+    }, { passive: false });
+    interactBtn.addEventListener("click", () => {
+      this.input.touchInteract = true;
+      if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance();
+    });
+  }
+
+  _bindResize() {
+    const resize = () => {
+      const wrap = document.getElementById("canvasWrap");
+      const w = wrap.clientWidth, h = wrap.clientHeight;
+      this.canvas.width = w; this.canvas.height = h;
+      this.camera.resize(w, h);
+    };
+    window.addEventListener("resize", resize);
+    resize();
+  }
+}
+
+Object.assign(NS, { Game });
+
+window.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.getElementById("gameCanvas");
+  const game = new Game(canvas);
+  window.__juegoArtInstance = game;
+  game.boot();
+});
+})();
+
+</script>
+</body>
+</html>
