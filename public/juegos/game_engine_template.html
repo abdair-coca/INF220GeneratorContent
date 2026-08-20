@@ -233,6 +233,7 @@ html, body {
 .stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px dashed #332e4d; }
 .concepts-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
 .concept-chip { background: #0f2a30; color: var(--ok); font-size: 10px; padding: 3px 8px; border-radius: 10px; }
+.completion-note { margin-top: 12px; font-size: 11px; color: var(--text-dim); }
 
 /* ---------------- Selector de misión (Demo Mode) ---------------- */
 #missionSelectorModal .modal-panel {
@@ -423,7 +424,7 @@ html, body {
       <div class="modal-panel">
         <h2>MISIÓN COMPLETADA</h2>
         <div id="completionStats"></div>
-        <button class="btn btn-primary" id="btnContinueAfterComplete" style="margin-top:14px; width:100%;">Continuar</button>
+        <p class="completion-note">Tu nota ya fue registrada en Titi. La misión quedó completada.</p>
       </div>
     </div>
 
@@ -1667,7 +1668,6 @@ class UIManager {
     this.$("btnRun").addEventListener("click", () => this.onRunCode && this.onRunCode(this.getEditorCode()));
     this.$("btnHint").addEventListener("click", () => this.onHintRequested && this.onHintRequested());
     this.$("btnBookInEditor").addEventListener("click", () => this.onBookRequested && this.onBookRequested());
-    this.$("btnContinueAfterComplete").addEventListener("click", () => this.onCompletionContinue && this.onCompletionContinue());
   }
   _bindEditorSync() {
     const ta = this.$("editorTextarea");
@@ -1837,7 +1837,6 @@ class Game {
     };
     this.ui.onHintRequested = () => { const hint = this.challengeSystem.requestHint(); this.audio.play("hint"); if (hint) this.ui.showHint(hint); else this.ui.showNoMoreHints(); };
     this.ui.onBookRequested = () => { const pages = this.book.getPages(); this.ui.renderBook(pages); this.ui.openBook(); };
-    this.ui.onCompletionContinue = () => { this.ui.hideCompletion(); this.ui.setObjective("¡Misión completada!"); };
   }
 
   _completeMission() { this.missionComplete = true; const stats = this.statistics.compute(); this.titiBridge.completeLesson(stats); this.titiBridge.submitScore(stats); this.ui.setObjective("¡Misión completada!"); this.ui.showCompletion(stats); }
