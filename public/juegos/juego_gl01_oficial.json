@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL01",
+    "titulo": "Los Planos del Viajero — La Lógica del Refugio",
+    "duracion": "3 h de laboratorio",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02"
+  },
+  "chapter": "clases_y_objetos",
+  "zone": {
+    "rows": 18,
+    "cols": 26,
+    "map": [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TPPPPPPPPPPPPPPPPPPPPPPPPT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGPGGGGGGGGGGGGT",
+      "TGGGGGGGGGGGDGGGGGGGGGGGGT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    "flags": {
+      "fogataLit": false,
+      "tiendaArmada": false,
+      "campamentoListo": false,
+      "senderoAbierto": false
+    },
+    "npcs": [
+      {
+        "id": "alizon",
+        "x": 256,
+        "y": 224,
+        "w": 26,
+        "h": 28,
+        "sprite": "alizon",
+        "asset": "npc_alizon",
+        "name": "Alizon",
+        "style": "blue",
+        "dialogue": [
+          "¡Qué claro tan enorme! Aquí tendremos sitio de sobra para el campamento.",
+          "El Guardabosques dice que lo primero es planear: un buen dibujo de flujo nos dice qué hacer antes de hacer nada.",
+          "Después toca fabricar. Cada pieza del refugio se construye con una función: una receta que recibe algo y devuelve un resultado.",
+          "Y cuando el bosque nos haga decidir... ahí entra la lógica de las condiciones. Yo preparo la madera, tú escribes los planos."
+        ]
+      },
+      {
+        "id": "sabio",
+        "x": 192,
+        "y": 160,
+        "w": 26,
+        "h": 28,
+        "sprite": "guardabosques",
+        "asset": "npc_guardabosques",
+        "name": "El Guardabosques",
+        "style": "green",
+        "dialogue": [
+          "Bienvenido, viajero. Este es tu primer día en El Gran Backend. Aquí no hay botones mágicos: todo se construye con lógica.",
+          "Lo primero que haremos es PLANEAR. En el Libro tienes los diagramas de flujo: el plano mental de cualquier tarea. Estúdialos antes de escribir una sola línea.",
+          "Con el plano claro, fabricamos las piezas. Una función es como una receta: recibe ingredientes (parámetros) y devuelve un resultado (return).",
+          "Y cuando el bosque nos obligue a decidir, usaremos la lógica de las condiciones: si esto, entonces aquello.",
+          "Empecemos por el calor. Acércate al hogar de piedras."
+        ]
+      }
+    ],
+    "interactables": [
+      {
+        "id": "fogata01",
+        "type": "fogata",
+        "asset": "campfire",
+        "x": 128,
+        "y": 128,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge1",
+        "solid": { "x": 5, "y": 20, "w": 22, "h": 12 },
+        "sortOffset": 30
+      },
+      {
+        "id": "tienda01",
+        "type": "tienda",
+        "asset": "tent_blue",
+        "x": 640,
+        "y": 128,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge2",
+        "solid": { "x": -18, "y": 21, "w": 68, "h": 18 },
+        "sortOffset": 39
+      },
+      {
+        "id": "fogata02",
+        "type": "fogata",
+        "asset": "campfire",
+        "x": 128,
+        "y": 384,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge3",
+        "solid": { "x": 5, "y": 20, "w": 22, "h": 12 },
+        "sortOffset": 30
+      },
+      {
+        "id": "tienda02",
+        "type": "tienda",
+        "asset": "tent_blue",
+        "x": 640,
+        "y": 384,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge4",
+        "solid": { "x": -18, "y": 21, "w": 68, "h": 18 },
+        "sortOffset": 39
+      },
+      {
+        "id": "campamento01",
+        "type": "campamento",
+        "asset": "workbench",
+        "x": 448,
+        "y": 256,
+        "w": 32,
+        "h": 32,
+        "missionNode": "challenge5",
+        "solid": { "x": -20, "y": 14, "w": 72, "h": 25 },
+        "sortOffset": 39
+      }
+    ],
+    "decor": [
+      { "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 },
+      { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 },
+      { "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 3 },
+      { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 96, "w": 34, "h": 30, "seed": 1 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 480, "y": 96, "w": 34, "h": 30, "seed": 2 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 320, "y": 512, "w": 34, "h": 30, "seed": 3 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 512, "y": 512, "w": 34, "h": 30, "seed": 1 },
+      { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 416, "w": 24, "h": 18, "seed": 2 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 192, "y": 224, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 224, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 256, "y": 416, "w": 14, "h": 12 },
+      { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 416, "w": 14, "h": 12 }
+    ],
+    "doors": [
+      { "id": "sendero", "x": 384, "y": 512, "tileRow": 16, "tileCol": 12 }
+    ]
+  },
+  "lesson": {
+    "id": "planos_del_viajero",
+    "title": "Capítulo 1 · Los Planos del Viajero",
+    "concept": "funciones_selectivas",
+    "zone": "claro_del_bosque",
+    "story": [
+      "Capítulo 1 — Los Planos del Viajero.",
+      "No basta con desear un refugio: hay que planearlo (diagramas), fabricarlo con funciones y decidir con condiciones. Solo así el claro se vuelve hogar."
+    ],
+    "introDialogue": {
+      "speaker": "El Guardabosques",
+      "lines": [
+        "Bienvenido al claro, viajero. Este será tu hogar, pero no está hecho: hay que construirlo.",
+        "En el Libro encontrarás los diagramas de flujo: el plano mental que guía toda tarea. Estúdialos.",
+        "Con el plano claro, fabricamos las piezas con funciones. Y cuando el bosque nos haga decidir, usaremos la lógica de las condiciones.",
+        "Empecemos por lo esencial: el calor. Acércate al hogar de piedras."
+      ]
+    },
+    "objectives": {
+      "intro": "Habla con El Guardabosques.",
+      "challenge1": "Define encender(nombre) para despertar el hogar.",
+      "challenge2": "Define promedio(a, b, c) para fabricar la lona de la tienda.",
+      "challenge3": "Define mayor_de_tres(a, b, c) para avivar el fogón de cocina.",
+      "challenge4": "Define clasificar_nota(n) para ordenar la despensa.",
+      "challenge5": "Imprime el mensaje que sella el campamento."
+    },
+    "challenges": [
+      {
+        "id": "challenge1",
+        "title": "El Hogar Dormido",
+        "target": "fogata01",
+        "objective": "El hogar de piedras está dormido. Define la función encender(nombre) que reciba un nombre y devuelva un saludo que lo incluya, para despertar el fuego.",
+        "example": "def encender(nombre):\n    return \"Hola, \" + nombre + \"!\"",
+        "starterCode": "",
+        "hints": [
+          "Una función se declara con def, su nombre y los parámetros entre paréntesis.",
+          "Para devolver un valor usa return.",
+          "El texto devuelto debe incluir el nombre que recibe la función."
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "encender",
+          "params": [ "nombre" ],
+          "sampleArgs": [ "Aprendiz" ],
+          "contains": "Aprendiz"
+        },
+        "successAction": { "kind": "fogata", "id": "fogata01" },
+        "successDialogue": [
+          "El hogar parpadea y despierta: \"¡Hola, Aprendiz!\" — una luz cálida ilumina el claro.",
+          "El Guardabosques asiente: \"Bien. La primera función del refugio vuelve a vivir.\""
+        ],
+        "concepts": [ "funciones", "def", "return" ]
+      },
+      {
+        "id": "challenge2",
+        "title": "La Lona de la Tienda",
+        "target": "tienda01",
+        "objective": "La tienda necesita su lona. Define la función promedio(a, b, c) que reciba tres números y devuelva su promedio, para calcular las medidas justas del tejido.",
+        "example": "def promedio(a, b, c):\n    return (a + b + c) / 3",
+        "starterCode": "",
+        "hints": [
+          "La función recibe tres parámetros: a, b y c.",
+          "Suma los tres y divide entre la cantidad.",
+          "Devuelve el resultado con return."
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "promedio",
+          "params": [ "a", "b", "c" ],
+          "sampleArgs": [ 6, 7, 8 ],
+          "expected": "7"
+        },
+        "successAction": { "kind": "tienda", "id": "tienda01" },
+        "successDialogue": [
+          "La tienda se yergue firme: su lona mide exactamente lo que necesita el claro.",
+          "Alizon sonríe: \"Con parámetros y retorno, el refugio fabrica lo que necesita.\""
+        ],
+        "concepts": [ "funciones", "parametros", "return" ]
+      },
+      {
+        "id": "challenge3",
+        "title": "El Fogón Decidido",
+        "target": "fogata02",
+        "objective": "El fogón de cocina solo arde si recibe la pieza más pesada. Define mayor_de_tres(a, b, c) que devuelva el mayor de tres números, para elegir el tronco correcto.",
+        "example": "def mayor_de_tres(a, b, c):\n    if a > b and a > c:\n        return a\n    elif b > c:\n        return b\n    else:\n        return c",
+        "starterCode": "",
+        "hints": [
+          "Compara los tres valores con condiciones if/elif/else.",
+          "Puedes combinar condiciones con and.",
+          "Cada rama devuelve el mayor con return."
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "mayor_de_tres",
+          "params": [ "a", "b", "c" ],
+          "sampleArgs": [ 9, 3, 5 ],
+          "expected": "9"
+        },
+        "successAction": { "kind": "fogata", "id": "fogata02" },
+        "successDialogue": [
+          "El fogón rugió: tomó el tronco más pesado, el 9, y arde con fuerza.",
+          "El Guardabosques sonríe: \"Decidir es parte de sobrevivir. Bien usado el if.\""
+        ],
+        "concepts": [ "selectivas", "if", "elif", "else", "operadores" ]
+      },
+      {
+        "id": "challenge4",
+        "title": "La Despensa Ordenada",
+        "target": "tienda02",
+        "objective": "La despensa clasifica las provisiones. Define clasificar_nota(n) que devuelva 'Reprobado' si n < 51, 'Aprobado' si 51 ≤ n ≤ 79, o 'Excelente' si n ≥ 80.",
+        "example": "def clasificar_nota(n):\n    if n < 51:\n        return \"Reprobado\"\n    elif n <= 79:\n        return \"Aprobado\"\n    else:\n        return \"Excelente\"",
+        "starterCode": "",
+        "hints": [
+          "Usa if, elif y else para los tres rangos.",
+          "El primer caso es n < 51.",
+          "El último caso (else) cubre n >= 80."
+        ],
+        "validator": {
+          "kind": "def_return",
+          "defName": "clasificar_nota",
+          "params": [ "n" ],
+          "sampleArgs": [ 65 ],
+          "expected": "Aprobado"
+        },
+        "successAction": { "kind": "tienda", "id": "tienda02" },
+        "successDialogue": [
+          "La despensa quedó ordenada: cada provisión en su lugar, cada nota en su rango.",
+          "Alizon asiente: \"La lógica selectiva es lo que separa el orden del caos.\""
+        ],
+        "concepts": [ "selectivas", "if", "elif", "else", "rangos" ]
+      },
+      {
+        "id": "challenge5",
+        "title": "El Refugio Sella",
+        "target": "campamento01",
+        "objective": "Todo está en su sitio. Imprime el mensaje que declara al refugio habitable y cierra el Capítulo 1.",
+        "example": "print(\"El campamento esta listo\")",
+        "starterCode": "",
+        "hints": [
+          "Usa print con el texto entre comillas.",
+          "El mensaje exacto es: El campamento esta listo"
+        ],
+        "validator": {
+          "kind": "print_call",
+          "expectedText": "El campamento esta listo"
+        },
+        "successAction": { "kind": "campamento", "id": "campamento01" },
+        "successDialogue": [
+          "El campamento se enciende por completo: un destello dorado cruza el claro y el refugio queda habitable.",
+          "El Guardabosques posa la mano en tu hombro: \"Hoy planificaste, fabricaste y decidiste. Así se domina este bosque.\"",
+          "Mira hacia el sendero. \"Pero la tormenta se acerca, y las provisiones están en peligro. Algo aguarda más allá de la luz del fuego... Continúa en el próximo capítulo.\""
+        ],
+        "concepts": [ "print", "cierre", "campamento" ]
+      }
+    ]
+  },
+  "book_pages": [
+    {
+      "id": "diagramas_flujo",
+      "title": "Diagramas de Flujo (GL01)",
+      "unlockedBy": "planos_del_viajero",
+      "what": "El plano mental de cualquier tarea: representación gráfica de un algoritmo con símbolos conectados por flechas. Se estudia antes de escribir código.",
+      "syntax": "Inicio → Proceso → Decisión → Fin",
+      "example": "Símbolos: terminal (Inicio/Fin), proceso (rectángulo), entrada/salida (paralelogramo), decisión (rombo con Sí/No).",
+      "commonError": "Dibujar un diagrama sin Inicio o sin Fin, o una decisión con una sola salida.",
+      "tip": "Todo diagrama empieza en Inicio y termina en Fin; cada decisión tiene dos salidas: Sí y No."
+    },
+    {
+      "id": "funciones",
+      "title": "Funciones (GL02)",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Una función es una receta reutilizable: agrupa código con un nombre para invocarlo muchas veces.",
+      "syntax": "def nombre(parametros):\n    # cuerpo\n    return resultado",
+      "example": "def encender(nombre):\n    return \"Hola, \" + nombre + \"!\"\nprint(encender(\"Aprendiz\"))",
+      "commonError": "Olvidar los dos puntos ':' o no indentar el cuerpo.",
+      "tip": "El cuerpo de la función se escribe indentado con 4 espacios."
+    },
+    {
+      "id": "parametros_return",
+      "title": "Parámetros y return (GL02)",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Los parámetros son los valores de entrada que recibe la función; return finaliza la función y devuelve un resultado al punto donde fue llamada.",
+      "syntax": "def promedio(a, b, c):\n    return (a + b + c) / 3",
+      "example": "print(promedio(6, 7, 8))  # 7.0",
+      "commonError": "Llamar a la función sin pasarle los argumentos que pide, o creer que sin return 'devuelve' algo (sin return devuelve None).",
+      "tip": "Los parámetros son locales: solo existen dentro de la función."
+    },
+    {
+      "id": "selectivas",
+      "title": "Estructuras Selectivas (GL03)",
+      "unlockedBy": "planos_del_viajero",
+      "what": "La toma de decisiones: ejecuta un bloque u otro según una condición lógica.",
+      "syntax": "if condicion:\n    # bloque verdadero\nelif otra_condicion:\n    # otro bloque\nelse:\n    # bloque por defecto",
+      "example": "def clasificar_nota(n):\n    if n < 51:\n        return \"Reprobado\"\n    elif n <= 79:\n        return \"Aprobado\"\n    else:\n        return \"Excelente\"",
+      "commonError": "Olvidar los dos puntos, o que una condición anule a otra por un mal orden.",
+      "tip": "Se evalúa en orden: solo se ejecuta el primer bloque cuya condición sea verdadera."
+    },
+    {
+      "id": "operadores",
+      "title": "Operadores relacionales y lógicos (GL03)",
+      "unlockedBy": "planos_del_viajero",
+      "what": "Construyen las condiciones de las estructuras selectivas.",
+      "syntax": "Relacionales: > < >= <= == !=\nLógicos: and or not",
+      "example": "if a > b and a > c:\n    return a",
+      "commonError": "Usar = (asignación) en lugar de == (comparación).",
+      "tip": "and exige que ambas condiciones sean verdaderas; or, que al menos una lo sea."
+    }
+  ]
+}
