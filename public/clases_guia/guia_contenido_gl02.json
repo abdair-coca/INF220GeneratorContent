@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL02",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Funciones, Parámetros y Retornos en Algoritmos",
+    "subtitulo": "Práctica N.º 2 · Modularización de código, firma de funciones y ámbito de variables en Python.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "convenciones": "En esta guía se evalúa la modularización de programas. Podés ejecutar directamente en el navegador las celdas interactiva de Python para verificar el comportamiento de parámetros y retornos.",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Competencia y objetivos",
+      "bloques": [
+        {"tipo": "texto", "texto": "Competencia de la práctica"},
+        {"tipo": "competencia", "texto": "Diseña y construye módulos de código reutilizables mediante funciones y procedimientos en Python, definiendo correctamente sus firmas, parámetros y valores de retorno para descomponer problemas complejos en subproblemas más simples."},
+        {"tipo": "texto", "texto": "Objetivos específicos"},
+        {"tipo": "lista", "items": [
+          "Comprender el concepto de modularización y abstracción funcional.",
+          "Definir funciones en Python utilizando la palabra reservada def.",
+          "Distinguir entre parámetros de entrada y valores de retorno con return.",
+          "Diferenciar el ámbito de variables locales y globales dentro de un programa.",
+          "Ejecutar y probar subprogramas modulares interactivos en el navegador."
+        ]}
+      ]
+    },
+    {
+      "num": "02",
+      "titulo": "Requisitos y preparación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Para completar esta guía solo necesitas tu navegador web. Las celdas de código se ejecutan localmente mediante el motor Pyodide de Python."},
+        {"tipo": "lista", "items": [
+          "Navegador moderno (Chrome, Firefox, Edge o Safari).",
+          "Lectura previa de la Guía GL01 sobre estructuras de control.",
+          "Enunciado oficial de la Práctica N.º 2."
+        ]},
+        {"tipo": "nota", "texto": "Podés modificar el código dentro de las celdas In[] y presionar ▶ ejecutar para ver el resultado de inmediato en pantalla."}
+      ]
+    },
+    {
+      "num": "03",
+      "titulo": "Conceptos previos",
+      "bloques": [
+        {"tipo": "definicion", "titulo": "Función", "texto": "Bloque de código con un nombre asignado que realiza una tarea específica y puede ser invocado múltiples veces desde diferentes partes de un programa."},
+        {"tipo": "definicion", "titulo": "Parámetro", "texto": "Variable especificada en la definición de una función que recibe valores (argumentos) al momento de invocarla."},
+        {"tipo": "definicion", "titulo": "Retorno (Return)", "texto": "Instrucción que finaliza la ejecución de la función y devuelve un resultado al punto donde fue llamada."},
+        {"tipo": "nota", "texto": "Ámbito de variables (Scope): Una variable creada dentro de una función es local a ella y no existe fuera de su bloque de ejecución."}
+      ]
+    },
+    {
+      "num": "04",
+      "titulo": "Diseño de Funciones en Python",
+      "bloques": [
+        {"tipo": "texto", "texto": "En Python, la sintaxis básica para declarar una función incluye la palabra def, el nombre, los parámetros entre paréntesis y dos puntos:"},
+        {"tipo": "pasos", "items": [
+          {"texto": "Definición del encabezado de la función con def y parámetros:", "codigo": "def saludar(nombre):\n    return f'¡Hola, {nombre}! BIenvenido a INF-220.'"},
+          {"texto": "Invocación de la función pasando un argumento:", "codigo": "mensaje = saludar('Estudiante')\nprint(mensaje)"}
+        ]}
+      ]
+    },
+    {
+      "num": "05",
+      "titulo": "Laboratorio Práctico interactivo",
+      "bloques": [
+        {"tipo": "texto", "texto": "Probá ejecutar los siguientes programas modulares escritos en Python real:"},
+        {"tipo": "celda", "in": "def calcular_area_rectangulo(base, altura):\n    area = base * altura\n    return area\n\n# Prueba de la función\na1 = calcular_area_rectangulo(5.5, 4.0)\na2 = calcular_area_rectangulo(10, 2)\nprint(f'Área 1: {a1}')\nprint(f'Área 2: {a2}')", "out": "Área 1: 22.0\nÁrea 2: 20"},
+        {"tipo": "celda", "in": "def es_par(numero):\n    return numero % 2 == 0\n\nfor n in [4, 7, 12, 15, 20]:\n    estado = 'Par' if es_par(n) else 'Impar'\n    print(f'El número {n} es {estado}')", "out": "El número 4 es Par\nEl número 7 es Impar\nEl número 12 es Par\nEl número 15 es Impar\nEl número 20 es Par"}
+      ]
+    },
+    {
+      "num": "06",
+      "titulo": "Autoevaluación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Responde las siguientes preguntas para comprobar tu aprendizaje sobre funciones:"},
+        {"tipo": "quiz", "pregunta": "¿Qué ocurre si una función no incluye la sentencia return explícita?", "opciones": [
+          "Genera un error de sintaxis al compilar",
+          "Devuelve automáticamente el valor especial None",
+          "Produce un bucle infinito",
+          "Devuelve siempre el número 0"
+        ], "correcta": 1},
+        {"tipo": "quiz", "pregunta": "¿Dónde es accesible una variable declarada dentro de una función?", "opciones": [
+          "En cualquier parte de todo el script de Python",
+          "Únicamente dentro de esa misma función (ámbito local)",
+          "En otros archivos del sistema operativo",
+          "Solo dentro de las sentencias print"
+        ], "correcta": 1},
+        {"tipo": "quiz", "pregunta": "Para definir una función en Python se utiliza la palabra clave:", "opciones": [
+          "function",
+          "func",
+          "def",
+          "procedure"
+        ], "correcta": 2}
+      ]
+    },
+    {
+      "num": "07",
+      "titulo": "Práctica en clase",
+      "bloques": [
+        {"tipo": "texto", "texto": "Construye los programas requeridos para la Práctica N.º 2 definiendo funciones para cada problema:"},
+        {"tipo": "lista", "items": [
+          "1. Función celsius_a_fahrenheit(c): Convierte una temperatura de Celsius a Fahrenheit.",
+          "2. Función mayor_de_tres(a, b, c): Recibe 3 números y retorna el valor mayor.",
+          "3. Función es_primo(n): Determina si un entero mayor a 1 es primo (retorna True o False).",
+          "4. Función factorial(n): Calcula el factorial de un número n de forma iterativa.",
+          "5. Función promedio_lista(numeros): Recibe una lista de números y retorna su promedio.",
+          "6. Función contar_vocales(texto): Cuenta la cantidad de vocales en una cadena.",
+          "7. Función es_palindromo(cadena): Verifica si una palabra se lee igual de izquierda a derecha.",
+          "8. Función generar_tabla(n): Imprime la tabla de multiplicar de n del 1 al 10."
+        ]}
+      ]
+    },
+    {
+      "num": "08",
+      "titulo": "Entregable",
+      "bloques": [
+        {"tipo": "texto", "texto": "Subir el código fuente de los 8 ejercicios resueltos en formato .py o PDF antes de la fecha indicada en plataforma."},
+        {"tipo": "ejemplo", "texto": "Formato de archivo: Practica_2_Apellido_Nombre.py. Fecha límite: 25/08/2026."}
+      ]
+    },
+    {
+      "num": "09",
+      "titulo": "Rúbrica de evaluación",
+      "rubrica": [
+        {"criterio": "Firma y Modularización", "descripcion": "Definición correcta de funciones con def, parámetros explícitos y return.", "pts": 30},
+        {"criterio": "Lógica Algorítmica", "descripcion": "Resolución correcta del problema planteado para cualquier entrada válida.", "pts": 30},
+        {"criterio": "Manejo de Ámbito", "descripcion": "Uso adecuado de variables locales sin contaminación global.", "pts": 20},
+        {"criterio": "Pruebas e Invocación", "descripcion": "Invocación correcta de funciones con diversos casos de prueba.", "pts": 20}
+      ]
+    },
+    {
+      "num": "10",
+      "titulo": "Referencias",
+      "referencias": [
+        "Documentación Oficial de Python 3 — Defining Functions: https://docs.python.org/3/tutorial/controlflow.html#defining-functions",
+        "Joyanes Aguilar, L. — Fundamentos de programación (McGraw-Hill)."
+      ]
+    }
+  ]
+}

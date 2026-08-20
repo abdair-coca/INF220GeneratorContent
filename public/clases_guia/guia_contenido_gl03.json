@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL03",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Estructuras Selectivas — Diagramas de Flujo y Python",
+    "subtitulo": "Práctica N.º 3 · Toma de decisiones simples, dobles, anidadas y múltiples con diagramas de flujo e implementación en Python.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "convenciones": "En esta guía se modelan algoritmos de decisión selectiva. Para cada ejercicio deberás diseñar el diagrama de flujo y escribir su respectivo programa en Python. Podés probar las celdas interactivas y verificar los diagramas de ejemplo en línea.",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Competencia y objetivos",
+      "bloques": [
+        {"tipo": "texto", "texto": "Competencia de la práctica"},
+        {"tipo": "competencia", "texto": "Aplica estructuras de control selectivas (if, if-else, if-elif-else y condicionales anidados) para diseñar diagramas de flujo lógicos y construir programas ejecutables en Python que tomen decisiones automáticas ante diversas condiciones de entrada."},
+        {"tipo": "texto", "texto": "Objetivos específicos"},
+        {"tipo": "lista", "items": [
+          "Identificar y diferenciar selecciones simples, dobles, anidadas y múltiples.",
+          "Modelar la toma de decisiones en diagramas de flujo con el símbolo del rombo de decisión.",
+          "Traducir diagramas de flujo selectivos a sintaxis Python usando if, elif y else.",
+          "Validar condiciones lógicas complejas mediante operadores relacionales (>, <, ==, !=, >=, <=) y lógicos (and, or, not).",
+          "Ejecutar y probar programas interactivos directamente en el navegador."
+        ]}
+      ]
+    },
+    {
+      "num": "02",
+      "titulo": "Requisitos y preparación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Para completar esta guía necesitarás tu navegador web para ejecutar código Python en vivo y herramientas de dibujo (draw.io o papel) para los diagramas de flujo."},
+        {"tipo": "lista", "items": [
+          "Comprensión de estructuras secuenciales y lectura de variables (GL01 y GL02).",
+          "Editor de diagramas de flujo (draw.io / diagrams.net).",
+          "Enunciado oficial de la Práctica N.º 3 (11 ejercicios selectivos)."
+        ]},
+        {"tipo": "nota", "texto": "Ambos entregables (diagrama de flujo y código Python) deben ser estrictamente coherentes entre sí."}
+      ]
+    },
+    {
+      "num": "03",
+      "titulo": "Conceptos previos",
+      "bloques": [
+        {"tipo": "definicion", "titulo": "Selección Simple (if)", "texto": "Evalúa una condición lógica. Si es verdadera, ejecuta un bloque de instrucciones; si es falsa, no realiza ninguna acción."},
+        {"tipo": "definicion", "titulo": "Selección Doble (if-else)", "texto": "Evalúa una condición. Ejecuta un bloque si es verdadera y un bloque alternativo si es falsa."},
+        {"tipo": "definicion", "titulo": "Selección Múltiple (if-elif-else)", "texto": "Evalúa varias condiciones en secuencia. Se ejecuta el primer bloque cuya condición resulte verdadera."},
+        {"tipo": "definicion", "titulo": "Condicionales Anidados", "texto": "Estructuras condicionales ubicadas dentro del bloque de otra estructura condicional para evaluar decisiones jerárquicas."}
+      ]
+    },
+    {
+      "num": "04",
+      "titulo": "Modelado de Decisiones en Diagramas y Python",
+      "bloques": [
+        {"tipo": "texto", "texto": "Ejemplo de condicional anidado para determinar el mayor de tres números distintos:"},
+        {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Mayor de Tres Números", "code": "graph TD\n    A([Inicio]) --> B[/Leer a, b, c/]\n    B --> C{¿a > b?}\n    C -- Sí --> D{¿a > c?}\n    D -- Sí --> E[/Mostrar 'El mayor es a'/]\n    D -- No --> F[/Mostrar 'El mayor es c'/]\n    C -- No --> G{¿b > c?}\n    G -- Sí --> H[/Mostrar 'El mayor es b'/]\n    G -- No --> I[/Mostrar 'El mayor es c'/]\n    E --> J([Fin])\n    F --> J\n    H --> J\n    I --> J"},
+        {"tipo": "pasos", "items": [
+          {"texto": "Implementación equivalente en Python con condicionales anidados:", "codigo": "a = int(input('a: '))\nb = int(input('b: '))\nc = int(input('c: '))\n\nif a > b:\n    if a > c:\n        print(f'El mayor es {a}')\n    else:\n        print(f'El mayor es {c}')\nelse:\n    if b > c:\n        print(f'El mayor es {b}')\n    else:\n        print(f'El mayor es {c}')"}
+        ]}
+      ]
+    },
+    {
+      "num": "05",
+      "titulo": "Laboratorio Práctico interactivo",
+      "bloques": [
+        {"tipo": "texto", "texto": "Probá ejecutar los siguientes programas interactivos de toma de decisiones:"},
+        {"tipo": "celda", "in": "def evaluar_triangulo(a, b, c):\n    if (a + b > c) and (a + c > b) and (b + c > a):\n        if a == b == c:\n            return 'Triángulo Equilátero'\n        elif a == b or a == c or b == c:\n            return 'Triángulo Isósceles'\n        else:\n            return 'Triángulo Escaleno'\n    return 'No forma un triángulo válido'\n\nprint(evaluar_triangulo(3, 3, 3))\nprint(evaluar_triangulo(5, 5, 8))\nprint(evaluar_triangulo(3, 4, 5))\nprint(evaluar_triangulo(1, 2, 10))", "out": "Triángulo Equilátero\nTriángulo Isósceles\nTriángulo Escaleno\nNo forma un triángulo válido"},
+        {"tipo": "celda", "in": "def calcular_imc(peso, estatura):\n    imc = peso / (estatura ** 2)\n    if imc < 18.5:\n        cat = 'Bajo peso'\n    elif imc < 25:\n        cat = 'Normal'\n    elif imc < 30:\n        cat = 'Sobrepeso'\n    else:\n        cat = 'Obesidad'\n    return f'IMC: {imc:.2f} - Categoría: {cat}'\n\nprint(calcular_imc(70, 1.75))\nprint(calcular_imc(95, 1.70))", "out": "IMC: 22.86 - Categoría: Normal\nIMC: 32.87 - Categoría: Obesidad"}
+      ]
+    },
+    {
+      "num": "06",
+      "titulo": "Autoevaluación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Responde las siguientes preguntas sobre estructuras selectivas:"},
+        {"tipo": "quiz", "pregunta": "¿Qué símbolo se utiliza en un diagrama de flujo para representar una toma de decisión condicional?", "opciones": [
+          "Un rectángulo de proceso",
+          "Un rombo con una entrada y dos salidas (Sí / No)",
+          "Un paralelogramo de entrada y salida",
+          "Un círculo conector"
+        ], "correcta": 1},
+        {"tipo": "quiz", "pregunta": "En una estructura if-elif-else en Python, ¿cuántos bloques elif se pueden incluir?", "opciones": [
+          "Solo uno",
+          "Exactamente dos",
+          "Tantos como sean necesarios según la lógica del programa",
+          "Ninguno, elif no existe en Python"
+        ], "correcta": 2},
+        {"tipo": "quiz", "pregunta": "¿Cuál es la forma correcta de verificar si un número x está entre 10 y 20 inclusive en Python?", "opciones": [
+          "if 10 <= x <= 20:",
+          "if x = 10 and x = 20:",
+          "if 10 < x y x < 20:",
+          "if x between 10 and 20:"
+        ], "correcta": 0},
+        {"tipo": "quiz", "pregunta": "¿Qué ocurre si ninguna condición de un bloque if-elif resulta verdadera y no hay cláusula else?", "opciones": [
+          "El programa arroja un error de sintaxis",
+          "El programa se detiene inmediatamente",
+          "El programa no ejecuta ninguno de los bloques y continúa en la siguiente línea",
+          "Se ejecuta el primer bloque por defecto"
+        ], "correcta": 2}
+      ]
+    },
+    {
+      "num": "07",
+      "titulo": "Práctica en clase",
+      "bloques": [
+        {"tipo": "texto", "texto": "Para cada uno de los siguientes 11 ejercicios, diseña el diagrama de flujo y escribe el código Python correspondiente:"},
+        {"tipo": "lista", "items": [
+          "1. Mayoría de edad: Lee la edad y determina si es mayor de edad (>= 18) o menor.",
+          "2. Número positivo, negativo o cero: Determina la polaridad de un número.",
+          "3. Aprobación de una materia: Lee nota (0 a 100) y muestra 'Aprobado' (>= 51) o 'Reprobado'.",
+          "4. El mayor de tres números: Determina el mayor de 3 números distintos usando condicionales anidados.",
+          "5. Clasificación de un triángulo: Verifica validez (a+b>c) y clasifica en Equilátero, Isósceles o Escaleno.",
+          "6. Descuento por compra: Monto final con descuentos (0% <100Bs, 5% 100-299.99Bs, 10% 300-699.99Bs, 15% >=700Bs).",
+          "7. Año bisiesto: Determina si un año es bisiesto (divisible entre 4, excepto divisibles entre 100 no divisibles entre 400).",
+          "8. Clasificación de IMC: Calcula IMC = peso / estatura² y clasifica en Bajo peso, Normal, Sobrepeso u Obesidad.",
+          "9. Validación de contraseña: Verifica longitud >= 8, al menos un número y al menos una letra mayúscula.",
+          "10. Calculadora básica con menú: Menú (1:suma, 2:resta, 3:multiplicación, 4:división) controlando división entre cero.",
+          "11. Cuadrante de un punto: Determina cuadrante (I, II, III, IV), ejes u origen para coordenadas (x, y)."
+        ]}
+      ]
+    },
+    {
+      "num": "08",
+      "titulo": "Entregable",
+      "bloques": [
+        {"tipo": "texto", "texto": "Entregar el archivo de diagramas (draw.io exportado a PDF o imágenes) y el código fuente Python (.py o PDF)."},
+        {"tipo": "ejemplo", "texto": "Formato de entrega: Practica_3_Apellido_Nombre.pdf / .py. Fecha límite: 25/08/2026."}
+      ]
+    },
+    {
+      "num": "09",
+      "titulo": "Rúbrica de evaluación",
+      "rubrica": [
+        {"criterio": "Simbología de Diagramas", "descripcion": "Uso adecuado del rombo de decisión con salidas Sí y No rotuladas.", "pts": 25},
+        {"criterio": "Traducción a Python", "descripcion": "Correspondencia exacta entre el diagrama de flujo y el código con estructuras if-elif-else.", "pts": 25},
+        {"criterio": "Lógica Algorítmica", "descripcion": "Manejo correcto de condicionales anidados y casos límite (división entre cero, triángulo inválido).", "pts": 25},
+        {"criterio": "Presentación y Coherencia", "descripcion": "Código limpio, diagramas claros y entregables completos (Inicio a Fin).", "pts": 25}
+      ]
+    },
+    {
+      "num": "10",
+      "titulo": "Referencias",
+      "referencias": [
+        "Python Software Foundation — Conditional Statements: https://docs.python.org/3/tutorial/controlflow.html#if-statements",
+        "Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega)."
+      ]
+    }
+  ]
+}

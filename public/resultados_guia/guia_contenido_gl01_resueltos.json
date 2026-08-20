@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL01",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Diagramas de Flujo — Ejercicios Resueltos",
+    "subtitulo": "Soluciones de la Práctica N.º 1, paso a paso, con su diagrama de flujo.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "convenciones": "Diagramas interactivos: ampliables con la rueda del ratón. Rombo = decisión (una entrada, dos salidas Sí/No).",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Soluciones — Práctica N.º 1",
+      "bloques": [
+        {"tipo": "texto", "texto": "Cada ejercicio resuelto con su diagrama de flujo completo, de Inicio a Fin."},
+        {"tipo": "sub", "titulo": "5.1  Lectura y visualización de un número", "bloques": [
+          {"tipo": "texto", "texto": "Leer un número entero y mostrarlo en pantalla. Es el patrón mínimo: entrada → salida."},
+          {"tipo": "diagrama", "titulo": "Solución 5.1", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer n\"/]\n    B --> C[/\"Mostrar n\"/]\n    C --> D([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.2  Suma de dos números", "bloques": [
+          {"tipo": "texto", "texto": "Leer dos números, calcular la suma y mostrarla. La suma es un proceso que guarda el resultado en una variable."},
+          {"tipo": "diagrama", "titulo": "Solución 5.2", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer a, b\"/]\n    B --> C[\"s ← a + b\"]\n    C --> D[/\"Mostrar s\"/]\n    D --> E([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.3  Promedio de tres números", "bloques": [
+          {"tipo": "texto", "texto": "Leer tres números y calcular su promedio: sumar los tres y dividir entre 3."},
+          {"tipo": "diagrama", "titulo": "Solución 5.3", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer a, b, c\"/]\n    B --> C[\"p ← (a + b + c) / 3\"]\n    C --> D[/\"Mostrar p\"/]\n    D --> E([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.4  Área y perímetro de un círculo", "bloques": [
+          {"tipo": "texto", "texto": "Leer el radio y calcular área (π·r²) y perímetro (2·π·r) con π = 3.1416."},
+          {"tipo": "diagrama", "titulo": "Solución 5.4", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer r\"/]\n    B --> C[\"area ← 3.1416 * r * r\"]\n    C --> D[\"perimetro ← 2 * 3.1416 * r\"]\n    D --> E[/\"Mostrar area, perimetro\"/]\n    E --> F([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.5  Conversión de bolivianos a dólares", "bloques": [
+          {"tipo": "texto", "texto": "Leer una cantidad en bolivianos y convertirla a dólares. Tipo de cambio: 1 USD = 6.96 Bs, por lo que se divide entre 6.96."},
+          {"tipo": "diagrama", "titulo": "Solución 5.5", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer bs\"/]\n    B --> C[\"usd ← bs / 6.96\"]\n    C --> D[/\"Mostrar usd\"/]\n    D --> E([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.6  Número par o impar", "bloques": [
+          {"tipo": "texto", "texto": "Leer un entero y determinar si es par o impar. Un número es par si el resto de dividirlo entre 2 es 0. Primer ejemplo con selección."},
+          {"tipo": "diagrama", "titulo": "Solución 5.6", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer n\"/]\n    B --> C{\"¿n % 2 == 0?\"}\n    C -- \"Sí\" --> D[/\"Mostrar 'PAR'\"/]\n    C -- \"No\" --> E[/\"Mostrar 'IMPAR'\"/]\n    D --> F([\"Fin\"])\n    E --> F"}
+        ]},
+        {"tipo": "sub", "titulo": "5.7  El mayor de dos números", "bloques": [
+          {"tipo": "texto", "texto": "Leer dos números distintos y mostrar cuál es el mayor. Mismo patrón que 5.6, cambiando la condición."},
+          {"tipo": "diagrama", "titulo": "Solución 5.7", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer a, b\"/]\n    B --> C{\"¿a > b?\"}\n    C -- \"Sí\" --> D[/\"Mostrar a\"/]\n    C -- \"No\" --> E[/\"Mostrar b\"/]\n    D --> F([\"Fin\"])\n    E --> F"}
+        ]},
+        {"tipo": "sub", "titulo": "5.8  Calificación según la nota", "bloques": [
+          {"tipo": "texto", "texto": "Leer una nota entre 0 y 100 y asignar: Reprobado (< 51), Aprobado (51 a 79) o Excelente (80 a 100). Es una selección múltiple encadenada: se resuelve con dos rombos en serie."},
+          {"tipo": "diagrama", "titulo": "Solución 5.8", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer nota\"/]\n    B --> C{\"¿nota < 51?\"}\n    C -- \"Sí\" --> D[/\"Mostrar 'Reprobado'\"/]\n    C -- \"No\" --> E{\"¿nota <= 79?\"}\n    E -- \"Sí\" --> F[/\"Mostrar 'Aprobado'\"/]\n    E -- \"No\" --> G[/\"Mostrar 'Excelente'\"/]\n    D --> H([\"Fin\"])\n    F --> H\n    G --> H"}
+        ]},
+        {"tipo": "sub", "titulo": "5.9  Números del 1 al 10", "bloques": [
+          {"tipo": "texto", "texto": "Mostrar los números del 1 al 10. Primer ejemplo de repetición: contador inicializado, condición de parada e incremento."},
+          {"tipo": "diagrama", "titulo": "Solución 5.9", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[\"i ← 1\"]\n    B --> C{\"¿i <= 10?\"}\n    C -- \"Sí\" --> D[/\"Mostrar i\"/]\n    D --> E[\"i ← i + 1\"]\n    E --> C\n    C -- \"No\" --> F([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.10  Suma de 5 números", "bloques": [
+          {"tipo": "texto", "texto": "Leer 5 números y calcular su suma total. Combina bucle para con un acumulador: suma ← suma + n en cada iteración."},
+          {"tipo": "diagrama", "titulo": "Solución 5.10", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[\"suma ← 0\"]\n    B --> C[\"i ← 1\"]\n    C --> D{\"¿i <= 5?\"}\n    D -- \"Sí\" --> E[/\"Leer n\"/]\n    E --> F[\"suma ← suma + n\"]\n    F --> G[\"i ← i + 1\"]\n    G --> D\n    D -- \"No\" --> H[/\"Mostrar suma\"/]\n    H --> I([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "5.11  Conteo de números hasta ingresar 0", "bloques": [
+          {"tipo": "texto", "texto": "Leer números de forma continua hasta que el usuario ingrese 0 y mostrar cuántos se ingresaron (sin contar el 0). Usa un bucle mientras con contador; la condición de parada se evalúa después de cada lectura."},
+          {"tipo": "diagrama", "titulo": "Solución 5.11", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[\"cont ← 0\"]\n    B --> C[/\"Leer n\"/]\n    C --> D{\"¿n == 0?\"}\n    D -- \"Sí\" --> E[/\"Mostrar cont\"/]\n    D -- \"No\" --> F[\"cont ← cont + 1\"]\n    F --> C\n    E --> G([\"Fin\"])"}
+        ]}
+      ]
+    }
+  ]
+}

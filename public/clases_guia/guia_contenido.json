@@ -1,0 +1,218 @@
+{
+  "meta": {
+    "materia": "INF672 · Machine Learning",
+    "codigo": "GL02",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Introducción a NumPy, Pandas y Matplotlib",
+    "subtitulo": "Las herramientas de datos que usaremos en toda la materia, sobre un mismo dataset: iris.",
+    "semestre": "Machine Learning · 6º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: M.Sc. Huáscar Fedor Gonzales Guzmán"
+  },
+  "convenciones": "Bloques oscuros = terminal. In [ ] / Out [ ] = celdas de Jupyter con su código y su resultado. Reproduce cada celda en tu cuaderno. En esta versión interactiva, pulsa ▶ ejecutar para correr cada celda de Python directamente en el navegador.",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Competencia y objetivos",
+      "bloques": [
+        {"tipo": "texto", "texto": "Competencia de la práctica"},
+        {"tipo": "competencia", "texto": "Manipula datos numéricos y tabulares con NumPy y Pandas, y comunica hallazgos mediante visualizaciones con Matplotlib y Seaborn, siguiendo el flujo de trabajo básico del análisis de datos que sostiene todo proyecto de Machine Learning."},
+        {"tipo": "texto", "texto": "Objetivos específicos"},
+        {"tipo": "lista", "items": [
+          "Crear y operar arreglos de NumPy con operaciones vectorizadas y funciones de agregación.",
+          "Construir y explorar Series y DataFrames de Pandas, y cargar datos desde archivos con read_csv.",
+          "Usar el dataset iris como caso de estudio recurrente a lo largo de la materia.",
+          "Generar gráficos con Matplotlib (dispersión, histograma, barras y subgráficos).",
+          "Producir visualizaciones exploratorias rápidas con Seaborn."
+        ]}
+      ]
+    },
+    {
+      "num": "02",
+      "titulo": "Requisitos y preparación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Esta práctica continúa la GL01. Necesitas el entorno inf672 con las librerías ya instaladas (numpy, pandas, matplotlib, seaborn, scikit-learn)."},
+        {"tipo": "pasos", "items": [
+          {"texto": "Lanza Jupyter Notebook con el entorno inf672 (desde Anaconda Navigator o desde la terminal)."},
+          {"texto": "Crea un cuaderno nuevo: New ▸ Notebook ▸ Python 3, y guárdalo como GL02."},
+          {"texto": "Escribe en la primera celda los imports que usaremos en toda la guía.", "codigo": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns"}
+        ]},
+        {"tipo": "nota", "texto": "Los alias np, pd, plt y sns son la convención universal: verás el mismo estilo en la documentación oficial, en libros y en la bibliografía de la materia. Mantenlos siempre."}
+      ]
+    },
+    {
+      "num": "03",
+      "titulo": "NumPy — el arreglo n-dimensional",
+      "bloques": [
+        {"tipo": "definicion", "titulo": "ndarray", "texto": "El ndarray (arreglo n-dimensional) es la estructura central de NumPy: una colección de elementos del mismo tipo dispuestos en una o más dimensiones. A diferencia de una lista de Python, permite operaciones vectorizadas (aplicar una operación a todos los elementos sin bucles), lo que lo hace mucho más rápido y conciso."},
+        {"tipo": "sub", "titulo": "3.1  Crear arreglos", "bloques": [
+          {"tipo": "celda", "in": "a = np.array([2, 4, 6, 8])\na", "out": "array([2, 4, 6, 8])"},
+          {"tipo": "celda", "in": "np.arange(0, 10, 2)      # inicio, fin (excl.), paso", "out": "array([0, 2, 4, 6, 8])"},
+          {"tipo": "celda", "in": "np.linspace(0, 1, 5)     # 5 valores equiespaciados en [0, 1]", "out": "array([0.  , 0.25, 0.5 , 0.75, 1.  ])"},
+          {"tipo": "nota", "texto": "np.zeros(n), np.ones(n) y np.random.rand(n) también crean arreglos: ceros, unos y valores aleatorios. Son útiles para inicializar o generar datos de prueba."}
+        ]},
+        {"tipo": "sub", "titulo": "3.2  Forma, tipo y atributos", "bloques": [
+          {"tipo": "texto", "texto": "Todo arreglo conoce su forma (shape), su tipo de dato (dtype) y su número de dimensiones. Un arreglo 2D es una matriz de filas y columnas:"},
+          {"tipo": "celda", "in": "M = np.array([[1, 2, 3],\n              [4, 5, 6]])\nM.shape, M.dtype, M.ndim", "out": "((2, 3), dtype('int64'), 2)"}
+        ]},
+        {"tipo": "sub", "titulo": "3.3  Indexado y slicing", "bloques": [
+          {"tipo": "texto", "texto": "Se accede a los elementos por posición (empezando en 0). En 2D, el primer índice es la fila y el segundo la columna; los dos puntos ( : ) seleccionan todo un eje:"},
+          {"tipo": "celda", "in": "M[0]        # primera fila", "out": "array([1, 2, 3])"},
+          {"tipo": "celda", "in": "M[:, 1]     # segunda columna (todas las filas)", "out": "array([2, 5])"}
+        ]},
+        {"tipo": "sub", "titulo": "3.4  Operaciones vectorizadas y agregación", "bloques": [
+          {"tipo": "texto", "texto": "Las operaciones se aplican elemento a elemento sobre todo el arreglo, sin escribir bucles. Las funciones de agregación resumen los datos, y con axis se agregan por filas o por columnas:"},
+          {"tipo": "celda", "in": "a * 10          # multiplica cada elemento", "out": "array([20, 40, 60, 80])"},
+          {"tipo": "celda", "in": "a.mean(), a.sum(), a.std()", "out": "(5.0, 20, 2.23606797749979)"},
+          {"tipo": "celda", "in": "M.sum(axis=0)   # suma por columnas (recorre las filas)", "out": "array([5, 7, 9])"},
+          {"tipo": "nota", "texto": "Vectorizar no es solo más corto: NumPy ejecuta esas operaciones en código optimizado por debajo, mucho más rápido que un bucle de Python. En Machine Learning, donde se opera sobre miles de datos a la vez, esta diferencia es decisiva."}
+        ]},
+        {"tipo": "sub", "titulo": "3.5  Del arreglo al dataset real: iris", "bloques": [
+          {"tipo": "texto", "texto": "A partir de aquí trabajaremos con iris, un dataset clásico de 150 flores descritas por 4 medidas (largo y ancho de sépalo y pétalo). Viene incluido en scikit-learn y sus datos son, precisamente, un arreglo de NumPy:"},
+          {"tipo": "celda", "in": "iris = load_iris()\niris.data.shape          # 150 muestras, 4 características", "out": "(150, 4)"},
+          {"tipo": "celda", "in": "iris.data.mean(axis=0)   # media de cada característica", "out": "array([5.843, 3.054, 3.759, 1.199])"},
+          {"tipo": "nota", "texto": "En tu Jupyter local, carga iris con: from sklearn.datasets import load_iris. En esta guía interactiva el generador ya provee load_iris (usa datos sintéticos si scikit-learn no está disponible en el navegador). Aquí iris.data es un ndarray puro: útil para el cálculo, pero sin nombres de columnas ni etiquetas legibles. Ese es justamente el trabajo de Pandas, que veremos a continuación."}
+        ]}
+      ]
+    },
+    {
+      "num": "04",
+      "titulo": "Pandas — Series",
+      "bloques": [
+        {"tipo": "definicion", "titulo": "Series", "texto": "Una Series es un arreglo unidimensional etiquetado: como una columna de una tabla, donde cada valor tiene asociada una etiqueta (su índice). Combina la velocidad de NumPy con un índice que da significado a cada dato."},
+        {"tipo": "sub", "titulo": "4.1  Crear una Series", "bloques": [
+          {"tipo": "celda", "in": "s = pd.Series([5.1, 4.9, 4.7, 4.6],\n              index=[\"m1\", \"m2\", \"m3\", \"m4\"])\ns", "out": "m1    5.1\nm2    4.9\nm3    4.7\nm4    4.6\ndtype: float64"}
+        ]},
+        {"tipo": "sub", "titulo": "4.2  Acceso, filtrado y métodos", "bloques": [
+          {"tipo": "texto", "texto": "Se accede a los valores por etiqueta o por posición, se filtran con condiciones booleanas y se resumen con métodos estadísticos:"},
+          {"tipo": "celda", "in": "s[\"m1\"], s.iloc[0]      # por etiqueta y por posición", "out": "(5.1, 5.1)"},
+          {"tipo": "celda", "in": "s[s > 4.7]              # filtrado booleano", "out": "m1    5.1\nm2    4.9\ndtype: float64"},
+          {"tipo": "celda", "in": "s.mean(), s.max()", "out": "(4.825, 5.1)"}
+        ]}
+      ]
+    },
+    {
+      "num": "05",
+      "titulo": "Pandas — DataFrames",
+      "bloques": [
+        {"tipo": "definicion", "titulo": "DataFrame", "texto": "Un DataFrame es una tabla bidimensional: un conjunto de columnas (cada una es una Series) que comparten el mismo índice de filas. Es la estructura que más usarás: representa un dataset completo, con sus filas (muestras) y columnas (características)."},
+        {"tipo": "sub", "titulo": "5.1  Crear un DataFrame", "bloques": [
+          {"tipo": "celda", "in": "pd.DataFrame({\n    \"nombre\": [\"Ana\", \"Beto\", \"Carla\"],\n    \"nota\":   [89, 74, 95],\n})", "out": "  nombre  nota\n0    Ana    89\n1   Beto    74\n2  Carla    95"}
+        ]},
+        {"tipo": "sub", "titulo": "5.2  Cargar el dataset iris", "bloques": [
+          {"tipo": "texto", "texto": "Construimos un DataFrame con los datos de iris. Usamos nombres de columna cortos y agregamos la especie como columna categórica:"},
+          {"tipo": "celda", "in": "iris = load_iris()\n\ndf = pd.DataFrame(iris.data,\n                  columns=[\"sepal_len\", \"sepal_wid\",\n                           \"petal_len\", \"petal_wid\"])\ndf[\"species\"] = pd.Categorical.from_codes(iris.target,\n                                          iris.target_names)\ndf.head()", "out": "   sepal_len  sepal_wid  petal_len  petal_wid species\n0        5.1        3.5        1.4        0.2  setosa\n1        4.9        3.0        1.4        0.2  setosa\n2        4.7        3.2        1.3        0.2  setosa\n3        4.6        3.1        1.5        0.2  setosa\n4        5.0        3.6        1.4        0.2  setosa"}
+        ]},
+        {"tipo": "sub", "titulo": "5.3  Explorar el DataFrame", "bloques": [
+          {"tipo": "texto", "texto": "Antes de analizar, conviene mirar la forma y un resumen de los datos. head() muestra las primeras filas; shape da (filas, columnas); describe() resume estadísticamente las columnas numéricas:"},
+          {"tipo": "celda", "in": "df.shape", "out": "(150, 5)"},
+          {"tipo": "celda", "in": "df[\"sepal_len\"].describe()", "out": "count    150.000000\nmean       5.843333\nstd        0.828066\nmin        4.300000\n25%        5.100000\n50%        5.800000\n75%        6.400000\nmax        7.900000\nName: sepal_len, dtype: float64"}
+        ]},
+        {"tipo": "sub", "titulo": "5.4  Seleccionar y filtrar", "bloques": [
+          {"tipo": "texto", "texto": "Se selecciona una columna con corchetes y se filtran filas con una condición booleana, igual que en NumPy pero conservando etiquetas:"},
+          {"tipo": "celda", "in": "df[df[\"species\"] == \"setosa\"].head(3)   # solo setosa", "out": "   sepal_len  sepal_wid  petal_len  petal_wid species\n0        5.1        3.5        1.4        0.2  setosa\n1        4.9        3.0        1.4        0.2  setosa\n2        4.7        3.2        1.3        0.2  setosa"}
+        ]},
+        {"tipo": "sub", "titulo": "5.5  Columnas derivadas y groupby", "bloques": [
+          {"tipo": "texto", "texto": "Podemos crear columnas nuevas a partir de las existentes, y agrupar por una categoría para resumir cada grupo. groupby es una de las operaciones más potentes de Pandas:"},
+          {"tipo": "celda", "in": "df[\"petal_ratio\"] = df[\"petal_len\"] / df[\"petal_wid\"]\ndf[[\"petal_len\", \"petal_wid\", \"petal_ratio\"]].head(3)", "out": "   petal_len  petal_wid  petal_ratio\n0        1.4        0.2         7.00\n1        1.4        0.2         7.00\n2        1.3        0.2         6.50"},
+          {"tipo": "celda", "in": "df.groupby(\"species\")[[\"sepal_len\", \"petal_len\"]].mean()", "out": "            sepal_len  petal_len\nspecies\nsetosa          5.006      1.462\nversicolor      5.936      4.260\nvirginica       6.588      5.552"},
+          {"tipo": "ejemplo", "texto": "Ya se ve un patrón clave: setosa tiene pétalos mucho más pequeños que las otras dos especies. Ese tipo de diferencia entre grupos es lo que después permitirá a un modelo distinguir las clases."}
+        ]},
+        {"tipo": "sub", "titulo": "5.6  Cargar datos desde un archivo (pd.read_csv)", "bloques": [
+          {"tipo": "texto", "texto": "En la práctica, los datos casi nunca vienen de una librería: llegan en archivos. read_csv es la puerta de entrada de la mayoría de los proyectos. Guardemos iris a CSV y leámoslo de vuelta:"},
+          {"tipo": "celda", "in": "df.to_csv(\"iris.csv\", index=False)   # guardar a archivo\ndatos = pd.read_csv(\"iris.csv\")      # leer desde archivo\ndatos.head(2)", "out": "   sepal_len  sepal_wid  petal_len  petal_wid species  petal_ratio\n0        5.1        3.5        1.4        0.2  setosa         7.00\n1        4.9        3.0        1.4        0.2  setosa         7.00"},
+          {"tipo": "nota", "texto": "read_csv acepta parámetros muy útiles: sep para el separador, header y names para los encabezados, index_col para elegir la columna índice y na_values para marcar datos faltantes. Volverás a él en casi todas las prácticas."}
+        ]}
+      ]
+    },
+    {
+      "num": "06",
+      "titulo": "Matplotlib — visualización",
+      "bloques": [
+        {"tipo": "texto", "texto": "Matplotlib es la librería base de gráficos en Python. El patrón habitual es: dibujar con una función (plt.scatter, plt.hist…), etiquetar los ejes y el título, y cerrar con plt.show(). Trabajaremos sobre el DataFrame df de iris."},
+        {"tipo": "sub", "titulo": "6.1  Dispersión (scatter)", "bloques": [
+          {"tipo": "texto", "texto": "Un diagrama de dispersión relaciona dos variables numéricas; es el gráfico más usado para ver relaciones entre características:"},
+          {"tipo": "celda", "in": "plt.scatter(df[\"sepal_len\"], df[\"petal_len\"])\nplt.xlabel(\"Largo de sépalo (cm)\")\nplt.ylabel(\"Largo de pétalo (cm)\")\nplt.title(\"Iris: sépalo vs pétalo\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Nube de puntos de largo de sépalo frente a largo de pétalo."}
+        ]},
+        {"tipo": "sub", "titulo": "6.2  Histograma", "bloques": [
+          {"tipo": "texto", "texto": "Un histograma muestra cómo se distribuye una sola variable, agrupando los valores en intervalos (bins):"},
+          {"tipo": "celda", "in": "plt.hist(df[\"sepal_len\"], bins=15, color=\"#4F46E5\",\n         edgecolor=\"white\")\nplt.xlabel(\"Largo de sépalo (cm)\")\nplt.ylabel(\"Frecuencia\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Histograma de la distribución del largo de sépalo."}
+        ]},
+        {"tipo": "sub", "titulo": "6.3  Barras (con Pandas)", "bloques": [
+          {"tipo": "texto", "texto": "Pandas usa Matplotlib por debajo: el método .plot() de una Series o DataFrame genera el gráfico directamente. Aquí, el largo de pétalo medio por especie:"},
+          {"tipo": "celda", "in": "medias = df.groupby(\"species\")[\"petal_len\"].mean()\nmedias.plot(kind=\"bar\")\nplt.ylabel(\"Largo de pétalo medio (cm)\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Gráfico de barras del largo de pétalo medio por especie."}
+        ]},
+        {"tipo": "sub", "titulo": "6.4  Varios ejes (subplots)", "bloques": [
+          {"tipo": "texto", "texto": "plt.subplots crea una figura con varios ejes para comparar gráficos lado a lado. Cada eje se controla por separado:"},
+          {"tipo": "celda", "in": "fig, axes = plt.subplots(1, 2, figsize=(9, 3))\naxes[0].scatter(df[\"sepal_len\"], df[\"sepal_wid\"])\naxes[0].set_title(\"Sépalo\")\naxes[1].scatter(df[\"petal_len\"], df[\"petal_wid\"])\naxes[1].set_title(\"Pétalo\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Dos diagramas de dispersión lado a lado: sépalo y pétalo."}
+        ]}
+      ]
+    },
+    {
+      "num": "07",
+      "titulo": "Seaborn — exploración rápida",
+      "bloques": [
+        {"tipo": "texto", "texto": "Seaborn se construye sobre Matplotlib y trabaja directamente con DataFrames. Con muy poco código produce gráficos estadísticos vistosos, y el parámetro hue colorea automáticamente por categoría. Es la herramienta ideal para el análisis exploratorio (EDA)."},
+        {"tipo": "sub", "titulo": "7.1  Boxplot y dispersión por categoría", "bloques": [
+          {"tipo": "texto", "texto": "Un boxplot compara la distribución de una variable entre grupos; un scatter con hue separa las clases por color:"},
+          {"tipo": "celda", "in": "sns.boxplot(data=df, x=\"species\", y=\"petal_len\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Boxplot del largo de pétalo por especie."},
+          {"tipo": "celda", "in": "sns.scatterplot(data=df, x=\"sepal_len\", y=\"petal_len\",\n                hue=\"species\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Dispersión de sépalo vs pétalo, coloreada por especie."}
+        ]},
+        {"tipo": "sub", "titulo": "7.2  Mapa de correlación", "bloques": [
+          {"tipo": "texto", "texto": "El heatmap de correlación resume, de un vistazo, qué variables se mueven juntas. Es uno de los gráficos más usados al comenzar a explorar un dataset:"},
+          {"tipo": "celda", "in": "corr = df.drop(columns=\"species\").corr()\nsns.heatmap(corr, annot=True, cmap=\"viridis\")\nplt.show()", "out": ""},
+          {"tipo": "figura", "texto": "Mapa de calor de correlaciones entre las medidas de iris."},
+          {"tipo": "nota", "texto": "Para una exploración completa en una sola línea, sns.pairplot(df, hue=\"species\") dibuja todas las combinaciones de variables a la vez. Es más pesado de calcular, pero muy revelador."}
+        ]}
+      ]
+    },
+    {
+      "num": "08",
+      "titulo": "Entregable",
+      "bloques": [
+        {"tipo": "texto", "texto": "Elabora un cuaderno que aplique todo el flujo sobre iris y súbelo al aula virtual."},
+        {"tipo": "ejemplo", "texto": "Archivo: GL02_Apellido_Nombre.ipynb"},
+        {"tipo": "lista", "items": [
+          "Celda Markdown inicial con tus datos y un título con formato.",
+          "NumPy: crea un arreglo, muestra su shape, aplica una operación vectorizada y una agregación con axis.",
+          "Carga iris en un DataFrame y muestra head(), shape y describe().",
+          "Aplica un filtrado booleano y un groupby por especie con al menos una columna.",
+          "Crea una columna derivada nueva a partir de dos columnas existentes.",
+          "Dos gráficos con Matplotlib (uno de dispersión y otro distinto), con ejes etiquetados.",
+          "Un gráfico de EDA con Seaborn (boxplot, scatter con hue o heatmap de correlación).",
+          "El cuaderno debe correr limpio con Restart & Run All antes de entregar."
+        ]}
+      ]
+    },
+    {
+      "num": "09",
+      "titulo": "Rúbrica de evaluación",
+      "rubrica": [
+        {"criterio": "NumPy", "descripcion": "Arreglo, operación vectorizada y agregación con axis.", "pts": 20},
+        {"criterio": "Series y DataFrame", "descripcion": "Carga de iris, exploración (head/shape/describe) y filtrado.", "pts": 25},
+        {"criterio": "Transformación", "descripcion": "Columna derivada y groupby por especie coherentes.", "pts": 15},
+        {"criterio": "Matplotlib", "descripcion": "Dos gráficos correctos y con ejes etiquetados.", "pts": 20},
+        {"criterio": "Seaborn", "descripcion": "Un gráfico de exploración pertinente.", "pts": 10},
+        {"criterio": "Ejecución y presentación", "descripcion": "Corre sin errores (Restart & Run All); cuaderno ordenado.", "pts": 10}
+      ]
+    },
+    {
+      "num": "10",
+      "titulo": "Referencias",
+      "referencias": [
+        "Raschka, S. & Mirjalili, V. — Python Machine Learning (bibliografía oficial de la asignatura).",
+        "Documentación de NumPy: https://numpy.org/doc",
+        "Documentación de Pandas: https://pandas.pydata.org/docs",
+        "Documentación de Matplotlib: https://matplotlib.org/stable",
+        "Documentación de Seaborn: https://seaborn.pydata.org",
+        "Dataset iris en scikit-learn: https://scikit-learn.org/stable/datasets/toy_dataset.html"
+      ]
+    }
+  ]
+}

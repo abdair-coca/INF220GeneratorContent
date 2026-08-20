@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL03",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Estructuras Selectivas — Ejercicios Resueltos",
+    "subtitulo": "Solucionario oficial de la Práctica N.º 3 con diagramas de flujo interactivos y código fuente Python ejecutable.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "convenciones": "Cada ejercicio incluye su Diagrama de Flujo en Mermaid y su código fuente Python con celda ejecutable en tiempo real.",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Solucionario Oficial — Práctica N.º 3",
+      "bloques": [
+        {"tipo": "texto", "texto": "A continuación se desarrollan las soluciones completas de los 11 ejercicios de la Práctica N.º 3:"},
+        {"tipo": "sub", "titulo": "1. Mayoría de edad", "bloques": [
+          {"tipo": "texto", "texto": "Lee la edad de una persona y determina si es mayor de edad (18 años o más) o menor de edad."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Mayoría de edad", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer edad\"/]\n    B --> C{\"¿edad >= 18?\"}\n    C -- \"Sí\" --> D[/\"Mostrar 'Mayor de edad'\"/]\n    C -- \"No\" --> E[/\"Mostrar 'Menor de edad'\"/]\n    D --> F([\"Fin\"])\n    E --> F"},
+          {"tipo": "celda", "in": "def evaluar_edad(edad):\n    if edad >= 18:\n        return 'Mayor de edad'\n    else:\n        return 'Menor de edad'\n\nprint('Edad 15:', evaluar_edad(15))\nprint('Edad 20:', evaluar_edad(20))", "out": "Edad 15: Menor de edad\nEdad 20: Mayor de edad"}
+        ]},
+        {"tipo": "sub", "titulo": "2. Número positivo, negativo o cero", "bloques": [
+          {"tipo": "texto", "texto": "Determina si un número ingresado es positivo (> 0), negativo (< 0) o igual a cero."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Polaridad de un número", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer n\"/]\n    B --> C{\"¿n > 0?\"}\n    C -- \"Sí\" --> D[/\"Mostrar 'Positivo'\"/]\n    C -- \"No\" --> E{\"¿n < 0?\"}\n    E -- \"Sí\" --> F[/\"Mostrar 'Negativo'\"/]\n    E -- \"No\" --> G[/\"Mostrar 'Cero'\"/]\n    D --> H([\"Fin\"])\n    F --> H\n    G --> H"},
+          {"tipo": "celda", "in": "def determinar_polaridad(n):\n    if n > 0:\n        return 'Positivo'\n    elif n < 0:\n        return 'Negativo'\n    else:\n        return 'Cero'\n\nfor val in [10, -5, 0]:\n    print(f'Número {val}: {determinar_polaridad(val)}')", "out": "Número 10: Positivo\nNúmero -5: Negativo\nNúmero 0: Cero"}
+        ]},
+        {"tipo": "sub", "titulo": "3. Aprobación de una materia", "bloques": [
+          {"tipo": "texto", "texto": "Lee la nota final (0 a 100) y muestra 'Aprobado' si nota >= 51, o 'Reprobado' en caso contrario."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Aprobación de materia", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer nota\"/]\n    B --> C{\"¿nota >= 51?\"}\n    C -- \"Sí\" --> D[/\"Mostrar 'Aprobado'\"/]\n    C -- \"No\" --> E[/\"Mostrar 'Reprobado'\"/]\n    D --> F([\"Fin\"])\n    E --> F"},
+          {"tipo": "celda", "in": "def evaluar_materia(nota):\n    if nota >= 51:\n        return 'Aprobado'\n    else:\n        return 'Reprobado'\n\nprint('Nota 45:', evaluar_materia(45))\nprint('Nota 75:', evaluar_materia(75))", "out": "Nota 45: Reprobado\nNota 75: Aprobado"}
+        ]},
+        {"tipo": "sub", "titulo": "4. El mayor de tres números", "bloques": [
+          {"tipo": "texto", "texto": "Lee tres números distintos y determina cuál es el mayor mediante condicionales anidados."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Mayor de tres números", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer a, b, c\"/]\n    B --> C{\"¿a > b?\"}\n    C -- \"Sí\" --> D{\"¿a > c?\"}\n    D -- \"Sí\" --> E[/\"Mostrar a\"/]\n    D -- \"No\" --> F[/\"Mostrar c\"/]\n    C -- \"No\" --> G{\"¿b > c?\"}\n    G -- \"Sí\" --> H[/\"Mostrar b\"/]\n    G -- \"No\" --> I[/\"Mostrar c\"/]\n    E --> J([\"Fin\"])\n    F --> J\n    H --> J\n    I --> J"},
+          {"tipo": "celda", "in": "def mayor_de_tres_anidado(a, b, c):\n    if a > b:\n        if a > c:\n            return a\n        else:\n            return c\n    else:\n        if b > c:\n            return b\n        else:\n            return c\n\nprint('Mayor de (12, 45, 30):', mayor_de_tres_anidado(12, 45, 30))", "out": "Mayor de (12, 45, 30): 45"}
+        ]},
+        {"tipo": "sub", "titulo": "5. Clasificación de un triángulo", "bloques": [
+          {"tipo": "texto", "texto": "Valida primero si tres lados forman un triángulo (a+b>c, a+c>b, b+c>a) y luego clasifica en Equilátero, Isósceles o Escaleno."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Clasificación de Triángulo", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer a, b, c\"/]\n    B --> C{\"¿a+b>c y a+c>b y b+c>a?\"}\n    C -- \"Sí\" --> D{\"¿a == b == c?\"}\n    D -- \"Sí\" --> E[/\"Equilátero\"/]\n    D -- \"No\" --> F{\"¿a==b o a==c o b==c?\"}\n    F -- \"Sí\" --> G[/\"Isósceles\"/]\n    F -- \"No\" --> H[/\"Escaleno\"/]\n    C -- \"No\" --> I[/\"Triángulo Inválido\"/]\n    E --> J([\"Fin\"])\n    G --> J\n    H --> J\n    I --> J"},
+          {"tipo": "celda", "in": "def clasificar_triangulo(a, b, c):\n    if (a + b > c) and (a + c > b) and (b + c > a):\n        if a == b == c:\n            return 'Equilátero'\n        elif a == b or a == c or b == c:\n            return 'Isósceles'\n        else:\n            return 'Escaleno'\n    return 'No forma un triángulo válido'\n\nprint('(5,5,5):', clasificar_triangulo(5,5,5))\nprint('(5,5,8):', clasificar_triangulo(5,5,8))\nprint('(3,4,5):', clasificar_triangulo(3,4,5))\nprint('(1,2,10):', clasificar_triangulo(1,2,10))", "out": "(5,5,5): Equilátero\n(5,5,8): Isósceles\n(3,4,5): Escaleno\n(1,2,10): No forma un triángulo válido"}
+        ]},
+        {"tipo": "sub", "titulo": "6. Descuento según el monto de compra", "bloques": [
+          {"tipo": "texto", "texto": "Calcula el descuento aplicable: 0% (<100 Bs), 5% (100 a 299.99 Bs), 10% (300 a 699.99 Bs) y 15% (>= 700 Bs). Muestra el pago final."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Descuento por compra", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer monto\"/]\n    B --> C{\"¿monto < 100?\"}\n    C -- \"Sí\" --> D[\"desc ← 0\"]\n    C -- \"No\" --> E{\"¿monto < 300?\"}\n    E -- \"Sí\" --> F[\"desc ← 0.05\"]\n    E -- \"No\" --> G{\"¿monto < 700?\"}\n    G -- \"Sí\" --> H[\"desc ← 0.10\"]\n    G -- \"No\" --> I[\"desc ← 0.15\"]\n    D --> J[\"total ← monto * (1 - desc)\"]\n    F --> J\n    H --> J\n    I --> J\n    J --> K[/\"Mostrar total\"/]\n    K --> L([\"Fin\"])"},
+          {"tipo": "celda", "in": "def calcular_descuento(monto):\n    if monto < 100:\n        desc = 0.0\n    elif monto < 300:\n        desc = 0.05\n    elif monto < 700:\n        desc = 0.10\n    else:\n        desc = 0.15\n    total = monto * (1 - desc)\n    return f'Monto: {monto:.2f} Bs | Descuento: {desc*100:.0f}% | Total a pagar: {total:.2f} Bs'\n\nprint(calcular_descuento(80))\nprint(calcular_descuento(250))\nprint(calcular_descuento(500))\nprint(calcular_descuento(1000))", "out": "Monto: 80.00 Bs | Descuento: 0% | Total a pagar: 80.00 Bs\nMonto: 250.00 Bs | Descuento: 5% | Total a pagar: 237.50 Bs\nMonto: 500.00 Bs | Descuento: 10% | Total a pagar: 450.00 Bs\nMonto: 1000.00 Bs | Descuento: 15% | Total a pagar: 850.00 Bs"}
+        ]},
+        {"tipo": "sub", "titulo": "7. Año bisiesto", "bloques": [
+          {"tipo": "texto", "texto": "Un año es bisiesto si es divisible entre 4, excepto divisibles entre 100 salvo que también lo sean entre 400."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Año bisiesto", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer anio\"/]\n    B --> C{\"¿anio % 4 == 0?\"}\n    C -- \"Sí\" --> D{\"¿anio % 100 == 0?\"}\n    D -- \"Sí\" --> E{\"¿anio % 400 == 0?\"}\n    E -- \"Sí\" --> F[/\"Bisiesto\"/]\n    E -- \"No\" --> G[/\"No Bisiesto\"/]\n    D -- \"No\" --> F\n    C -- \"No\" --> G\n    F --> H([\"Fin\"])\n    G --> H"},
+          {"tipo": "celda", "in": "def es_bisiesto(anio):\n    if (anio % 4 == 0 and anio % 100 != 0) or (anio % 400 == 0):\n        return 'Es bisiesto'\n    return 'No es bisiesto'\n\nfor y in [2000, 1900, 2024, 2026]:\n    print(f'Año {y}: {es_bisiesto(y)}')", "out": "Año 2000: Es bisiesto\nAño 1900: No es bisiesto\nAño 2024: Es bisiesto\nAño 2026: No es bisiesto"}
+        ]},
+        {"tipo": "sub", "titulo": "8. Clasificación del IMC", "bloques": [
+          {"tipo": "texto", "texto": "Calcula el IMC = peso / estatura² y clasifica en Bajo peso (<18.5), Normal (18.5 a 24.9), Sobrepeso (25 a 29.9) u Obesidad (>= 30)."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Clasificación IMC", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer peso, estatura\"/]\n    B --> C[\"imc ← peso / (estatura * estatura)\"]\n    C --> D{\"¿imc < 18.5?\"}\n    D -- \"Sí\" --> E[/\"Bajo peso\"/]\n    D -- \"No\" --> F{\"¿imc < 25?\"}\n    F -- \"Sí\" --> G[/\"Normal\"/]\n    F -- \"No\" --> H{\"¿imc < 30?\"}\n    H -- \"Sí\" --> I[/\"Sobrepeso\"/]\n    H -- \"No\" --> J[/\"Obesidad\"/]\n    E --> K([\"Fin\"])\n    G --> K\n    I --> K\n    J --> K"},
+          {"tipo": "celda", "in": "def evaluar_imc(peso, estatura):\n    imc = peso / (estatura ** 2)\n    if imc < 18.5:\n        estado = 'Bajo peso'\n    elif imc < 25:\n        estado = 'Normal'\n    elif imc < 30:\n        estado = 'Sobrepeso'\n    else:\n        estado = 'Obesidad'\n    return f'IMC: {imc:.2f} ({estado})'\n\nprint(evaluar_imc(50, 1.70))\nprint(evaluar_imc(68, 1.75))\nprint(evaluar_imc(82, 1.70))\nprint(evaluar_imc(98, 1.65))", "out": "IMC: 17.30 (Bajo peso)\nIMC: 22.20 (Normal)\nIMC: 28.37 (Sobrepeso)\nIMC: 36.00 (Obesidad)"}
+        ]},
+        {"tipo": "sub", "titulo": "9. Validación de contraseña", "bloques": [
+          {"tipo": "texto", "texto": "Verifica tres condiciones: longitud >= 8, al menos un dígito numérico y al menos una letra mayúscula."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Validación de contraseña", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer clave\"/]\n    B --> C{\"¿len(clave) >= 8?\"}\n    C -- \"Sí\" --> D{\"¿contiene dígito?\"}\n    D -- \"Sí\" --> E{\"¿contiene mayúscula?\"}\n    E -- \"Sí\" --> F[/\"Contraseña VÁLIDA\"/]\n    E -- \"No\" --> G[/\"Error: Falta mayúscula\"/]\n    D -- \"No\" --> H[/\"Error: Falta número\"/]\n    C -- \"No\" --> I[/\"Error: Menos de 8 caracteres\"/]\n    F --> J([\"Fin\"])\n    G --> J\n    H --> J\n    I --> J"},
+          {"tipo": "celda", "in": "def validar_password(clave):\n    if len(clave) < 8:\n        return 'Inválida: Debe tener al menos 8 caracteres'\n    if not any(c.isdigit() for c in clave):\n        return 'Inválida: Debe contener al menos un número'\n    if not any(c.isupper() for c in clave):\n        return 'Inválida: Debe contener al menos una letra mayúscula'\n    return 'Contraseña VÁLIDA'\n\nprint('\"abc\":', validar_password('abc'))\nprint('\"password\":', validar_password('password'))\nprint('\"Password\":', validar_password('Password'))\nprint('\"Password123\":', validar_password('Password123'))", "out": "\"abc\": Inválida: Debe tener al menos 8 caracteres\n\"password\": Inválida: Debe contener al menos un número\n\"Password\": Inválida: Debe contener al menos un número\n\"Password123\": Contraseña VÁLIDA"}
+        ]},
+        {"tipo": "sub", "titulo": "10. Calculadora básica con menú", "bloques": [
+          {"tipo": "texto", "texto": "Menú de 4 opciones (1:suma, 2:resta, 3:multiplicación, 4:división) controlando la división entre cero."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Calculadora básica", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer n1, n2, op\"/]\n    B --> C{\"¿op == 1?\"}\n    C -- \"Sí\" --> D[\"res ← n1 + n2\"]\n    C -- \"No\" --> E{\"¿op == 2?\"}\n    E -- \"Sí\" --> F[\"res ← n1 - n2\"]\n    E -- \"No\" --> G{\"¿op == 3?\"}\n    G -- \"Sí\" --> H[\"res ← n1 * n2\"]\n    G -- \"No\" --> I{\"¿op == 4?\"}\n    I -- \"Sí\" --> J{\"¿n2 != 0?\"}\n    J -- \"Sí\" --> K[\"res ← n1 / n2\"]\n    J -- \"No\" --> L[/\"Error: Div por cero\"/]\n    I -- \"No\" --> M[/\"Opción inválida\"/]\n    D --> N[/\"Mostrar res\"/]\n    F --> N\n    H --> N\n    K --> N\n    N --> O([\"Fin\"])\n    L --> O\n    M --> O"},
+          {"tipo": "celda", "in": "def calculadora(n1, n2, op):\n    if op == 1:\n        return f'Suma: {n1 + n2}'\n    elif op == 2:\n        return f'Resta: {n1 - n2}'\n    elif op == 3:\n        return f'Multiplicación: {n1 * n2}'\n    elif op == 4:\n        if n2 != 0:\n            return f'División: {n1 / n2}'\n        return 'Error: No se puede dividir entre cero'\n    else:\n        return 'Opción no válida'\n\nprint(calculadora(10, 5, 1))\nprint(calculadora(10, 5, 4))\nprint(calculadora(10, 0, 4))", "out": "Suma: 15\nDivisión: 2.0\nError: No se puede dividir entre cero"}
+        ]},
+        {"tipo": "sub", "titulo": "11. Cuadrante de un punto", "bloques": [
+          {"tipo": "texto", "texto": "Lee las coordenadas (x, y) y determina si está en los cuadrantes I, II, III, IV, sobre el Eje X, Eje Y o en el Origen."},
+          {"tipo": "diagrama", "titulo": "Diagrama de Flujo — Cuadrante del punto Cartesianos", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[/\"Leer x, y\"/]\n    B --> C{\"¿x == 0 y y == 0?\"}\n    C -- \"Sí\" --> D[/\"Origen (0,0)\"/]\n    C -- \"No\" --> E{\"¿x == 0?\"}\n    E -- \"Sí\" --> F[/\"Sobre el Eje Y\"/]\n    E -- \"No\" --> G{\"¿y == 0?\"}\n    G -- \"Sí\" --> H[/\"Sobre el Eje X\"/]\n    G -- \"No\" --> I{\"¿x > 0 y y > 0?\"}\n    I -- \"Sí\" --> J[/\"Cuadrante I\"/]\n    I -- \"No\" --> K{\"¿x < 0 y y > 0?\"}\n    K -- \"Sí\" --> L[/\"Cuadrante II\"/]\n    K -- \"No\" --> M{\"¿x < 0 y y < 0?\"}\n    M -- \"Sí\" --> N[/\"Cuadrante III\"/]\n    M -- \"No\" --> O[/\"Cuadrante IV\"/]\n    D --> P([\"Fin\"])\n    F --> P\n    H --> P\n    J --> P\n    L --> P\n    N --> P\n    O --> P"},
+          {"tipo": "celda", "in": "def evaluar_cuadrante(x, y):\n    if x == 0 and y == 0:\n        return 'Origen (0,0)'\n    elif x == 0:\n        return 'Sobre el Eje Y'\n    elif y == 0:\n        return 'Sobre el Eje X'\n    elif x > 0 and y > 0:\n        return 'Cuadrante I'\n    elif x < 0 and y > 0:\n        return 'Cuadrante II'\n    elif x < 0 and y < 0:\n        return 'Cuadrante III'\n    else:\n        return 'Cuadrante IV'\n\nprint('(3, 5):', evaluar_cuadrante(3, 5))\nprint('(-2, 4):', evaluar_cuadrante(-2, 4))\nprint('(-1, -7):', evaluar_cuadrante(-1, -7))\nprint('(4, -3):', evaluar_cuadrante(4, -3))\nprint('(0, 0):', evaluar_cuadrante(0, 0))\nprint('(0, 8):', evaluar_cuadrante(0, 8))", "out": "(3, 5): Cuadrante I\n(-2, 4): Cuadrante II\n(-1, -7): Cuadrante III\n(4, -3): Cuadrante IV\n(0, 0): Origen (0,0)\n(0, 8): Sobre el Eje Y"}
+        ]}
+      ]
+    }
+  ]
+}

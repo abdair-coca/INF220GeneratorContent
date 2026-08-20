@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL02",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Funciones y Programas Python — Ejercicios Resueltos",
+    "subtitulo": "Solucionario oficial de la Práctica N.º 2 con código Python ejecutable y explicaciones paso a paso.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "convenciones": "Celdas ejecutables en Python: Podés modificar las entradas y presionar ▶ Ejecutar para comprobar la solución en tiempo real en tu navegador.",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Solucionario Oficial — Práctica N.º 2",
+      "bloques": [
+        {"tipo": "texto", "texto": "A continuación se presentan las soluciones comentadas e interactivas de todos los programas requeridos en la Práctica N.º 2:"},
+        {"tipo": "sub", "titulo": "1. Evaluación de Rango Numérico", "bloques": [
+          {"tipo": "texto", "texto": "Lee un valor numérico desde teclado e indica a qué rango pertenece (10-30, 31-60, 61-100) o si se encuentra fuera de estos rangos."},
+          {"tipo": "celda", "in": "def evaluar_rango(n):\n    if 10 <= n <= 30:\n        return 'Pertenece al rango 10 - 30'\n    elif 31 <= n <= 60:\n        return 'Pertenece al rango 31 - 60'\n    elif 61 <= n <= 100:\n        return 'Pertenece al rango 61 - 100'\n    else:\n        return 'El número no pertenece a ningún rango'\n\nprint(evaluar_rango(25))\nprint(evaluar_rango(45))\nprint(evaluar_rango(80))\nprint(evaluar_rango(5))", "out": "Pertenece al rango 10 - 30\nPertenece al rango 31 - 60\nPertenece al rango 61 - 100\nEl número no pertenece a ningún rango"}
+        ]},
+        {"tipo": "sub", "titulo": "2. Selección de Día de la Semana", "bloques": [
+          {"tipo": "texto", "texto": "Lee un entero del 1 al 7 e imprime el día correspondiente. Si está fuera de rango, muestra 'Número fuera de rango'."},
+          {"tipo": "celda", "in": "def obtener_dia(num):\n    dias = {1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sábado', 7: 'Domingo'}\n    return dias.get(num, 'Número fuera de rango')\n\nfor i in [1, 4, 7, 9]:\n    print(f'Día {i}: {obtener_dia(i)}')", "out": "Día 1: Lunes\nDía 4: Jueves\nDía 7: Domingo\nDía 9: Número fuera de rango"}
+        ]},
+        {"tipo": "sub", "titulo": "3. Conversión Celsius a Fahrenheit", "bloques": [
+          {"tipo": "texto", "texto": "Función celsius_a_fahrenheit(c) aplicando la fórmula F = (C * 9/5) + 32."},
+          {"tipo": "celda", "in": "def celsius_a_fahrenheit(c):\n    return (c * 9/5) + 32\n\nprint('0°C  ->', celsius_a_fahrenheit(0), '°F')\nprint('25°C ->', celsius_a_fahrenheit(25), '°F')\nprint('100°C->', celsius_a_fahrenheit(100), '°F')", "out": "0°C  -> 32.0 °F\n25°C -> 77.0 °F\n100°C-> 212.0 °F"}
+        ]},
+        {"tipo": "sub", "titulo": "4. El Mayor de Tres Números", "bloques": [
+          {"tipo": "texto", "texto": "Función mayor_de_tres(a, b, c) utilizando comparaciones directas o max()."},
+          {"tipo": "celda", "in": "def mayor_de_tres(a, b, c):\n    if a >= b and a >= c:\n        return a\n    elif b >= c:\n        return b\n    else:\n        return c\n\nprint('Mayor de (15, 42, 9):', mayor_de_tres(15, 42, 9))\nprint('Mayor de (88, 12, 50):', mayor_de_tres(88, 12, 50))", "out": "Mayor de (15, 42, 9): 42\nMayor de (88, 12, 50): 88"}
+        ]},
+        {"tipo": "sub", "titulo": "5. Verificación de Número Primo", "bloques": [
+          {"tipo": "texto", "texto": "Función es_primo(n) que retorna True si n > 1 y carece de divisores propios."},
+          {"tipo": "celda", "in": "def es_primo(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\nprimos = [n for n in range(1, 20) if es_primo(n)]\nprint('Números primos entre 1 y 20:', primos)", "out": "Números primos entre 1 y 20: [2, 3, 5, 7, 11, 13, 17, 19]"}
+        ]},
+        {"tipo": "sub", "titulo": "6. Cálculo del Factorial", "bloques": [
+          {"tipo": "texto", "texto": "Función factorial(n) implementada de forma iterativa."},
+          {"tipo": "celda", "in": "def factorial(n):\n    if n < 0:\n        return None\n    fact = 1\n    for i in range(1, n + 1):\n        fact *= i\n    return fact\n\nprint('Factorial de 5:', factorial(5))\nprint('Factorial de 7:', factorial(7))", "out": "Factorial de 5: 120\nFactorial de 7: 5040"}
+        ]},
+        {"tipo": "sub", "titulo": "7. Promedio de una Lista", "bloques": [
+          {"tipo": "texto", "texto": "Función promedio_lista(numeros) que retorna la media aritmética."},
+          {"tipo": "celda", "in": "def promedio_lista(numeros):\n    if not numeros:\n        return 0.0\n    return sum(numeros) / len(numeros)\n\nnotas = [75, 80, 90, 60, 100]\nprint('Notas:', notas)\nprint('Promedio:', promedio_lista(notas))", "out": "Notas: [75, 80, 90, 60, 100]\nPromedio: 81.0"}
+        ]},
+        {"tipo": "sub", "titulo": "8. Conteo de Vocales", "bloques": [
+          {"tipo": "texto", "texto": "Función contar_vocales(texto) que contabiliza a, e, i, o, u ignorando mayúsculas/minúsculas."},
+          {"tipo": "celda", "in": "def contar_vocales(texto):\n    vocales = 'aeiouAEIOU'\n    return sum(1 for char in texto if char in vocales)\n\nfrase = 'Programación Orientada a Objetos'\nprint(f'Frase: \"{frase}\"')\nprint('Cantidad de vocales:', contar_vocales(frase))", "out": "Frase: \"Programación Orientada a Objetos\"\nCantidad de vocales: 14"}
+        ]},
+        {"tipo": "sub", "titulo": "9. Verificación de Palíndromo", "bloques": [
+          {"tipo": "texto", "texto": "Función es_palindromo(cadena) que ignora espacios y diferencias entre mayúsculas y minúsculas."},
+          {"tipo": "celda", "in": "def es_palindromo(cadena):\n    limpio = ''.join(c.lower() for c in cadena if c.isalnum())\n    return limpio == limpio[::-1]\n\nprint('¿\"reconocer\" es palíndromo?:', es_palindromo('reconocer'))\nprint('¿\"Anita lava la tina\" es palíndromo?:', es_palindromo('Anita lava la tina'))\nprint('¿\"Python\" es palíndromo?:', es_palindromo('Python'))", "out": "¿\"reconocer\" es palíndromo?: True\n¿\"Anita lava la tina\" es palíndromo?: True\n¿\"Python\" es palíndromo?: False"}
+        ]},
+        {"tipo": "sub", "titulo": "10. Generación de Tabla de Multiplicar", "bloques": [
+          {"tipo": "texto", "texto": "Función generar_tabla(n) que imprime la tabla del 1 al 10."},
+          {"tipo": "celda", "in": "def generar_tabla(n):\n    for i in range(1, 11):\n        print(f'{n} x {i:2d} = {n * i}')\n\nprint('Tabla del 7:')\ngenerar_tabla(7)", "out": "Tabla del 7:\n7 x  1 = 7\n7 x  2 = 14\n7 x  3 = 21\n7 x  4 = 28\n7 x  5 = 35\n7 x  6 = 42\n7 x  7 = 49\n7 x  8 = 56\n7 x  9 = 63\n7 x 10 = 70"}
+        ]}
+      ]
+    }
+  ]
+}

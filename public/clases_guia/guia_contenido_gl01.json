@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "GL01",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "Diagramas de Flujo — Estructuras de Control Básicas",
+    "subtitulo": "Práctica N.º 1 · Diseña únicamente el diagrama de flujo de cada algoritmo: sin código ni pseudocódigo.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "3 h de laboratorio",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "convenciones": "Los diagramas se muestran como figuras interactivas (ampliables con la rueda del ratón). Los rombos representan decisiones y siempre tienen una entrada y dos salidas (Sí / No). Cada ejercicio de la Práctica N.º 1 se resuelve únicamente con su diagrama de flujo: no se pide código ni pseudocódigo.",
+  "secciones": [
+    {
+      "num": "01",
+      "titulo": "Competencia y objetivos",
+      "bloques": [
+        {"tipo": "texto", "texto": "Competencia de la práctica"},
+        {"tipo": "competencia", "texto": "Diseña algoritmos mediante diagramas de flujo, aplicando las estructuras de control básicas (secuencia, selección y repetición), como fundamento del razonamiento lógico que sostiene la programación orientada a objetos."},
+        {"tipo": "texto", "texto": "Objetivos específicos"},
+        {"tipo": "lista", "items": [
+          "Identificar los símbolos del diagrama de flujo y sus reglas de uso.",
+          "Representar algoritmos lineales (secuencia) con entrada, proceso y salida.",
+          "Modelar decisiones con selección simple, doble y múltiple.",
+          "Representar bucles con repetición: mientras, repetir-hasta y para.",
+          "Resolver los ejercicios de la Práctica N.º 1 únicamente con diagramas de flujo."
+        ]}
+      ]
+    },
+    {
+      "num": "02",
+      "titulo": "Requisitos y preparación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Para esta práctica necesitas material de dibujo o una herramienta digital. Ambos caminos son válidos; elige el que tengas a mano."},
+        {"tipo": "lista", "items": [
+          "Lápiz, regla y plantilla de figuras de diagramas de flujo (o lápiz y papel a mano alzada).",
+          "Alternativa digital: editor gratuito draw.io (https://app.diagrams.net) con la plantilla de flowchart.",
+          "El enunciado de la Práctica N.º 1 (10 ejercicios, fecha de entrega: 18/08/2026)."
+        ]},
+        {"tipo": "nota", "texto": "No se evalúa código ni pseudocódigo: solo el diagrama de flujo. La claridad del trazado y el uso correcto de los símbolos son parte de la nota."}
+      ]
+    },
+    {
+      "num": "03",
+      "titulo": "Conceptos previos",
+      "bloques": [
+        {"tipo": "definicion", "titulo": "Algoritmo", "texto": "Conjunto ordenado y finito de pasos que resuelve un problema. Debe ser preciso (sin ambigüedad), definido (mismo resultado cada vez) y finito (termina en algún momento)."},
+        {"tipo": "definicion", "titulo": "Diagrama de flujo", "texto": "Representación gráfica de un algoritmo mediante símbolos conectados por flechas que indican el orden de ejecución. Permite ver la lógica completa de un vistazo, antes de escribir una sola línea de código."},
+        {"tipo": "texto", "texto": "Simbología básica que usaremos en toda la práctica:"},
+        {"tipo": "simbolos"},
+        {"tipo": "nota", "texto": "Reglas de dibujo: todo diagrama empieza con un terminal Inicio y termina con un terminal Fin. Las flechas nunca se cruzan sin necesidad y cada camino debe llegar a Fin. Una decisión siempre tiene dos salidas rotuladas Sí y No."}
+      ]
+    },
+    {
+      "num": "04",
+      "titulo": "Estructuras de control",
+      "bloques": [
+        {"tipo": "texto", "texto": "Toda lógica de programación se construye combinando tres estructuras. Dominarlas aquí en el diagrama es dominarlas para siempre en el código."},
+        {"tipo": "sub", "titulo": "4.1  Secuencia", "bloques": [
+          {"tipo": "texto", "texto": "Pasos ejecutados uno tras otro, en orden. Es la estructura más simple: leer datos, procesar, mostrar resultados."},
+          {"tipo": "diagrama", "titulo": "Patrón de secuencia", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[\"Proceso\"]\n    B --> C[\"Proceso\"]\n    C --> D([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "4.2  Selección (si / si-no)", "bloques": [
+          {"tipo": "texto", "texto": "Ejecuta una u otra rama según una condición. Si la condición es verdadera va por un camino; si es falsa, por el otro. Nunca por los dos a la vez."},
+          {"tipo": "diagrama", "titulo": "Patrón de selección doble", "code": "flowchart TD\n    A([\"Inicio\"]) --> B{\"¿condición?\"}\n    B -- \"Sí\" --> C[\"Acción A\"]\n    B -- \"No\" --> D[\"Acción B\"]\n    C --> E([\"Fin\"])\n    D --> E"}
+        ]},
+        {"tipo": "sub", "titulo": "4.3  Repetición mientras", "bloques": [
+          {"tipo": "texto", "texto": "La condición se evalúa ANTES de ejecutar el cuerpo: si es falsa desde el inicio, el bucle no se ejecuta ni una vez. Se usa cuando no sabemos de antemano cuántas iteraciones habrá."},
+          {"tipo": "diagrama", "titulo": "Patrón de bucle mientras", "code": "flowchart TD\n    A([\"Inicio\"]) --> B{\"¿condición?\"}\n    B -- \"Sí\" --> C[\"Acción\"]\n    C --> B\n    B -- \"No\" --> D([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "4.4  Repetición repetir-hasta", "bloques": [
+          {"tipo": "texto", "texto": "La condición se evalúa DESPUÉS de ejecutar el cuerpo: el bucle corre al menos una vez y termina cuando la condición se cumple."},
+          {"tipo": "diagrama", "titulo": "Patrón de bucle repetir-hasta", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[\"Acción\"]\n    B --> C{\"¿condición de salida?\"}\n    C -- \"No\" --> B\n    C -- \"Sí\" --> D([\"Fin\"])"}
+        ]},
+        {"tipo": "sub", "titulo": "4.5  Repetición para (contador)", "bloques": [
+          {"tipo": "texto", "texto": "Se usa cuando el número de iteraciones se conoce de antemano. Se inicializa un contador, se evalúa una condición y se incrementa el contador en cada vuelta. En el diagrama se dibuja como un mientras con tres pasos: inicializar, evaluar e incrementar."},
+          {"tipo": "diagrama", "titulo": "Patrón de bucle para", "code": "flowchart TD\n    A([\"Inicio\"]) --> B[\"i ← 1\"]\n    B --> C{\"¿i <= N?\"}\n    C -- \"Sí\" --> D[\"Acción\"]\n    D --> E[\"i ← i + 1\"]\n    E --> C\n    C -- \"No\" --> F([\"Fin\"])"}
+        ]}
+      ]
+    },
+    {
+      "num": "05",
+      "titulo": "Autoevaluación",
+      "bloques": [
+        {"tipo": "texto", "texto": "Comprueba tus conocimientos teóricos respondiendo las siguientes preguntas interactivas:"},
+        {"tipo": "quiz", "pregunta": "Un rombo de decisión recibe una entrada y produce:", "opciones": [
+          "Una sola salida (el flujo continúa en línea recta)",
+          "Dos salidas rotuladas Sí y No",
+          "Ninguna salida: solo procesa datos",
+          "Tantas salidas como condiciones existan"
+        ], "correcta": 1},
+        {"tipo": "quiz", "pregunta": "En la estructura mientras, la condición se evalúa:", "opciones": [
+          "Después de cada iteración",
+          "Solo una vez al inicio",
+          "Antes de cada iteración; si es falsa al inicio, no se ejecuta ninguna",
+          "Al final del algoritmo"
+        ], "correcta": 2}
+      ]
+    },
+    {
+      "num": "06",
+      "titulo": "Práctica en clase",
+      "bloques": [
+        {"tipo": "texto", "texto": "Resuelve ahora los 10 ejercicios de la Práctica N.º 1. Identifica primero la estructura que necesita cada uno y luego dibuja el diagrama completo, desde Inicio hasta Fin."},
+        {"tipo": "lista", "items": [
+          "Lectura y visualización de un número: lee un número entero y muéstralo en pantalla.",
+          "Suma de dos números: lee dos números y muestra su suma.",
+          "Promedio de tres números: lee tres números y calcula su promedio.",
+          "Área y perímetro de un círculo: lee el radio y calcula área y perímetro (π = 3.1416).",
+          "Conversión de bolivianos a dólares: lee bolivianos y conviértelos (1 USD = 6.96 Bs).",
+          "Número par o impar: lee un entero y determina si es par o impar.",
+          "El mayor de dos números: lee dos números distintos y muestra cuál es mayor.",
+          "Calificación según la nota: nota entre 0 y 100 → Reprobado (< 51), Aprobado (51–79) o Excelente (80–100).",
+          "Números del 1 al 10: muestra los números del 1 al 10.",
+          "Suma de 5 números: lee 5 números y calcula su suma total.",
+          "Conteo de números hasta ingresar 0: lee números hasta que se ingrese 0 y muestra cuántos se ingresaron (sin contar el 0)."
+        ]},
+        {"tipo": "ejemplo", "texto": "Retos extra (para practicar más): promedio de N números; tabla de multiplicar de un número N; verificar si un número es positivo, negativo o cero. La misma lógica de las soluciones 5.8 y 5.10 te sirve."}
+      ]
+    },
+    {
+      "num": "07",
+      "titulo": "Entregable",
+      "bloques": [
+        {"tipo": "texto", "texto": "Entrega la Práctica N.º 1 resuelta antes de la fecha indicada. Recuerda: únicamente diagramas de flujo, sin código ni pseudocódigo."},
+        {"tipo": "ejemplo", "texto": "Archivo: Practica_1_Apellido_Nombre — diagramas dibujados a mano (foto o escaneo claro) o digitales (draw.io exportado a PDF). Fecha de entrega: 18/08/2026."},
+        {"tipo": "lista", "items": [
+          "Cada diagrama debe empezar con Inicio y terminar con Fin.",
+          "Símbolos correctos: terminal, proceso, entrada/salida y decisión.",
+          "Toda decisión con sus dos salidas rotuladas Sí y No.",
+          "Flechas claras, sin cortes ni cruces innecesarios.",
+          "El diagrama debe correr mentalmente de punta a punta sin trabas (verifica con un caso de ejemplo)."
+        ]}
+      ]
+    },
+    {
+      "num": "08",
+      "titulo": "Rúbrica de evaluación",
+      "rubrica": [
+        {"criterio": "Simbología", "descripcion": "Uso correcto de terminales, procesos, entradas/salidas y decisiones.", "pts": 20},
+        {"criterio": "Flujo y trazado", "descripcion": "Flechas direccionales claras, sin cortes ni cruces innecesarios.", "pts": 20},
+        {"criterio": "Estructuras de control", "descripcion": "Selección y repetición modeladas correctamente según el problema.", "pts": 30},
+        {"criterio": "Solución lógica", "descripcion": "El algoritmo resuelve el problema para cualquier entrada válida.", "pts": 20},
+        {"criterio": "Presentación", "descripcion": "Diagramas limpios, legibles y completos (Inicio a Fin).", "pts": 10}
+      ]
+    },
+    {
+      "num": "09",
+      "titulo": "Referencias",
+      "referencias": [
+        "Joyanes Aguilar, L. — Fundamentos de programación: algoritmos, estructura de datos y objetos (McGraw-Hill).",
+        "Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).",
+        "Documentación de draw.io / diagrams.net: https://app.diagrams.net",
+        "Wikipedia — Diagrama de flujo: https://es.wikipedia.org/wiki/Diagrama_de_flujo",
+        "Práctica N.º 1 · Diagramas de Flujo — Estructuras de Control Básicas (INF-220, Gestión 2026-02)."
+      ]
+    }
+  ]
+}
