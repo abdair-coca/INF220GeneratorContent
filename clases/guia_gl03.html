@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'self' 'unsafe-inline' data: blob: https:; script-src 'unsafe-inline' 'unsafe-eval' https:; style-src 'unsafe-inline' https:; img-src data: blob: https:; font-src data: https:; connect-src https:;"><title>Diagramas de Flujo — Estructuras de Control Básicas · GL01</title><style>
+<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'self' 'unsafe-inline' data: blob: https:; script-src 'unsafe-inline' 'unsafe-eval' https:; style-src 'unsafe-inline' https:; img-src data: blob: https:; font-src data: https:; connect-src https:;"><title>Estructuras Selectivas — Diagramas de Flujo y Python · GL03</title><style>
 :root {
   --ink: #172033;
   --muted: #647083;
@@ -734,102 +734,114 @@ footer {
     display: none !important;
   }
 }
-</style></head><body><header class="topbar"><div class="brand"><div class="mark">GL01</div><div><strong>INF-220 · Programación Orientada a Objetos · Guía de laboratorio</strong><small>UATF · Facultad de Ciencias Puras · Ing. Informática</small></div></div></header><div class="progress" aria-hidden="true"><i id="bar"></i></div><div class="layout"><main><section class="hero" id="inicio"><div class="eyebrow">GL01 · 3 h de laboratorio</div><h1>Diagramas de Flujo — Estructuras de Control Básicas</h1><p class="lead">Práctica N.º 1 · Diseña únicamente el diagrama de flujo de cada algoritmo: sin código ni pseudocódigo.</p><div class="chips"><span class="chip">Ing. Informática · 2º semestre · Gestión 2026-02</span><span class="chip">Gestión 2026-02</span></div><div class="meta-details"><div><b>Asignatura:</b> INF-220 · Programación Orientada a Objetos</div><div><b>Institución:</b> UATF · Facultad de Ciencias Puras · Ing. Informática</div><div><b>Información:</b> Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo</div></div></section><aside class="notice"><div aria-hidden="true">💡</div><div><strong>Antes de comenzar</strong><p>Los diagramas se muestran como figuras interactivas (ampliables con la rueda del ratón). Los rombos representan decisiones y siempre tienen una entrada y dos salidas (Sí / No). Cada ejercicio de la Práctica N.º 1 se resuelve únicamente con su diagrama de flujo: no se pide código ni pseudocódigo.</p></div></aside><section class="section" id="sec-01"><div class="head"><div><span class="num">SECCIÓN 01</span><h2>Competencia y objetivos</h2></div></div><p class="muted">Competencia de la práctica</p><div class="box-info highlight"><b>Competencia de la práctica</b><p>Diseña algoritmos mediante diagramas de flujo, aplicando las estructuras de control básicas (secuencia, selección y repetición), como fundamento del razonamiento lógico que sostiene la programación orientada a objetos.</p></div><p class="muted">Objetivos específicos</p><ul class="list-custom"><li>Identificar los símbolos del diagrama de flujo y sus reglas de uso.</li><li>Representar algoritmos lineales (secuencia) con entrada, proceso y salida.</li><li>Modelar decisiones con selección simple, doble y múltiple.</li><li>Representar bucles con repetición: mientras, repetir-hasta y para.</li><li>Resolver los ejercicios de la Práctica N.º 1 únicamente con diagramas de flujo.</li></ul></section><section class="section" id="sec-02"><div class="head"><div><span class="num">SECCIÓN 02</span><h2>Requisitos y preparación</h2></div></div><p class="muted">Para esta práctica necesitas material de dibujo o una herramienta digital. Ambos caminos son válidos; elige el que tengas a mano.</p><ul class="list-custom"><li>Lápiz, regla y plantilla de figuras de diagramas de flujo (o lápiz y papel a mano alzada).</li><li>Alternativa digital: editor gratuito draw.io (https://app.diagrams.net) con la plantilla de flowchart.</li><li>El enunciado de la Práctica N.º 1 (10 ejercicios, fecha de entrega: 18/08/2026).</li></ul><div class="box-info"><b>NOTA</b><p>No se evalúa código ni pseudocódigo: solo el diagrama de flujo. La claridad del trazado y el uso correcto de los símbolos son parte de la nota.</p></div></section><section class="section" id="sec-03"><div class="head"><div><span class="num">SECCIÓN 03</span><h2>Conceptos previos</h2></div></div><div class="box-info"><b>DEFINICIÓN · Algoritmo</b><p>Conjunto ordenado y finito de pasos que resuelve un problema. Debe ser preciso (sin ambigüedad), definido (mismo resultado cada vez) y finito (termina en algún momento).</p></div><div class="box-info"><b>DEFINICIÓN · Diagrama de flujo</b><p>Representación gráfica de un algoritmo mediante símbolos conectados por flechas que indican el orden de ejecución. Permite ver la lógica completa de un vistazo, antes de escribir una sola línea de código.</p></div><p class="muted">Simbología básica que usaremos en toda la práctica:</p>
-<div class="table-container">
-  <table class="styled-table">
-    <thead>
-      <tr>
-        <th>Símbolo</th>
-        <th>Nombre</th>
-        <th>Uso y Descripción</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <svg width="70" height="30" viewBox="0 0 70 30">
-            <rect x="3" y="3" width="64" height="24" rx="12" fill="#eeecff" stroke="#5145cd" stroke-width="2"/>
-            <text x="35" y="19" text-anchor="middle" font-size="10" fill="#172033" font-weight="700">Inicio/Fin</text>
-          </svg>
-        </td>
-        <td><b>Terminal</b></td>
-        <td>Marca el inicio o fin del algoritmo. Todo diagrama debe empezar y terminar aquí.</td>
-      </tr>
-      <tr>
-        <td>
-          <svg width="70" height="30" viewBox="0 0 70 30">
-            <rect x="5" y="4" width="60" height="22" fill="#fff" stroke="#5145cd" stroke-width="2"/>
-            <text x="35" y="19" text-anchor="middle" font-size="10" fill="#172033">Proceso</text>
-          </svg>
-        </td>
-        <td><b>Proceso</b></td>
-        <td>Operación de cálculo, asignación de variable o fórmula (ej. <i>s ← a + b</i>).</td>
-      </tr>
-      <tr>
-        <td>
-          <svg width="70" height="30" viewBox="0 0 70 30">
-            <polygon points="12,4 66,4 58,26 4,26" fill="#fff" stroke="#5145cd" stroke-width="2"/>
-            <text x="35" y="19" text-anchor="middle" font-size="9" fill="#172033">Leer/Mostrar</text>
-          </svg>
-        </td>
-        <td><b>Entrada / Salida</b></td>
-        <td>Lectura de datos desde teclado (<b>Leer</b>) o emisión en pantalla (<b>Mostrar</b>).</td>
-      </tr>
-      <tr>
-        <td>
-          <svg width="70" height="30" viewBox="0 0 70 30">
-            <polygon points="35,2 66,15 35,28 4,15" fill="#eeecff" stroke="#5145cd" stroke-width="2"/>
-            <text x="35" y="18" text-anchor="middle" font-size="8" fill="#172033" font-weight="700">¿Condición?</text>
-          </svg>
-        </td>
-        <td><b>Decisión</b></td>
-        <td>Evalúa una condición lógica y ramifica el flujo: siempre posee <b>una entrada</b> y <b>dos salidas</b> (Sí / No).</td>
-      </tr>
-      <tr>
-        <td>
-          <svg width="70" height="30" viewBox="0 0 70 30">
-            <circle cx="35" cy="15" r="9" fill="#fff" stroke="#5145cd" stroke-width="2"/>
-          </svg>
-        </td>
-        <td><b>Conector</b></td>
-        <td>Enlaza partes del diagrama dentro de la misma página sin cruzar líneas.</td>
-      </tr>
-      <tr>
-        <td>
-          <svg width="70" height="30" viewBox="0 0 70 30">
-            <line x1="10" y1="15" x2="52" y2="15" stroke="#5145cd" stroke-width="2"/>
-            <polygon points="48,10 58,15 48,20" fill="#5145cd"/>
-          </svg>
-        </td>
-        <td><b>Flecha de flujo</b></td>
-        <td>Indica el sentido de ejecución. Nunca deben cruzarse ni quedar ramales huérfanos.</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<div class="box-info"><b>NOTA</b><p>Reglas de dibujo: todo diagrama empieza con un terminal Inicio y termina con un terminal Fin. Las flechas nunca se cruzan sin necesidad y cada camino debe llegar a Fin. Una decisión siempre tiene dos salidas rotuladas Sí y No.</p></div></section><section class="section" id="sec-04"><div class="head"><div><span class="num">SECCIÓN 04</span><h2>Estructuras de control</h2></div></div><p class="muted">Toda lógica de programación se construye combinando tres estructuras. Dominarlas aquí en el diagrama es dominarlas para siempre en el código.</p><h3 class="sub-head">4.1  Secuencia</h3><p class="muted">Pasos ejecutados uno tras otro, en orden. Es la estructura más simple: leer datos, procesar, mostrar resultados.</p><figure class="diagrama"><figcaption>Patrón de secuencia</figcaption><pre class="mermaid">flowchart TD
-    A([&quot;Inicio&quot;]) --&gt; B[&quot;Proceso&quot;]
-    B --&gt; C[&quot;Proceso&quot;]
-    C --&gt; D([&quot;Fin&quot;])</pre></figure><h3 class="sub-head">4.2  Selección (si / si-no)</h3><p class="muted">Ejecuta una u otra rama según una condición. Si la condición es verdadera va por un camino; si es falsa, por el otro. Nunca por los dos a la vez.</p><figure class="diagrama"><figcaption>Patrón de selección doble</figcaption><pre class="mermaid">flowchart TD
-    A([&quot;Inicio&quot;]) --&gt; B{&quot;¿condición?&quot;}
-    B -- &quot;Sí&quot; --&gt; C[&quot;Acción A&quot;]
-    B -- &quot;No&quot; --&gt; D[&quot;Acción B&quot;]
-    C --&gt; E([&quot;Fin&quot;])
-    D --&gt; E</pre></figure><h3 class="sub-head">4.3  Repetición mientras</h3><p class="muted">La condición se evalúa ANTES de ejecutar el cuerpo: si es falsa desde el inicio, el bucle no se ejecuta ni una vez. Se usa cuando no sabemos de antemano cuántas iteraciones habrá.</p><figure class="diagrama"><figcaption>Patrón de bucle mientras</figcaption><pre class="mermaid">flowchart TD
-    A([&quot;Inicio&quot;]) --&gt; B{&quot;¿condición?&quot;}
-    B -- &quot;Sí&quot; --&gt; C[&quot;Acción&quot;]
-    C --&gt; B
-    B -- &quot;No&quot; --&gt; D([&quot;Fin&quot;])</pre></figure><h3 class="sub-head">4.4  Repetición repetir-hasta</h3><p class="muted">La condición se evalúa DESPUÉS de ejecutar el cuerpo: el bucle corre al menos una vez y termina cuando la condición se cumple.</p><figure class="diagrama"><figcaption>Patrón de bucle repetir-hasta</figcaption><pre class="mermaid">flowchart TD
-    A([&quot;Inicio&quot;]) --&gt; B[&quot;Acción&quot;]
-    B --&gt; C{&quot;¿condición de salida?&quot;}
-    C -- &quot;No&quot; --&gt; B
-    C -- &quot;Sí&quot; --&gt; D([&quot;Fin&quot;])</pre></figure><h3 class="sub-head">4.5  Repetición para (contador)</h3><p class="muted">Se usa cuando el número de iteraciones se conoce de antemano. Se inicializa un contador, se evalúa una condición y se incrementa el contador en cada vuelta. En el diagrama se dibuja como un mientras con tres pasos: inicializar, evaluar e incrementar.</p><figure class="diagrama"><figcaption>Patrón de bucle para</figcaption><pre class="mermaid">flowchart TD
-    A([&quot;Inicio&quot;]) --&gt; B[&quot;i ← 1&quot;]
-    B --&gt; C{&quot;¿i &lt;= N?&quot;}
-    C -- &quot;Sí&quot; --&gt; D[&quot;Acción&quot;]
-    D --&gt; E[&quot;i ← i + 1&quot;]
-    E --&gt; C
-    C -- &quot;No&quot; --&gt; F([&quot;Fin&quot;])</pre></figure></section><section class="section" id="sec-05"><div class="head"><div><span class="num">SECCIÓN 05</span><h2>Autoevaluación</h2></div></div><p class="muted">Comprueba tus conocimientos teóricos respondiendo las siguientes preguntas interactivas:</p><article class="quiz-card" data-q="1" data-correct="1"><p class="question">1. Un rombo de decisión recibe una entrada y produce:</p><div class="options" role="group" aria-label="Opciones Pregunta 1"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Una sola salida (el flujo continúa en línea recta)</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Dos salidas rotuladas Sí y No</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Ninguna salida: solo procesa datos</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Tantas salidas como condiciones existan</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="2" data-correct="2"><p class="question">2. En la estructura mientras, la condición se evalúa:</p><div class="options" role="group" aria-label="Opciones Pregunta 2"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Después de cada iteración</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Solo una vez al inicio</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Antes de cada iteración; si es falsa al inicio, no se ejecuta ninguna</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Al final del algoritmo</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><div class="score-card" id="titi-score-card"><div class="score-info"><b>Estado de Autoevaluación Titi</b><span id="score-text">Respondidas: 0 / 2</span><div class="titi-status" id="titi-status">Sincronización activa con entorno Titi</div></div><div class="score-badge"><div class="score-val" id="score-val">0%</div></div></div></section><section class="section" id="sec-06"><div class="head"><div><span class="num">SECCIÓN 06</span><h2>Práctica en clase</h2></div></div><p class="muted">Resuelve ahora los 10 ejercicios de la Práctica N.º 1. Identifica primero la estructura que necesita cada uno y luego dibuja el diagrama completo, desde Inicio hasta Fin.</p><ul class="list-custom"><li>Lectura y visualización de un número: lee un número entero y muéstralo en pantalla.</li><li>Suma de dos números: lee dos números y muestra su suma.</li><li>Promedio de tres números: lee tres números y calcula su promedio.</li><li>Área y perímetro de un círculo: lee el radio y calcula área y perímetro (π = 3.1416).</li><li>Conversión de bolivianos a dólares: lee bolivianos y conviértelos (1 USD = 6.96 Bs).</li><li>Número par o impar: lee un entero y determina si es par o impar.</li><li>El mayor de dos números: lee dos números distintos y muestra cuál es mayor.</li><li>Calificación según la nota: nota entre 0 y 100 → Reprobado (&lt; 51), Aprobado (51–79) o Excelente (80–100).</li><li>Números del 1 al 10: muestra los números del 1 al 10.</li><li>Suma de 5 números: lee 5 números y calcula su suma total.</li><li>Conteo de números hasta ingresar 0: lee números hasta que se ingrese 0 y muestra cuántos se ingresaron (sin contar el 0).</li></ul><div class="box-info highlight"><b>EJEMPLO</b><p>Retos extra (para practicar más): promedio de N números; tabla de multiplicar de un número N; verificar si un número es positivo, negativo o cero. La misma lógica de las soluciones 5.8 y 5.10 te sirve.</p></div></section><section class="section" id="sec-07"><div class="head"><div><span class="num">SECCIÓN 07</span><h2>Entregable</h2></div></div><p class="muted">Entrega la Práctica N.º 1 resuelta antes de la fecha indicada. Recuerda: únicamente diagramas de flujo, sin código ni pseudocódigo.</p><div class="box-info highlight"><b>EJEMPLO</b><p>Archivo: Practica_1_Apellido_Nombre — diagramas dibujados a mano (foto o escaneo claro) o digitales (draw.io exportado a PDF). Fecha de entrega: 18/08/2026.</p></div><ul class="list-custom"><li>Cada diagrama debe empezar con Inicio y terminar con Fin.</li><li>Símbolos correctos: terminal, proceso, entrada/salida y decisión.</li><li>Toda decisión con sus dos salidas rotuladas Sí y No.</li><li>Flechas claras, sin cortes ni cruces innecesarios.</li><li>El diagrama debe correr mentalmente de punta a punta sin trabas (verifica con un caso de ejemplo).</li></ul></section><section class="section" id="sec-08"><div class="head"><div><span class="num">SECCIÓN 08</span><h2>Rúbrica de evaluación</h2></div></div><div class="table-container"><table class="styled-table"><thead><tr><th>Criterio</th><th>Descripción</th><th style="width:100px;">Puntaje</th></tr></thead><tbody><tr><td><b>Simbología</b></td><td>Uso correcto de terminales, procesos, entradas/salidas y decisiones.</td><td class="pts">20 pts</td></tr><tr><td><b>Flujo y trazado</b></td><td>Flechas direccionales claras, sin cortes ni cruces innecesarios.</td><td class="pts">20 pts</td></tr><tr><td><b>Estructuras de control</b></td><td>Selección y repetición modeladas correctamente según el problema.</td><td class="pts">30 pts</td></tr><tr><td><b>Solución lógica</b></td><td>El algoritmo resuelve el problema para cualquier entrada válida.</td><td class="pts">20 pts</td></tr><tr><td><b>Presentación</b></td><td>Diagramas limpios, legibles y completos (Inicio a Fin).</td><td class="pts">10 pts</td></tr></tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td class="pts">100 Pts</td></tr></tfoot></table></div></section><section class="section" id="sec-09"><div class="head"><div><span class="num">SECCIÓN 09</span><h2>Referencias</h2></div></div><ul class="list-custom"><li>Joyanes Aguilar, L. — Fundamentos de programación: algoritmos, estructura de datos y objetos (McGraw-Hill).</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li><li>Documentación de draw.io / diagrams.net: https://app.diagrams.net</li><li>Wikipedia — Diagrama de flujo: https://es.wikipedia.org/wiki/Diagrama_de_flujo</li><li>Práctica N.º 1 · Diagramas de Flujo — Estructuras de Control Básicas (INF-220, Gestión 2026-02).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato UX · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script>
+</style></head><body><header class="topbar"><div class="brand"><div class="mark">GL03</div><div><strong>INF-220 · Programación Orientada a Objetos · Guía de laboratorio</strong><small>UATF · Facultad de Ciencias Puras · Ing. Informática</small></div></div></header><div class="progress" aria-hidden="true"><i id="bar"></i></div><div class="layout"><main><section class="hero" id="inicio"><div class="eyebrow">GL03 · 3 h de laboratorio</div><h1>Estructuras Selectivas — Diagramas de Flujo y Python</h1><p class="lead">Práctica N.º 3 · Toma de decisiones simples, dobles, anidadas y múltiples con diagramas de flujo e implementación en Python.</p><div class="chips"><span class="chip">Ing. Informática · 2º semestre · Gestión 2026-02</span><span class="chip">Gestión 2026-02</span></div><div class="meta-details"><div><b>Asignatura:</b> INF-220 · Programación Orientada a Objetos</div><div><b>Institución:</b> UATF · Facultad de Ciencias Puras · Ing. Informática</div><div><b>Información:</b> Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo</div></div></section><aside class="notice"><div aria-hidden="true">💡</div><div><strong>Antes de comenzar</strong><p>En esta guía se modelan algoritmos de decisión selectiva. Para cada ejercicio deberás diseñar el diagrama de flujo y escribir su respectivo programa en Python. Podés probar las celdas interactivas y verificar los diagramas de ejemplo en línea.</p></div></aside><section class="section" id="sec-01"><div class="head"><div><span class="num">SECCIÓN 01</span><h2>Competencia y objetivos</h2></div></div><p class="muted">Competencia de la práctica</p><div class="box-info highlight"><b>Competencia de la práctica</b><p>Aplica estructuras de control selectivas (if, if-else, if-elif-else y condicionales anidados) para diseñar diagramas de flujo lógicos y construir programas ejecutables en Python que tomen decisiones automáticas ante diversas condiciones de entrada.</p></div><p class="muted">Objetivos específicos</p><ul class="list-custom"><li>Identificar y diferenciar selecciones simples, dobles, anidadas y múltiples.</li><li>Modelar la toma de decisiones en diagramas de flujo con el símbolo del rombo de decisión.</li><li>Traducir diagramas de flujo selectivos a sintaxis Python usando if, elif y else.</li><li>Validar condiciones lógicas complejas mediante operadores relacionales (&gt;, &lt;, ==, !=, &gt;=, &lt;=) y lógicos (and, or, not).</li><li>Ejecutar y probar programas interactivos directamente en el navegador.</li></ul></section><section class="section" id="sec-02"><div class="head"><div><span class="num">SECCIÓN 02</span><h2>Requisitos y preparación</h2></div></div><p class="muted">Para completar esta guía necesitarás tu navegador web para ejecutar código Python en vivo y herramientas de dibujo (draw.io o papel) para los diagramas de flujo.</p><ul class="list-custom"><li>Comprensión de estructuras secuenciales y lectura de variables (GL01 y GL02).</li><li>Editor de diagramas de flujo (draw.io / diagrams.net).</li><li>Enunciado oficial de la Práctica N.º 3 (11 ejercicios selectivos).</li></ul><div class="box-info"><b>NOTA</b><p>Ambos entregables (diagrama de flujo y código Python) deben ser estrictamente coherentes entre sí.</p></div></section><section class="section" id="sec-03"><div class="head"><div><span class="num">SECCIÓN 03</span><h2>Conceptos previos</h2></div></div><div class="box-info"><b>DEFINICIÓN · Selección Simple (if)</b><p>Evalúa una condición lógica. Si es verdadera, ejecuta un bloque de instrucciones; si es falsa, no realiza ninguna acción.</p></div><div class="box-info"><b>DEFINICIÓN · Selección Doble (if-else)</b><p>Evalúa una condición. Ejecuta un bloque si es verdadera y un bloque alternativo si es falsa.</p></div><div class="box-info"><b>DEFINICIÓN · Selección Múltiple (if-elif-else)</b><p>Evalúa varias condiciones en secuencia. Se ejecuta el primer bloque cuya condición resulte verdadera.</p></div><div class="box-info"><b>DEFINICIÓN · Condicionales Anidados</b><p>Estructuras condicionales ubicadas dentro del bloque de otra estructura condicional para evaluar decisiones jerárquicas.</p></div></section><section class="section" id="sec-04"><div class="head"><div><span class="num">SECCIÓN 04</span><h2>Modelado de Decisiones en Diagramas y Python</h2></div></div><p class="muted">Ejemplo de condicional anidado para determinar el mayor de tres números distintos:</p><figure class="diagrama"><figcaption>Diagrama de Flujo — Mayor de Tres Números</figcaption><pre class="mermaid">graph TD
+    A([Inicio]) --&gt; B[/Leer a, b, c/]
+    B --&gt; C{¿a &gt; b?}
+    C -- Sí --&gt; D{¿a &gt; c?}
+    D -- Sí --&gt; E[/Mostrar &#x27;El mayor es a&#x27;/]
+    D -- No --&gt; F[/Mostrar &#x27;El mayor es c&#x27;/]
+    C -- No --&gt; G{¿b &gt; c?}
+    G -- Sí --&gt; H[/Mostrar &#x27;El mayor es b&#x27;/]
+    G -- No --&gt; I[/Mostrar &#x27;El mayor es c&#x27;/]
+    E --&gt; J([Fin])
+    F --&gt; J
+    H --&gt; J
+    I --&gt; J</pre></figure><ol class="pasos"><li><p>Implementación equivalente en Python con condicionales anidados:</p><div class="code-mini"><pre><code>a = int(input(&#x27;a: &#x27;))
+b = int(input(&#x27;b: &#x27;))
+c = int(input(&#x27;c: &#x27;))
+
+if a &gt; b:
+    if a &gt; c:
+        print(f&#x27;El mayor es {a}&#x27;)
+    else:
+        print(f&#x27;El mayor es {c}&#x27;)
+else:
+    if b &gt; c:
+        print(f&#x27;El mayor es {b}&#x27;)
+    else:
+        print(f&#x27;El mayor es {c}&#x27;)</code></pre></div></li></ol></section><section class="section" id="sec-05"><div class="head"><div><span class="num">SECCIÓN 05</span><h2>Laboratorio Práctico interactivo</h2></div></div><p class="muted">Probá ejecutar los siguientes programas interactivos de toma de decisiones:</p><div class="cell" id="cell-1"><div class="cell-in"><span class="cell-tag">In [1]:</span><button class="btn-copy" data-codigo="def evaluar_triangulo(a, b, c):
+    if (a + b &gt; c) and (a + c &gt; b) and (b + c &gt; a):
+        if a == b == c:
+            return &#x27;Triángulo Equilátero&#x27;
+        elif a == b or a == c or b == c:
+            return &#x27;Triángulo Isósceles&#x27;
+        else:
+            return &#x27;Triángulo Escaleno&#x27;
+    return &#x27;No forma un triángulo válido&#x27;
+
+print(evaluar_triangulo(3, 3, 3))
+print(evaluar_triangulo(5, 5, 8))
+print(evaluar_triangulo(3, 4, 5))
+print(evaluar_triangulo(1, 2, 10))" title="Copiar código">⧉ copiar</button><button class="btn-run" data-n="1" data-codigo="def evaluar_triangulo(a, b, c):
+    if (a + b &gt; c) and (a + c &gt; b) and (b + c &gt; a):
+        if a == b == c:
+            return &#x27;Triángulo Equilátero&#x27;
+        elif a == b or a == c or b == c:
+            return &#x27;Triángulo Isósceles&#x27;
+        else:
+            return &#x27;Triángulo Escaleno&#x27;
+    return &#x27;No forma un triángulo válido&#x27;
+
+print(evaluar_triangulo(3, 3, 3))
+print(evaluar_triangulo(5, 5, 8))
+print(evaluar_triangulo(3, 4, 5))
+print(evaluar_triangulo(1, 2, 10))" title="Ejecutar en el navegador">▶ ejecutar</button><pre><code>def evaluar_triangulo(a, b, c):
+    if (a + b &gt; c) and (a + c &gt; b) and (b + c &gt; a):
+        if a == b == c:
+            return &#x27;Triángulo Equilátero&#x27;
+        elif a == b or a == c or b == c:
+            return &#x27;Triángulo Isósceles&#x27;
+        else:
+            return &#x27;Triángulo Escaleno&#x27;
+    return &#x27;No forma un triángulo válido&#x27;
+
+print(evaluar_triangulo(3, 3, 3))
+print(evaluar_triangulo(5, 5, 8))
+print(evaluar_triangulo(3, 4, 5))
+print(evaluar_triangulo(1, 2, 10))</code></pre></div><div class="cell-out"><span class="cell-tag">Out [1]:</span><pre class="out-pre">Triángulo Equilátero
+Triángulo Isósceles
+Triángulo Escaleno
+No forma un triángulo válido</pre></div></div><div class="cell" id="cell-2"><div class="cell-in"><span class="cell-tag">In [2]:</span><button class="btn-copy" data-codigo="def calcular_imc(peso, estatura):
+    imc = peso / (estatura ** 2)
+    if imc &lt; 18.5:
+        cat = &#x27;Bajo peso&#x27;
+    elif imc &lt; 25:
+        cat = &#x27;Normal&#x27;
+    elif imc &lt; 30:
+        cat = &#x27;Sobrepeso&#x27;
+    else:
+        cat = &#x27;Obesidad&#x27;
+    return f&#x27;IMC: {imc:.2f} - Categoría: {cat}&#x27;
+
+print(calcular_imc(70, 1.75))
+print(calcular_imc(95, 1.70))" title="Copiar código">⧉ copiar</button><button class="btn-run" data-n="2" data-codigo="def calcular_imc(peso, estatura):
+    imc = peso / (estatura ** 2)
+    if imc &lt; 18.5:
+        cat = &#x27;Bajo peso&#x27;
+    elif imc &lt; 25:
+        cat = &#x27;Normal&#x27;
+    elif imc &lt; 30:
+        cat = &#x27;Sobrepeso&#x27;
+    else:
+        cat = &#x27;Obesidad&#x27;
+    return f&#x27;IMC: {imc:.2f} - Categoría: {cat}&#x27;
+
+print(calcular_imc(70, 1.75))
+print(calcular_imc(95, 1.70))" title="Ejecutar en el navegador">▶ ejecutar</button><pre><code>def calcular_imc(peso, estatura):
+    imc = peso / (estatura ** 2)
+    if imc &lt; 18.5:
+        cat = &#x27;Bajo peso&#x27;
+    elif imc &lt; 25:
+        cat = &#x27;Normal&#x27;
+    elif imc &lt; 30:
+        cat = &#x27;Sobrepeso&#x27;
+    else:
+        cat = &#x27;Obesidad&#x27;
+    return f&#x27;IMC: {imc:.2f} - Categoría: {cat}&#x27;
+
+print(calcular_imc(70, 1.75))
+print(calcular_imc(95, 1.70))</code></pre></div><div class="cell-out"><span class="cell-tag">Out [2]:</span><pre class="out-pre">IMC: 22.86 - Categoría: Normal
+IMC: 32.87 - Categoría: Obesidad</pre></div></div></section><section class="section" id="sec-06"><div class="head"><div><span class="num">SECCIÓN 06</span><h2>Autoevaluación</h2></div></div><p class="muted">Responde las siguientes preguntas sobre estructuras selectivas:</p><article class="quiz-card" data-q="1" data-correct="1"><p class="question">1. ¿Qué símbolo se utiliza en un diagrama de flujo para representar una toma de decisión condicional?</p><div class="options" role="group" aria-label="Opciones Pregunta 1"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Un rectángulo de proceso</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Un rombo con una entrada y dos salidas (Sí / No)</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Un paralelogramo de entrada y salida</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Un círculo conector</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="2" data-correct="2"><p class="question">2. En una estructura if-elif-else en Python, ¿cuántos bloques elif se pueden incluir?</p><div class="options" role="group" aria-label="Opciones Pregunta 2"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Solo uno</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Exactamente dos</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Tantos como sean necesarios según la lógica del programa</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Ninguno, elif no existe en Python</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="3" data-correct="0"><p class="question">3. ¿Cuál es la forma correcta de verificar si un número x está entre 10 y 20 inclusive en Python?</p><div class="options" role="group" aria-label="Opciones Pregunta 3"><button class="option" data-ans="0" type="button"><span class="letter">A</span> if 10 &lt;= x &lt;= 20:</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> if x = 10 and x = 20:</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> if 10 &lt; x y x &lt; 20:</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> if x between 10 and 20:</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="4" data-correct="2"><p class="question">4. ¿Qué ocurre si ninguna condición de un bloque if-elif resulta verdadera y no hay cláusula else?</p><div class="options" role="group" aria-label="Opciones Pregunta 4"><button class="option" data-ans="0" type="button"><span class="letter">A</span> El programa arroja un error de sintaxis</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> El programa se detiene inmediatamente</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> El programa no ejecuta ninguno de los bloques y continúa en la siguiente línea</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Se ejecuta el primer bloque por defecto</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><div class="score-card" id="titi-score-card"><div class="score-info"><b>Estado de Autoevaluación Titi</b><span id="score-text">Respondidas: 0 / 4</span><div class="titi-status" id="titi-status">Sincronización activa con entorno Titi</div></div><div class="score-badge"><div class="score-val" id="score-val">0%</div></div></div></section><section class="section" id="sec-07"><div class="head"><div><span class="num">SECCIÓN 07</span><h2>Práctica en clase</h2></div></div><p class="muted">Para cada uno de los siguientes 11 ejercicios, diseña el diagrama de flujo y escribe el código Python correspondiente:</p><ul class="list-custom"><li>1. Mayoría de edad: Lee la edad y determina si es mayor de edad (&gt;= 18) o menor.</li><li>2. Número positivo, negativo o cero: Determina la polaridad de un número.</li><li>3. Aprobación de una materia: Lee nota (0 a 100) y muestra &#x27;Aprobado&#x27; (&gt;= 51) o &#x27;Reprobado&#x27;.</li><li>4. El mayor de tres números: Determina el mayor de 3 números distintos usando condicionales anidados.</li><li>5. Clasificación de un triángulo: Verifica validez (a+b&gt;c) y clasifica en Equilátero, Isósceles o Escaleno.</li><li>6. Descuento por compra: Monto final con descuentos (0% &lt;100Bs, 5% 100-299.99Bs, 10% 300-699.99Bs, 15% &gt;=700Bs).</li><li>7. Año bisiesto: Determina si un año es bisiesto (divisible entre 4, excepto divisibles entre 100 no divisibles entre 400).</li><li>8. Clasificación de IMC: Calcula IMC = peso / estatura² y clasifica en Bajo peso, Normal, Sobrepeso u Obesidad.</li><li>9. Validación de contraseña: Verifica longitud &gt;= 8, al menos un número y al menos una letra mayúscula.</li><li>10. Calculadora básica con menú: Menú (1:suma, 2:resta, 3:multiplicación, 4:división) controlando división entre cero.</li><li>11. Cuadrante de un punto: Determina cuadrante (I, II, III, IV), ejes u origen para coordenadas (x, y).</li></ul></section><section class="section" id="sec-08"><div class="head"><div><span class="num">SECCIÓN 08</span><h2>Entregable</h2></div></div><p class="muted">Entregar el archivo de diagramas (draw.io exportado a PDF o imágenes) y el código fuente Python (.py o PDF).</p><div class="box-info highlight"><b>EJEMPLO</b><p>Formato de entrega: Practica_3_Apellido_Nombre.pdf / .py. Fecha límite: 25/08/2026.</p></div></section><section class="section" id="sec-09"><div class="head"><div><span class="num">SECCIÓN 09</span><h2>Rúbrica de evaluación</h2></div></div><div class="table-container"><table class="styled-table"><thead><tr><th>Criterio</th><th>Descripción</th><th style="width:100px;">Puntaje</th></tr></thead><tbody><tr><td><b>Simbología de Diagramas</b></td><td>Uso adecuado del rombo de decisión con salidas Sí y No rotuladas.</td><td class="pts">25 pts</td></tr><tr><td><b>Traducción a Python</b></td><td>Correspondencia exacta entre el diagrama de flujo y el código con estructuras if-elif-else.</td><td class="pts">25 pts</td></tr><tr><td><b>Lógica Algorítmica</b></td><td>Manejo correcto de condicionales anidados y casos límite (división entre cero, triángulo inválido).</td><td class="pts">25 pts</td></tr><tr><td><b>Presentación y Coherencia</b></td><td>Código limpio, diagramas claros y entregables completos (Inicio a Fin).</td><td class="pts">25 pts</td></tr></tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td class="pts">100 Pts</td></tr></tfoot></table></div></section><section class="section" id="sec-10"><div class="head"><div><span class="num">SECCIÓN 10</span><h2>Referencias</h2></div></div><ul class="list-custom"><li>Python Software Foundation — Conditional Statements: https://docs.python.org/3/tutorial/controlflow.html#if-statements</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato UX · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js'></script><script>
 // ---------- Barra de progreso de lectura ----------
 const progressBar = document.getElementById('bar');
 window.addEventListener('scroll', () => {
