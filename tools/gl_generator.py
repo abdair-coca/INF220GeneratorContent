@@ -939,6 +939,97 @@ footer {
     break-inside: avoid;
   }
 }
+
+/* ---------- Overlay: Nota subida a Titi ---------- */
+#titi-nota-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(21, 25, 39, 0.72);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#titi-nota-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+#titi-nota-overlay .nota-box {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 380px;
+  width: calc(100% - 48px);
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+#titi-nota-overlay .nota-spinner {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 18px;
+  border: 4px solid #e5e2ff;
+  border-top-color: #5b4df0;
+  border-radius: 50%;
+  animation: nota-spin 0.8s linear infinite;
+}
+#titi-nota-overlay .nota-box.done .nota-spinner {
+  border-color: #2fb380;
+  animation: none;
+}
+#titi-nota-overlay .nota-box.done .nota-spinner::after {
+  content: "✓";
+  display: block;
+  font-size: 22px;
+  line-height: 36px;
+  color: #2fb380;
+  font-weight: 700;
+}
+@keyframes nota-spin {
+  to { transform: rotate(360deg); }
+}
+#titi-nota-overlay .nota-title {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #151927;
+}
+#titi-nota-overlay .nota-text {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #4a4f63;
+}
+#titi-nota-overlay .nota-score {
+  font-size: 30px;
+  font-weight: 800;
+  color: #5b4df0;
+  margin: 8px 0 18px;
+}
+#titi-nota-overlay .nota-btn {
+  background: #5b4df0;
+  color: #fff;
+  border: 0;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#titi-nota-overlay .nota-btn:hover {
+  background: #4336be;
+}
+#titi-nota-overlay .nota-btn.hidden {
+  display: none;
+}
+
+@media print {
+  #titi-nota-overlay {
+    display: none !important;
+  }
+}
 """
 
 # ---------------------------------------------------------------------------
@@ -1008,12 +1099,53 @@ function actualizarCalculoScore() {
       : 'Sincronización activa con entorno Titi';
   }
 
-  reportarScoreTiti(scorePercent, {
-    total: totalQuizzes,
-    correct: correctCount,
-    answered: answeredCount
-  });
+  // Solo enviamos el score definitivo a Titi cuando la evaluación está completa.
+  // Enviarlo en cada respuesta haría que Titi registre el score parcial de la
+  // primera pregunta como si fuera la nota final.
+  if (answeredCount === totalQuizzes) {
+    reportarScoreTiti(scorePercent, {
+      total: totalQuizzes,
+      correct: correctCount,
+      answered: answeredCount
+    });
+    mostrarOverlayNota(scorePercent);
+  }
 }
+
+function mostrarOverlayNota(score) {
+  const overlay = document.getElementById('titi-nota-overlay');
+  const box = document.getElementById('titi-nota-box');
+  if (!overlay || !box) return;
+  const title = document.getElementById('nota-title');
+  const text = document.getElementById('nota-text');
+  const scoreEl = document.getElementById('nota-score');
+  const btn = document.getElementById('nota-btn');
+  box.classList.remove('done');
+  scoreEl.classList.add('hidden');
+  btn.classList.add('hidden');
+  if (title) title.textContent = 'Subiendo nota a Titi…';
+  if (text) text.textContent = 'Guardando tu resultado, espera un momento.';
+  overlay.classList.add('show');
+  setTimeout(() => {
+    box.classList.add('done');
+    if (title) title.textContent = '¡Nota subida a Titi!';
+    if (text) text.textContent = 'Tu puntaje quedó registrado correctamente.';
+    if (scoreEl) {
+      scoreEl.textContent = score + '%';
+      scoreEl.classList.remove('hidden');
+    }
+    btn.classList.remove('hidden');
+  }, 1400);
+}
+
+document.addEventListener('click', (ev) => {
+  if (ev.target && ev.target.id === 'nota-btn') {
+    const overlay = document.getElementById('titi-nota-overlay');
+    if (overlay) overlay.classList.remove('show');
+    const card = document.getElementById('titi-score-card');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
 
 quizCards.forEach(card => {
   const qId = card.dataset.q;
@@ -1225,8 +1357,48 @@ function actualizarCalculoScore() {
       ? '\\u2713 Evaluaci\\u00f3n completada y enviada a Titi'
       : 'Sincronizaci\\u00f3n activa con entorno Titi';
   }
-  reportarScoreTiti(pct);
+  // Solo reportamos el score final cuando la evaluación está completa, para
+  // evitar que Titi registre el score parcial de la primera pregunta.
+  if (answered === total) {
+    reportarScoreTiti(pct);
+    mostrarOverlayNota(pct);
+  }
 }
+
+function mostrarOverlayNota(score) {
+  const overlay = document.getElementById('titi-nota-overlay');
+  const box = document.getElementById('titi-nota-box');
+  if (!overlay || !box) return;
+  const title = document.getElementById('nota-title');
+  const text = document.getElementById('nota-text');
+  const scoreEl = document.getElementById('nota-score');
+  const btn = document.getElementById('nota-btn');
+  box.classList.remove('done');
+  scoreEl.classList.add('hidden');
+  btn.classList.add('hidden');
+  if (title) title.textContent = 'Subiendo nota a Titi…';
+  if (text) text.textContent = 'Guardando tu resultado, espera un momento.';
+  overlay.classList.add('show');
+  setTimeout(() => {
+    box.classList.add('done');
+    if (title) title.textContent = '¡Nota subida a Titi!';
+    if (text) text.textContent = 'Tu puntaje quedó registrado correctamente.';
+    if (scoreEl) {
+      scoreEl.textContent = score + '%';
+      scoreEl.classList.remove('hidden');
+    }
+    btn.classList.remove('hidden');
+  }, 1400);
+}
+
+document.addEventListener('click', (ev) => {
+  if (ev.target && ev.target.id === 'nota-btn') {
+    const overlay = document.getElementById('titi-nota-overlay');
+    if (overlay) overlay.classList.remove('show');
+    const card = document.getElementById('titi-score-card');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
 
 quizCards.forEach(card => {
   const qId = card.dataset.q;
@@ -1382,6 +1554,19 @@ def main():
     else:
         csp_str = "default-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'; frame-src 'none'; img-src data:; media-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline';"
 
+    nota_overlay = ""
+    if _quiz_n > 0:
+        nota_overlay = (
+            '<div id="titi-nota-overlay">'
+            '<div class="nota-box" id="titi-nota-box">'
+            '<div class="nota-spinner"></div>'
+            '<p class="nota-title" id="nota-title">Subiendo nota a Titi…</p>'
+            '<p class="nota-text" id="nota-text">Guardando tu resultado, espera un momento.</p>'
+            '<div class="nota-score hidden" id="nota-score"></div>'
+            '<button class="nota-btn hidden" id="nota-btn" type="button">Continuar</button>'
+            '</div></div>'
+        )
+
     page = (
         "<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'>"
         f"<meta name='viewport' content='width=device-width,initial-scale=1'>"
@@ -1402,6 +1587,7 @@ def main():
         f'<footer>Generado con gl_generator.py · formato UX · {esc(meta.get("facultad", ""))}</footer>'
         f'<div id="cargando-bar"></div>{scripts}'
         f'<script>{JS if interactivo else JS_STATIC}</script>'
+        f'{nota_overlay}'
         "</body></html>"
     )
 
