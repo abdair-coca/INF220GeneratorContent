@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'; frame-src 'none'; img-src data:; media-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Titi · El Refugio Lógico</title>
+<style>
+:root {
+  --bg: #12101c;
+  --panel: #201c33;
+  --panel-border: #4a3f6b;
+  --accent: #ffd166;
+  --accent2: #4dd0e1;
+  --ok: #18d6a0;
+  --err: #ff6b6b;
+  --text: #efeaff;
+  --text-dim: #b6adcf;
+  font-family: 'Courier New', 'Consolas', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: var(--bg); color: var(--text);
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  touch-action: none;
+}
+
+#appRoot {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+/* ---------------- HUD superior ---------------- */
+#hud {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(#241f3a, #1a1729);
+  border-bottom: 3px solid var(--panel-border);
+  z-index: 20;
+  flex-shrink: 0;
+}
+#hudLeft { display: flex; flex-direction: column; gap: 2px; }
+#missionTitleText { font-size: 13px; color: var(--accent); font-weight: bold; letter-spacing: 0.5px; }
+#objectiveRow { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+#objectiveRow::before { content: "🎯"; }
+#progressDots { display: flex; gap: 4px; }
+.progress-dot {
+  width: 9px; height: 9px; border-radius: 2px;
+  background: #33304a; border: 1px solid var(--panel-border);
+}
+.progress-dot.filled { background: var(--ok); border-color: var(--ok); }
+
+#bookBtn {
+  background: var(--panel); border: 2px solid var(--panel-border);
+  color: var(--accent); font-size: 18px; padding: 6px 10px;
+  cursor: pointer; border-radius: 6px;
+}
+#bookBtn:active { transform: scale(0.95); }
+
+#demoBadge {
+  position: absolute; top: 6px; right: 12px;
+  background: var(--accent2); color: #10202a; font-size: 9px; font-weight: bold;
+  padding: 2px 8px; border-radius: 4px; z-index: 25; letter-spacing: 0.5px;
+}
+#demoBadge.hidden { display: none; }
+
+/* ---------------- Canvas ---------------- */
+#canvasWrap {
+  position: relative; flex: 1; min-height: 0; background: #000;
+}
+#gameCanvas {
+  display: block; width: 100%; height: 100%;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+/* ---------------- Diálogo ---------------- */
+#dialogueBox {
+  position: absolute; left: 3%; right: 3%; bottom: 90px;
+  background: var(--panel); border: 3px solid var(--panel-border);
+  border-radius: 8px; padding: 10px 14px; cursor: pointer;
+  z-index: 30; max-width: 640px; margin: 0 auto;
+}
+#dialogueBox.hidden { display: none; }
+#dialogueSpeaker { color: var(--accent); font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+#dialogueText { font-size: 13px; line-height: 1.4; }
+#dialogueBox::after { content: "▶ toca para continuar"; display: block; font-size: 9px; color: var(--text-dim); margin-top: 6px; text-align: right; }
+
+/* ---------------- Controles móviles ---------------- */
+#mobileControls {
+  position: absolute; bottom: 14px; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 18px; pointer-events: none; z-index: 25;
+}
+#joystickBase {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 2px solid var(--panel-border);
+  pointer-events: all; position: relative;
+}
+#joystickKnob {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--accent); position: absolute; top: 27px; left: 27px;
+  transition: transform 0.03s linear;
+}
+#interactBtn {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--ok); color: #0c2a20; font-weight: bold; font-size: 13px;
+  border: 2px solid #0f8f6c; pointer-events: all;
+}
+@media (min-width: 900px) and (pointer: fine) {
+  #mobileControls { display: none; }
+}
+
+/* ---------------- Toast ---------------- */
+#toast {
+  position: absolute; top: 56px; left: 50%; transform: translateX(-50%) translateY(-8px);
+  background: #2a2440; border: 2px solid var(--accent); color: var(--text);
+  padding: 6px 14px; border-radius: 6px; font-size: 11px; z-index: 40;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------------- Modal genérico ---------------- */
+.modal-overlay {
+  position: absolute; inset: 0; background: rgba(5,3,15,0.78);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50; padding: 12px;
+}
+.modal-overlay.hidden { display: none; }
+
+/* ---------------- Editor (Mini VS Code) ---------------- */
+#editorModal .modal-panel {
+  width: 100%; max-width: 560px; max-height: 92vh; overflow: auto;
+  background: #1a1729; border: 3px solid var(--panel-border); border-radius: 10px;
+  display: flex; flex-direction: column;
+}
+.editor-titlebar {
+  background: #14111f; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 2px solid var(--panel-border);
+}
+.editor-titlebar span { font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
+.editor-titlebar button {
+  background: none; border: none; color: var(--text-dim); font-size: 16px; cursor: pointer;
+}
+.editor-brief { padding: 10px 14px; border-bottom: 1px dashed var(--panel-border); }
+.editor-brief h4 { margin: 0 0 4px; color: var(--accent); font-size: 12px; }
+.editor-brief p { margin: 0 0 6px; font-size: 12px; line-height: 1.4; }
+.editor-brief pre {
+  background: #0f0d18; padding: 6px 8px; border-radius: 4px; font-size: 11px; color: var(--accent2);
+  margin: 0; overflow-x: auto;
+}
+.code-editor-wrap {
+  position: relative; display: flex; background: #0f0d18; margin: 10px 14px; border-radius: 6px;
+  border: 1px solid var(--panel-border); overflow: hidden; height: 130px;
+}
+#editorLineNumbers {
+  padding: 8px 6px; text-align: right; color: #514a72; font-size: 13px; line-height: 1.5;
+  white-space: pre; user-select: none; background: #100e1a; min-width: 26px;
+}
+.code-editor-inner { position: relative; flex: 1; overflow: hidden; }
+#editorHighlight, #editorTextarea {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  margin: 0; padding: 8px; font-size: 13px; line-height: 1.5; font-family: 'Consolas','Courier New',monospace;
+  white-space: pre; overflow: auto; box-sizing: border-box;
+}
+#editorHighlight { color: var(--text); pointer-events: none; }
+#editorTextarea {
+  background: transparent; color: transparent; caret-color: var(--accent);
+  border: none; resize: none; outline: none; z-index: 2;
+}
+.tok-kw { color: #ff8fb3; font-weight: bold; }
+.tok-str { color: #a4e07f; }
+.tok-num { color: #7cc7ff; }
+.tok-id { color: #efeaff; }
+.tok-com { color: #6a628a; font-style: italic; }
+
+#editorHintText {
+  margin: 0 14px 8px; font-size: 11px; color: var(--accent2); background: #0f2a30;
+  padding: 6px 8px; border-radius: 4px; border-left: 3px solid var(--accent2);
+}
+#editorHintText.hidden { display: none; }
+
+#editorOutput { margin: 0 14px 10px; min-height: 20px; font-size: 12px; }
+.out-line { padding: 2px 0; }
+.out-ok { color: var(--ok); }
+.out-err { color: var(--err); font-weight: bold; }
+.out-hint { color: var(--accent); }
+
+.editor-actions {
+  display: flex; gap: 8px; padding: 10px 14px 14px; border-top: 1px solid var(--panel-border);
+}
+.btn {
+  flex: 1; padding: 9px 10px; border-radius: 6px; border: 2px solid var(--panel-border);
+  background: #241f3a; color: var(--text); font-family: inherit; font-size: 11px; cursor: pointer; font-weight: bold;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--ok); color: #0c2a20; border-color: #0f8f6c; flex: 1.4; }
+.btn-secondary { background: var(--accent); color: #3a2a00; border-color: #c9a04e; }
+
+/* ---------------- Libro de Python ---------------- */
+#bookModal .modal-panel {
+  width: 100%; max-width: 560px; max-height: 88vh;
+  background: #1a1729; border: 3px solid var(--panel-border); border-radius: 10px;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.book-header {
+  display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;
+  border-bottom: 2px solid var(--panel-border); background: #14111f;
+}
+.book-header h3 { margin: 0; font-size: 13px; color: var(--accent); }
+.book-header button { background: none; border: none; color: var(--text-dim); font-size: 16px; cursor: pointer; }
+.book-body { display: flex; flex: 1; overflow: hidden; }
+#bookPagesList { width: 130px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--panel-border); padding: 6px; }
+.book-page-item { font-size: 10px; padding: 7px 6px; border-radius: 4px; cursor: pointer; margin-bottom: 3px; color: var(--text-dim); }
+.book-page-item:hover { background: #2a2440; }
+.book-page-item.locked { opacity: 0.4; cursor: default; }
+#bookDetail { flex: 1; overflow-y: auto; padding: 12px 14px; font-size: 12px; line-height: 1.5; }
+#bookDetail h3 { color: var(--accent); margin: 0 0 8px; }
+.book-label { color: var(--accent2); font-size: 10px; text-transform: uppercase; margin: 8px 0 2px; letter-spacing: 0.5px; }
+#bookDetail pre { background: #0f0d18; padding: 6px 8px; border-radius: 4px; margin: 0; font-size: 11px; color: var(--accent2); white-space: pre-wrap; }
+
+/* ---------------- Pantalla de finalización ---------------- */
+#completionScreen .modal-panel {
+  width: 100%; max-width: 380px; background: #1a1729; border: 3px solid var(--accent);
+  border-radius: 10px; padding: 18px; text-align: center;
+}
+#completionScreen h2 { margin: 0 0 4px; color: var(--accent); font-size: 16px; }
+.score-big { font-size: 34px; font-weight: bold; color: var(--ok); margin: 10px 0; }
+.stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px dashed #332e4d; }
+.concepts-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+.concept-chip { background: #0f2a30; color: var(--ok); font-size: 10px; padding: 3px 8px; border-radius: 10px; }
+.completion-note { margin-top: 12px; font-size: 11px; color: var(--text-dim); }
+
+/* ---------------- Selector de misión (Demo Mode) ---------------- */
+#missionSelectorModal .modal-panel {
+  width: 100%; max-width: 380px; background: #1a1729; border: 3px solid var(--panel-border);
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+#missionSelectorModal h2 { color: var(--accent); font-size: 15px; margin: 0 0 4px; }
+#missionSelectorModal p { color: var(--text-dim); font-size: 11px; margin: 0 0 12px; }
+#missionSelectorList { display: flex; flex-direction: column; gap: 8px; }
+.mission-pick-btn {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  background: #241f3a; border: 2px solid var(--panel-border); border-radius: 6px;
+  color: var(--text); padding: 10px 12px; cursor: pointer; font-family: inherit;
+}
+.mission-pick-btn span { font-size: 10px; color: var(--accent2); }
+
+.hidden { display: none !important; }
+
+
+
+/* =========================================================================
+   Titi Game Kit v0.4 — capa visual reutilizable tipo RPG portátil clásico
+   ========================================================================= */
+:root {
+  --poke-ink: #17152a;
+  --poke-paper: #fff8dc;
+  --poke-blue: #4169a8;
+  --poke-blue-dark: #263f70;
+  --poke-red: #d95757;
+  --poke-green: #4e9b63;
+  --pixel-shadow: 0 4px 0 rgba(0,0,0,.28);
+}
+
+#hud {
+  min-height: 58px;
+  padding: 7px 12px;
+  background: linear-gradient(180deg, #f5efd8 0%, #e7dfc1 100%);
+  border-bottom: 4px solid var(--poke-ink);
+  box-shadow: 0 3px 0 rgba(255,255,255,.22) inset;
+}
+#missionTitleText { color: var(--poke-ink); font-size: 12px; text-transform: uppercase; }
+#objectiveRow { color: #4e4b58; font-size: 10px; }
+.progress-dot { width: 12px; height: 8px; border-radius: 0; border: 2px solid var(--poke-ink); background: #fff8dc; }
+.progress-dot.filled { background: var(--poke-green); border-color: var(--poke-ink); }
+#bookBtn {
+  border-radius: 3px; border: 3px solid var(--poke-ink); background: #fff8dc; color: var(--poke-ink);
+  box-shadow: 2px 2px 0 rgba(0,0,0,.2); padding: 5px 9px;
+}
+#canvasWrap { background: #1b2130; }
+#gameCanvas { filter: saturate(1.06) contrast(1.02); }
+
+#dialogueBox {
+  left: 4%; right: 4%; bottom: 24px; max-width: 720px;
+  background: var(--poke-paper); color: var(--poke-ink);
+  border: 4px solid var(--poke-ink); border-radius: 4px;
+  box-shadow: 0 0 0 3px #fff inset, var(--pixel-shadow);
+  padding: 12px 16px 14px;
+}
+#dialogueSpeaker { color: var(--poke-blue-dark); font-size: 12px; text-transform: uppercase; }
+#dialogueText { font-size: 13px; line-height: 1.5; }
+#dialogueBox::after { color: #6b6675; content: "▼ E / toca para continuar"; }
+
+#toast { background: var(--poke-paper); color: var(--poke-ink); border: 3px solid var(--poke-ink); border-radius: 3px; box-shadow: var(--pixel-shadow); }
+
+/* Editor: portátil del personaje + ergonomía tipo VS Code */
+#editorModal { background: rgba(8,12,18,.72); }
+#editorModal .modal-panel {
+  max-width: 720px; max-height: 94vh; border: 4px solid #111827; border-radius: 8px;
+  background: #151922; box-shadow: 0 12px 0 rgba(0,0,0,.28);
+}
+.editor-titlebar { background: #202634; border-bottom: 1px solid #343b4e; padding: 7px 10px; }
+.editor-titlebar::before { content: "TITI//CODEX"; color: #8ba4d8; font-size: 9px; letter-spacing: 1.4px; margin-right: 10px; }
+#editorTerminalLabel { color: #d9e2f2; flex: 1; }
+.editor-brief { background: #181d27; border-bottom: 1px solid #343b4e; }
+.editor-brief h4 { color: #ffd166; font-size: 13px; }
+.editor-brief pre { border: 1px solid #343b4e; }
+.code-editor-wrap { height: 190px; margin: 0; border: 0; border-radius: 0; border-top: 1px solid #252c3a; border-bottom: 1px solid #252c3a; }
+#editorLineNumbers { background: #11151d; color: #526071; padding-left: 9px; padding-right: 9px; }
+#editorHighlight, #editorTextarea { padding: 10px 12px; }
+#editorHintText { margin-top: 10px; }
+#editorOutput { background: #10141b; border: 1px solid #2d3545; margin-top: 8px; padding: 8px 10px; border-radius: 3px; }
+.editor-actions { background: #181d27; padding-top: 9px; }
+.btn { border-radius: 3px; }
+.btn-primary { background: #4e9b63; border-color: #79c28b; color: #07170d; }
+.editor-statusbar { display:flex; justify-content:space-between; gap:12px; padding:5px 10px; background:#263f70; color:#f2f6ff; font-size:9px; letter-spacing:.3px; }
+.editor-tabbar { display:flex; align-items:center; min-height:30px; background:#11151d; border-bottom:1px solid #343b4e; }
+.editor-tab { padding:8px 12px 7px; color:#d9e2f2; background:#181d27; border-top:2px solid #ffd166; font-size:10px; }
+.editor-context { color:#7e8da8; font-size:9px; margin-left:auto; padding-right:10px; }
+
+#bookModal .modal-panel, #completionScreen .modal-panel, #missionSelectorModal .modal-panel {
+  border-radius: 4px; box-shadow: var(--pixel-shadow);
+}
+#completionScreen .modal-panel { background: var(--poke-paper); color: var(--poke-ink); border: 4px solid var(--poke-ink); }
+#completionScreen h2 { color: var(--poke-blue-dark); }
+.stat-row { border-color: #c8bea1; }
+
+@media (max-width: 620px) {
+  #hud { min-height: 54px; padding: 6px 8px; }
+  #missionTitleText { max-width: 58vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #objectiveRow { max-width: 62vw; }
+  #dialogueBox { bottom: 112px; }
+  .code-editor-wrap { height: 170px; }
+  .editor-actions { padding: 8px; gap: 5px; }
+}
+
+</style>
+</head>
+<body>
+  <div id="appRoot">
+    <span id="demoBadge" class="hidden">MODO DEMO</span>
+
+    <header id="hud">
+      <div id="hudLeft">
+        <div id="missionTitleText">El Refugio Lógico</div>
+        <div id="objectiveRow"><span id="objectiveText">Cargando...</span></div>
+      </div>
+      <div id="progressDots"></div>
+      <button id="bookBtn" title="Libro de Python">📖</button>
+    </header>
+
+    <div id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <div id="dialogueBox" class="hidden">
+        <div id="dialogueSpeaker">—</div>
+        <div id="dialogueText">...</div>
+      </div>
+
+      <div id="mobileControls">
+        <div id="joystickBase"><div id="joystickKnob"></div></div>
+        <button id="interactBtn">E</button>
+      </div>
+
+      <div id="toast"></div>
+    </div>
+
+    <!-- Mini VS Code -->
+    <div id="editorModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="editor-titlebar">
+          <span id="editorTerminalLabel">CONSOLA DE CAMPO</span>
+          <button id="btnCloseEditor" aria-label="Cerrar editor">✕</button>
+        </div>
+        <div class="editor-tabbar">
+          <div class="editor-tab">reto.py</div>
+          <div class="editor-context" id="editorContext">MODO APRENDIZAJE</div>
+        </div>
+        <div class="editor-brief">
+          <h4 id="editorTitle">Desafío</h4>
+          <p id="editorObjective">Objetivo</p>
+          <p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p>
+          <pre id="editorExample"></pre>
+        </div>
+        <div class="code-editor-wrap">
+          <div id="editorLineNumbers">1</div>
+          <div class="code-editor-inner">
+            <pre id="editorHighlight"></pre>
+            <textarea id="editorTextarea" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+          </div>
+        </div>
+        <div id="editorHintText" class="hidden"></div>
+        <div id="editorOutput"></div>
+        <div class="editor-actions">
+          <button class="btn" id="btnBookInEditor">📘 Manual</button>
+          <button class="btn btn-secondary" id="btnHint">💡 Pista</button>
+          <button class="btn btn-primary" id="btnRun">▶ Ejecutar</button>
+        </div>
+        <div class="editor-statusbar"><span>Python · Titi Sandbox</span><span>Tab = 4 espacios · Ctrl+Enter = ejecutar</span></div>
+      </div>
+    </div>
+
+    <!-- Libro de Python -->
+    <div id="bookModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="book-header">
+          <h3>📖 Libro de Python</h3>
+          <button id="bookCloseBtn">✕</button>
+        </div>
+        <div class="book-body">
+          <div id="bookPagesList"></div>
+          <div id="bookDetail"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de finalización -->
+    <div id="completionScreen" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <h2>MISIÓN COMPLETADA</h2>
+        <div id="completionStats"></div>
+        <p class="completion-note">Tu nota ya fue registrada en Titi. La misión quedó completada.</p>
+      </div>
+    </div>
+
+    <!-- Selector de misión (Demo Mode) -->
+    <div id="missionSelectorModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <h2>Modo Demo — JuegoArt</h2>
+        <p>No se detectó a Titi. Elige una misión para probar (solo desarrollo/testing).</p>
+        <div id="missionSelectorList"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================================================================
+   Titi Game Kit v0.4 — RPG educativo 2D reutilizable
+   Capas: Engine (input/render/world) → Lesson Spec → Validation → TitiBridge.
+   Una nueva lección debe describir objetivos, retos, requirements y world actions;
+   no necesita modificar el motor. Vanilla JS + Canvas 2D, sin dependencias.
+   ========================================================================= */
+(function () {
+"use strict";
+
+const TILE = 32;               // tamaño lógico de tile / sprite base
+const MAX_EXECUTION_STEPS = 1000; // límite de seguridad del mini intérprete
+
+const GAME_CONFIG = Object.freeze({
+  version: "0.4",
+  product: "Titi Game Kit",
+  movement: { speed: 132, animationFps: 8 },
+  interactionRange: 54,
+  visual: { tileTexture: true, worldReactions: true, classicRpgUi: true }
+});
+
+/* -------------------------------------------------------------------------
+   GameState — estado centralizado de la aplicación
+   ------------------------------------------------------------------------- */
+const GameState = {
+  lesson: null,        // definición de la misión activa (LessonManager)
+  player: {
+    x: 5 * TILE, y: 5 * TILE, dir: "down", moving: false, frame: 0,
+    skin: "default"
+  },
+  world: {
+    zoneId: "plaza_comunicacion",
+    flags: {}           // banderas mutadas por WorldActions (puertas, luces, etc.)
+  },
+  challenges: {
+    currentIndex: 0,
+    attempts: 0,
+    errors: 0,
+    hintsUsed: 0,
+    hintLevel: 0,
+    startedAt: 0
+  },
+  statistics: {
+    missionStartedAt: 0,
+    perChallenge: []    // {id, attempts, errors, hintsUsed, timeMs}
+  },
+  settings: {
+    sound: true,
+    demoMode: true
+  },
+  meta: {
+    unlockedConcepts: [] // ids de conceptos desbloqueados para el Libro
+  }
+};
+
+/* -------------------------------------------------------------------------
+   InputManager — teclado + controles táctiles (joystick virtual)
+   ------------------------------------------------------------------------- */
+class InputManager {
+  constructor() {
+    this.keys = Object.create(null);
+    this.justPressed = Object.create(null);
+    this.touchVector = { x: 0, y: 0 };
+    this.touchInteract = false;
+    this._bindKeyboard();
+  }
+
+  _bindKeyboard() {
+    window.addEventListener("keydown", (e) => {
+      const tag = document.activeElement && document.activeElement.tagName;
+      const isTyping = tag === "TEXTAREA" || tag === "INPUT";
+      if (isTyping) {
+        if (e.code === "Escape") { if (!this.keys[e.code]) this.justPressed[e.code] = true; this.keys[e.code] = true; }
+        return;
+      }
+      if (!this.keys[e.code]) this.justPressed[e.code] = true;
+      this.keys[e.code] = true;
+      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+    window.addEventListener("keyup", (e) => { this.keys[e.code] = false; });
+  }
+
+  update() {
+    this.justPressed = Object.create(null);
+  }
+
+  isDown(...codes) { return codes.some(c => this.keys[c]); }
+  pressed(...codes) { return codes.some(c => this.justPressed[c]); }
+
+  getMoveVector() {
+    let x = 0, y = 0;
+    if (this.isDown("KeyA", "ArrowLeft")) x -= 1;
+    if (this.isDown("KeyD", "ArrowRight")) x += 1;
+    if (this.isDown("KeyW", "ArrowUp")) y -= 1;
+    if (this.isDown("KeyS", "ArrowDown")) y += 1;
+    if (x === 0 && y === 0) {
+      x = this.touchVector.x; y = this.touchVector.y;
+    }
+    const len = Math.hypot(x, y);
+    if (len > 1) { x /= len; y /= len; }
+    return { x, y };
+  }
+
+  wantsInteract() {
+    const kb = this.pressed("KeyE", "Space");
+    const touch = this.touchInteract;
+    this.touchInteract = false;
+    return kb || touch;
+  }
+
+  wantsClose() { return this.pressed("Escape"); }
+}
+
+/* -------------------------------------------------------------------------
+   Camera — sigue al jugador suavemente
+   ------------------------------------------------------------------------- */
+class Camera {
+  constructor(viewW, viewH) {
+    this.x = 0; this.y = 0;
+    this.viewW = viewW; this.viewH = viewH;
+    this.targetX = 0; this.targetY = 0;
+  }
+  resize(w, h) { this.viewW = w; this.viewH = h; }
+  follow(entity, worldPxW, worldPxH) {
+    this.targetX = entity.x - this.viewW / 2;
+    this.targetY = entity.y - this.viewH / 2;
+    if (worldPxW <= this.viewW) {
+      this.targetX = -(this.viewW - worldPxW) / 2;
+    } else {
+      this.targetX = Math.max(0, Math.min(this.targetX, worldPxW - this.viewW));
+    }
+    if (worldPxH <= this.viewH) {
+      this.targetY = -(this.viewH - worldPxH) / 2;
+    } else {
+      this.targetY = Math.max(0, Math.min(this.targetY, worldPxH - this.viewH));
+    }
+  }
+  update(dt) {
+    const lerp = Math.min(1, dt * 6);
+    this.x += (this.targetX - this.x) * lerp;
+    this.y += (this.targetY - this.y) * lerp;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Paleta de color + utilitario de "sprites" pixel-art procedurales
+   ------------------------------------------------------------------------- */
+const PALETTE = {
+  0: null,
+  1: "#2b2140", 2: "#4a3f6b", 3: "#8a7ab5", 4: "#c9bde0",
+  5: "#f4d9a5", 6: "#e0ab6b", 7: "#9c6b3f", 8: "#5c3a21",
+  9: "#3fae5a", 10: "#2c7a40", 11: "#1f5c30",
+  12: "#3fa7c9", 13: "#276f8a", 14: "#bdeaf5",
+  15: "#e05a4e", 16: "#ffffff", 17: "#ffd166", 18: "#06d6a0",
+  19: "#222222", 20: "#ff6b6b", 21: "#4dd0e1", 22: "#7c4dff"
+};
+
+function drawSprite(ctx, grid, dx, dy, cell) {
+  for (let r = 0; r < grid.length; r++) {
+    const row = grid[r];
+    for (let c = 0; c < row.length; c++) {
+      const idx = row[c];
+      const color = PALETTE[idx];
+      if (!color) continue;
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(dx + c * cell), Math.round(dy + r * cell), cell, cell);
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   AudioManager
+   ------------------------------------------------------------------------- */
+class AudioManager {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+  }
+  _ensureCtx() {
+    if (this.ctx) return this.ctx;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = AC ? new AC() : null;
+    } catch (e) { this.ctx = null; }
+    return this.ctx;
+  }
+  play(kind) {
+    if (!this.enabled) return;
+    const ctx = this._ensureCtx();
+    if (!ctx) return;
+    try {
+      const freqMap = { success: 660, error: 180, click: 420, hint: 520, open: 300, complete: 880 };
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.frequency.value = freqMap[kind] || 400;
+      o.type = "square";
+      g.gain.value = 0.03;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+      o.stop(ctx.currentTime + 0.16);
+    } catch (e) {}
+  }
+}
+
+/* -------------------------------------------------------------------------
+   ParticleSystem
+   ------------------------------------------------------------------------- */
+class ParticleSystem {
+  constructor() { this.particles = []; }
+  spawnText(x, y, text, color) {
+    this.particles.push({ type: "text", x, y, vy: -22, life: 1.1, maxLife: 1.1, text, color: color || "#ffffff" });
+  }
+  spawnBurst(x, y, color, count) {
+    count = count || 8;
+    for (let i = 0; i < count; i++) {
+      const ang = (Math.PI * 2 * i) / count;
+      this.particles.push({
+        type: "spark", x, y, vx: Math.cos(ang) * 40, vy: Math.sin(ang) * 40,
+        life: 0.5, maxLife: 0.5, color: color || "#ffd166"
+      });
+    }
+  }
+  spawnEmoji(x, y, emoji) {
+    this.particles.push({ type: "emoji", x, y, vy: -14, life: 1.3, maxLife: 1.3, emoji });
+  }
+  spawnDust(x, y) {
+    this.particles.push({
+      type: "spark", x, y, vx: (Math.random()-0.5)*15, vy: -10 - Math.random()*15,
+      life: 0.35, maxLife: 0.35, color: "rgba(255,255,255,0.25)"
+    });
+  }
+  update(dt) {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.life -= dt;
+      p.x += (p.vx || 0) * dt;
+      p.y += (p.vy || 0) * dt;
+      if (p.life <= 0) this.particles.splice(i, 1);
+    }
+  }
+  render(ctx, camera) {
+    for (const p of this.particles) {
+      const alpha = Math.max(0, p.life / p.maxLife);
+      const sx = p.x - camera.x, sy = p.y - camera.y;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (p.type === "text") {
+        ctx.fillStyle = p.color;
+        ctx.font = "bold 12px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(p.text, sx, sy);
+      } else if (p.type === "emoji") {
+        ctx.font = "18px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(p.emoji, sx, sy);
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(sx - 2, sy - 2, 4, 4);
+      }
+      ctx.restore();
+    }
+  }
+}
+
+window.__JuegoArt = window.__JuegoArt || {};
+Object.assign(window.__JuegoArt, {
+  TILE, MAX_EXECUTION_STEPS, GameState, InputManager, Camera, PALETTE, drawSprite,
+  AudioManager, ParticleSystem, GAME_CONFIG
+});
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const { TILE, drawSprite, PALETTE, GAME_CONFIG } = NS;
+
+class JuegoArtAssetRenderer {
+  constructor(manifest){
+    if(!manifest || !manifest.assets) throw new Error("Manifest de assets invalido.");
+    this.manifest = manifest;
+    this.assets = manifest.assets;
+  }
+  asset(id){
+    const a=this.assets[id];
+    if(!a) throw new Error("Asset no encontrado: "+id);
+    return a;
+  }
+  resolveState(asset,state,timeMs){
+    const states=asset.states||{};
+    const key = state && states[state] ? state : Object.keys(states)[0];
+    const def=states[key];
+    if(!def) return {draw:[],state:key,frame:0};
+    if(def.frames && def.frames.length){
+      const fps=def.fps||6;
+      const frame=Math.floor((timeMs||0)/1000*fps)%def.frames.length;
+      return {draw:def.frames[frame].draw||[],state:key,frame};
+    }
+    return {draw:def.draw||[],state:key,frame:0};
+  }
+  drawPrimitive(ctx,p,ox,oy){
+    ctx.save();
+    ctx.globalAlpha = p.alpha == null ? 1 : p.alpha;
+    ctx.fillStyle = p.color || "#fff";
+    ctx.strokeStyle = p.color || "#fff";
+    if(p.type==="rect"){
+      ctx.fillRect(Math.round(ox+p.x),Math.round(oy+p.y),Math.round(p.w),Math.round(p.h));
+    } else if(p.type==="ellipse"){
+      ctx.beginPath();
+      ctx.ellipse(ox+p.x,oy+p.y,p.rx,p.ry,0,0,Math.PI*2);
+      ctx.fill();
+    } else if(p.type==="polygon"){
+      if(p.points && p.points.length){
+        ctx.beginPath();
+        ctx.moveTo(ox+p.points[0][0],oy+p.points[0][1]);
+        for(let i=1;i<p.points.length;i++) ctx.lineTo(ox+p.points[i][0],oy+p.points[i][1]);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if(p.type==="line"){
+      ctx.lineWidth=p.width||1;
+      ctx.lineCap="square";
+      ctx.beginPath();
+      ctx.moveTo(ox+p.x1,oy+p.y1);
+      ctx.lineTo(ox+p.x2,oy+p.y2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  drawAsset(ctx,id,state,worldX,worldY,camera,timeMs,options){
+    const asset=this.asset(id);
+    const cam=camera||{x:0,y:0};
+    const opt=options||{};
+    const topX=worldX-asset.anchor.x-cam.x;
+    const topY=worldY-asset.anchor.y-cam.y;
+    const resolved=this.resolveState(asset,state,timeMs||performance.now());
+    ctx.save();
+    ctx.imageSmoothingEnabled=false;
+    if(opt.alpha!=null) ctx.globalAlpha*=opt.alpha;
+    if(opt.clipY!=null){
+      ctx.beginPath();
+      ctx.rect(Math.round(topX),Math.round(topY+opt.clipY),asset.size.w,opt.clipH);
+      ctx.clip();
+    }
+    if(opt.flipX){
+      ctx.translate(Math.round(topX+asset.size.w),Math.round(topY));
+      ctx.scale(-1,1);
+      for(const p of resolved.draw) this.drawPrimitive(ctx,p,0,0);
+    } else {
+      for(const p of resolved.draw) this.drawPrimitive(ctx,p,topX,topY);
+    }
+    ctx.restore();
+    return {asset,state:resolved.state,frame:resolved.frame,topX,topY};
+  }
+  worldHitbox(id,worldX,worldY){
+    const a=this.asset(id);
+    if(!a.hitbox) return null;
+    const left=worldX-a.anchor.x+a.hitbox.x;
+    const top=worldY-a.anchor.y+a.hitbox.y;
+    return {x:left,y:top,w:a.hitbox.w,h:a.hitbox.h};
+  }
+  depthY(id,worldY){
+    const a=this.asset(id);
+    return worldY + ((a.depth&&a.depth.offsetY)||0);
+  }
+  sortInstances(instances){
+    return [...instances].sort((a,b)=>{
+      const ay=this.depthY(a.asset,a.y);
+      const by=this.depthY(b.asset,b.y);
+      return ay-by;
+    });
+  }
+  drawInstances(ctx,instances,camera,timeMs){
+    for(const it of this.sortInstances(instances)){
+      this.drawAsset(ctx,it.asset,it.state,it.x,it.y,camera,timeMs,it.options);
+    }
+  }
+  drawPrefab(ctx,prefabId,originX,originY,camera,timeMs){
+    const p=this.manifest.prefabs&&this.manifest.prefabs[prefabId];
+    if(!p) throw new Error("Prefab no encontrado: "+prefabId);
+    const list=(p.objects||[]).map(o=>({
+      asset:o.asset,state:o.state,
+      x:originX+o.x,y:originY+o.y,
+      options:o.options
+    }));
+    this.drawInstances(ctx,list,camera,timeMs);
+  }
+}
+
+const ASSET_MANIFEST = {"kit":{"name":"El Refugio Lógico — Visual Asset Kit","version":"1.0.0","format":"JuegoArtDrawCommands","tileSize":32,"description":"Assets pixel-art dibujados como comandos Canvas 2D. No son descripciones: cada asset contiene su geometría, estados, hitbox y metadata para renderizarlo directamente."},"palette":{"sand":"#d6b173","sandLight":"#e0bd82","sandDark":"#c39a5e","path":"#8c806f","pathLight":"#9b8f7c","pathDark":"#786d60","grass":"#39ad59","grassDark":"#218343","grassLight":"#57c86f","leaf0":"#125f35","leaf1":"#178545","leaf2":"#22a653","leaf3":"#43bf62","leafHi":"#74d870","trunk0":"#5b351e","trunk1":"#83502b","trunk2":"#a56b37","blue0":"#103958","blue1":"#17648b","blue2":"#258fbd","blue3":"#55b8d9","purple0":"#2d174f","purple1":"#5a2f8e","purple2":"#7c4dff","purple3":"#a476ff","skin0":"#8f572f","skin1":"#d59a62","skin2":"#f4c884","wood0":"#4f2d18","wood1":"#75431f","wood2":"#a36532","wood3":"#c48747","stone0":"#4d4a47","stone1":"#716d67","stone2":"#9c9589","stone3":"#b8ad9d","fire0":"#b83124","fire1":"#ef5b25","fire2":"#ff9d24","fire3":"#ffe15b","ink":"#17151d","white":"#fff4d8","flowerPink":"#ed6f9d","flowerWhite":"#fff8dc","flowerYellow":"#ffd75a","berry":"#e34e56","gold0":"#8f641e","gold1":"#ffd35d","gold2":"#ffe99b","water0":"#1f6f9a","water1":"#2e95c7","water2":"#67c7e8","snow":"#eaf7ff","snowShade":"#b9dbe9","metal0":"#4d5964","metal1":"#7d8b96","metal2":"#b7c4cc","red":"#d74a3a","cloth":"#d5c8a7","brown":"#6f4c2f","greenDark":"#165f34","green":"#2c8b4f"},"renderer_contract":{"supported_primitives":["rect","ellipse","polygon","line"],"coordinates":"local pixel coordinates relative to asset top-left","placement":"drawAsset(ctx,id,state,worldX,worldY,camera,time)","depth":"sort by worldY + asset.anchor.y","collision":"use asset.hitbox translated from the top-left derived from anchor"},"assets":{"campfire":{"id":"campfire","name":"Fogata","category":"camp","size":{"w":64,"h":64},"anchor":{"x":32,"y":55},"hitbox":{"x":12,"y":40,"w":40,"h":16},"depth":{"mode":"y_sort","footY":55},"states":{"off":{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1}]},"on":{"frames":[{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":23,"y":25,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":27,"y":17,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":30,"y":12,"w":7,"h":25,"color":"#ffe15b","alpha":1}]},{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":25,"y":27,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":29,"y":19,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":32,"y":14,"w":7,"h":25,"color":"#ffe15b","alpha":1},{"type":"rect","x":39,"y":21,"w":6,"h":13,"color":"#ef5b25","alpha":1}]},{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":22,"y":28,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":26,"y":20,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":29,"y":15,"w":7,"h":25,"color":"#ffe15b","alpha":1},{"type":"rect","x":19,"y":31,"w":6,"h":10,"color":"#ff9d24","alpha":1}]}],"fps":7},"embers":{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":25,"y":40,"w":16,"h":7,"color":"#b83124","alpha":1},{"type":"rect","x":29,"y":39,"w":8,"h":3,"color":"#ff9d24","alpha":1}]}},"collision":true,"interactable":true,"light":{"state":"on","radius":70,"color":"#ffd35d","alpha":0.16},"particles":{"state":"on","emitters":["smoke","sparks"]}},"tree_oak":{"id":"tree_oak","name":"Árbol frondoso","category":"vegetation","size":{"w":64,"h":64},"anchor":{"x":32,"y":60},"hitbox":{"x":25,"y":49,"w":14,"h":12},"depth":{"mode":"y_sort","footY":60},"states":{"default":{"draw":[{"type":"ellipse","x":32,"y":60,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":27,"y":39,"w":10,"h":25,"color":"#5b351e","alpha":1},{"type":"rect","x":29,"y":39,"w":6,"h":24,"color":"#a56b37","alpha":1},{"type":"rect","x":25,"y":58,"w":14,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":13,"y":10,"w":38,"h":7,"color":"#125f35","alpha":1},{"type":"rect","x":7,"y":17,"w":50,"h":25,"color":"#125f35","alpha":1},{"type":"rect","x":12,"y":10,"w":40,"h":34,"color":"#178545","alpha":1},{"type":"rect","x":6,"y":23,"w":11,"h":14,"color":"#22a653","alpha":1},{"type":"rect","x":45,"y":18,"w":11,"h":15,"color":"#22a653","alpha":1},{"type":"rect","x":20,"y":6,"w":25,"h":12,"color":"#22a653","alpha":1},{"type":"rect","x":18,"y":14,"w":12,"h":9,"color":"#43bf62","alpha":1},{"type":"rect","x":37,"y":23,"w":12,"h":9,"color":"#43bf62","alpha":1},{"type":"rect","x":24,"y":30,"w":10,"h":6,"color":"#74d870","alpha":1},{"type":"rect","x":12,"y":41,"w":41,"h":5,"color":"#125f35","alpha":1}]}},"collision":"trunk_only","occlusion":{"canopyFromY":10,"splitAtY":45}},"grass_tufts":{"id":"grass_tufts","name":"Hierba","category":"decor","size":{"w":44,"h":28},"anchor":{"x":22,"y":24},"hitbox":null,"depth":{"mode":"y_sort","footY":24},"states":{"default":{"draw":[{"type":"rect","x":9,"y":11,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":12,"y":8,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":11,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":12,"y":10,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":22,"y":15,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":25,"y":12,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":28,"y":15,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":25,"y":14,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":31,"y":8,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":34,"y":5,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":37,"y":8,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":34,"y":7,"w":2,"h":4,"color":"#57c86f","alpha":1}]}},"collision":false},"flowers_mixed":{"id":"flowers_mixed","name":"Flores silvestres","category":"decor","size":{"w":40,"h":40},"anchor":{"x":20,"y":34},"hitbox":null,"depth":{"mode":"y_sort","footY":34},"states":{"default":{"draw":[{"type":"rect","x":12,"y":19,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":16,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":18,"y":19,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":18,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":24,"y":21,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":27,"y":18,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":30,"y":21,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":27,"y":20,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":5,"y":13,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":2,"y":16,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":8,"y":16,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":5,"y":19,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":5,"y":16,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":18,"y":4,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":15,"y":7,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":21,"y":7,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":18,"y":10,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":18,"y":7,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":32,"y":12,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":29,"y":15,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":35,"y":15,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":32,"y":18,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":32,"y":15,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":23,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":8,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":14,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":29,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":28,"y":25,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":25,"y":28,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":31,"y":28,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":28,"y":31,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":28,"y":28,"w":2,"h":2,"color":"#ffd75a","alpha":1}]}},"collision":false},"wood_pile":{"id":"wood_pile","name":"Pila de troncos","category":"storage","size":{"w":64,"h":56},"anchor":{"x":32,"y":50},"hitbox":{"x":8,"y":36,"w":48,"h":14},"depth":{"mode":"y_sort","footY":50},"states":{"1":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"2":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"3":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"4":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":18,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":19,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":20,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":18,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":19,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":20,"w":3,"h":4,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true},"wooden_crate":{"id":"wooden_crate","name":"Caja de madera","category":"storage","size":{"w":48,"h":48},"anchor":{"x":24,"y":42},"hitbox":{"x":7,"y":24,"w":34,"h":18},"depth":{"mode":"y_sort","footY":42},"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":42,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":6,"y":14,"w":36,"h":29,"color":"#4f2d18","alpha":1},{"type":"rect","x":9,"y":17,"w":30,"h":23,"color":"#a36532","alpha":1},{"type":"rect","x":12,"y":20,"w":24,"h":17,"color":"#75431f","alpha":1},{"type":"line","x1":10,"y1":17,"x2":38,"y2":40,"color":"#c48747","width":3,"alpha":1},{"type":"line","x1":38,"y1":17,"x2":10,"y2":40,"color":"#c48747","width":3,"alpha":1},{"type":"rect","x":8,"y":12,"w":32,"h":5,"color":"#c48747","alpha":1}]}},"collision":true},"npc_alizon":{"id":"npc_alizon","name":"Alizon","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#258fbd","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#103958","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true,"fsm":["Idle","Following","Gathering","Cooking","Helping","Talking"]},"workbench":{"id":"workbench","name":"Mesa de trabajo","category":"camp","size":{"w":96,"h":88},"anchor":{"x":48,"y":78},"hitbox":{"x":13,"y":57,"w":68,"h":21},"depth":{"mode":"y_sort","footY":78},"states":{"default":{"draw":[{"type":"ellipse","x":48,"y":74,"rx":38,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":17,"y":27,"w":5,"h":45,"color":"#4f2d18","alpha":1},{"type":"rect","x":69,"y":27,"w":5,"h":45,"color":"#4f2d18","alpha":1},{"type":"rect","x":17,"y":27,"w":57,"h":5,"color":"#a36532","alpha":1},{"type":"rect","x":24,"y":35,"w":4,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":28,"y":38,"w":5,"h":8,"color":"#17151d","alpha":1},{"type":"rect","x":29,"y":40,"w":3,"h":5,"color":"#ffd35d","alpha":1},{"type":"rect","x":12,"y":59,"w":70,"h":7,"color":"#4f2d18","alpha":1},{"type":"rect","x":14,"y":53,"w":66,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":20,"y":56,"w":32,"h":5,"color":"#258fbd","alpha":1},{"type":"rect","x":20,"y":61,"w":32,"h":5,"color":"#17648b","alpha":1},{"type":"rect","x":20,"y":66,"w":5,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":70,"y":66,"w":5,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":57,"y":42,"w":23,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":59,"y":44,"w":19,"h":10,"color":"#c48747","alpha":1},{"type":"rect","x":66,"y":36,"w":7,"h":10,"color":"#b8ad9d","alpha":1},{"type":"rect","x":43,"y":68,"w":18,"h":5,"color":"#a36532","alpha":1},{"type":"rect","x":46,"y":73,"w":12,"h":10,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":42,"w":10,"h":8,"color":"#fff4d8","alpha":1},{"type":"rect","x":36,"y":44,"w":6,"h":2,"color":"#17648b","alpha":1}]}},"collision":true,"interactable":true},"npc_guardabosques":{"id":"npc_guardabosques","name":"El Guardabosques","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#1e4b2a","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#1e4b2a","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#326f3e","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#1e4b2a","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#326f3e","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#1e4b2a","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#1e4b2a","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#326f3e","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true,"fsm":["Idle","Following","Gathering","Cooking","Helping","Talking"]},"tent_blue":{"id":"tent_blue","name":"Tienda azul","category":"camp","size":{"w":96,"h":88},"anchor":{"x":48,"y":78},"hitbox":{"x":17,"y":65,"w":62,"h":16},"depth":{"mode":"y_sort","footY":78},"states":{"materials":{"draw":[{"type":"ellipse","x":48,"y":77,"rx":30,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":18,"y":71,"w":60,"h":4,"color":"#75431f","alpha":1},{"type":"rect","x":24,"y":63,"w":4,"h":10,"color":"#a36532","alpha":1},{"type":"rect","x":68,"y":63,"w":4,"h":10,"color":"#a36532","alpha":1},{"type":"rect","x":31,"y":61,"w":34,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":35,"y":58,"w":26,"h":3,"color":"#55b8d9","alpha":1},{"type":"rect","x":14,"y":68,"w":10,"h":6,"color":"#d5c8a7","alpha":1},{"type":"rect","x":73,"y":68,"w":9,"h":6,"color":"#9c9589","alpha":1}]},"built":{"draw":[{"type":"ellipse","x":48,"y":76,"rx":38,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":46,"y":2,"w":3,"h":14,"color":"#4f2d18","alpha":1},{"type":"rect","x":49,"y":3,"w":17,"h":3,"color":"#103958","alpha":1},{"type":"rect","x":50,"y":4,"w":14,"h":2,"color":"#258fbd","alpha":1},{"type":"rect","x":17,"y":69,"w":62,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":44,"y":19,"w":8,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":40,"y":25,"w":16,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":36,"y":31,"w":24,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":32,"y":37,"w":32,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":28,"y":43,"w":40,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":24,"y":49,"w":48,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":20,"y":55,"w":56,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":21,"y":53,"w":54,"h":19,"color":"#17648b","alpha":1},{"type":"rect","x":26,"y":44,"w":44,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":34,"y":45,"w":28,"h":28,"color":"#17151d","alpha":1},{"type":"rect","x":37,"y":48,"w":22,"h":24,"color":"#103958","alpha":1},{"type":"rect","x":41,"y":51,"w":14,"h":21,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":73,"w":4,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":76,"y":73,"w":4,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":11,"y":77,"w":10,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":75,"y":77,"w":10,"h":3,"color":"#ffd35d","alpha":1}]}},"collision":"base_only","occlusion":{"splitAtY":59},"interactable":true},"bush_flowers":{"id":"bush_flowers","name":"Arbusto con flores","category":"vegetation","size":{"w":48,"h":48},"anchor":{"x":24,"y":42},"hitbox":{"x":8,"y":27,"w":32,"h":12},"depth":{"mode":"y_sort","footY":42},"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":42,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":9,"y":17,"w":30,"h":18,"color":"#125f35","alpha":1},{"type":"rect","x":5,"y":21,"w":38,"h":13,"color":"#178545","alpha":1},{"type":"rect","x":12,"y":12,"w":24,"h":22,"color":"#22a653","alpha":1},{"type":"rect","x":15,"y":14,"w":9,"h":7,"color":"#43bf62","alpha":1},{"type":"rect","x":29,"y":20,"w":8,"h":7,"color":"#43bf62","alpha":1},{"type":"rect","x":12,"y":30,"w":26,"h":5,"color":"#178545","alpha":1},{"type":"rect","x":17,"y":16,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":14,"y":19,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":20,"y":19,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":17,"y":22,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":17,"y":19,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":34,"y":14,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":31,"y":17,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":37,"y":17,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":34,"y":20,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":34,"y":17,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":28,"y":27,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":25,"y":30,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":31,"y":30,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":28,"y":33,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":28,"y":30,"w":2,"h":2,"color":"#ffd75a","alpha":1}]}},"collision":true},"player_viajero":{"id":"player_viajero","name":"El Viajero","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#17151d","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#7c4dff","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#a476ff","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#17151d","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#7c4dff","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#a476ff","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#17151d","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#17151d","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#7c4dff","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"animated":true}},"effects":{"smoke":{"type":"particle","shape":"rect","size":[2,4],"colors":["#8b8b88","#b5b4ae"],"lifetime":[0.8,1.5],"velocity":{"x":[-5,5],"y":[-18,-9]},"wind":true},"sparks":{"type":"particle","shape":"rect","size":[2,2],"colors":["#ff9d24","#ffe15b"],"lifetime":[0.25,0.6],"velocity":{"x":[-16,16],"y":[-28,-12]},"wind":true},"rain":{"type":"particle","shape":"line","colors":["#67c7e8"],"lifetime":[0.4,0.8],"velocity":{"x":[-18,-8],"y":[150,220]}},"snow":{"type":"particle","shape":"rect","size":[2,2],"colors":["#eaf7ff"],"lifetime":[1.2,2.5],"velocity":{"x":[-12,12],"y":[18,35]},"wind":true},"wood_chips":{"type":"particle","shape":"rect","size":[2,3],"colors":["#a36532","#c48747"],"lifetime":[0.25,0.5],"velocity":{"x":[-40,40],"y":[-35,-10]}}}};
+const ASSET_RENDERER = new JuegoArtAssetRenderer(ASSET_MANIFEST);
+
+const TREE_TRUNK_TOP = TILE - 8;
+const CANOPY_H = TREE_TRUNK_TOP;
+
+/* -------------------------------------------------------------------------
+   Visual Kit v0.4 — pixel art procedural inspirado en RPG clásico.
+   Todo se dibuja por código: sin imágenes, librerías ni assets externos.
+   ------------------------------------------------------------------------- */
+const SPR = {}; // compatibilidad pública del motor
+function drawSpriteRows() {} // compatibilidad con versiones anteriores
+
+const C = Object.freeze({
+  sand: "#d6b173", sandLight: "#e0bd82", sandDark: "#c39a5e",
+  path: "#8c806f", pathLight: "#9b8f7c", pathDark: "#786d60",
+  grass: "#39ad59", grassDark: "#218343", grassLight: "#57c86f",
+  leaf0: "#125f35", leaf1: "#178545", leaf2: "#22a653", leaf3: "#43bf62", leafHi: "#74d870",
+  trunk0: "#5b351e", trunk1: "#83502b", trunk2: "#a56b37",
+  blue0: "#103958", blue1: "#17648b", blue2: "#258fbd", blue3: "#55b8d9",
+  purple0: "#2d174f", purple1: "#5a2f8e", purple2: "#7c4dff", purple3: "#a476ff",
+  skin0: "#8f572f", skin1: "#d59a62", skin2: "#f4c884",
+  wood0: "#4f2d18", wood1: "#75431f", wood2: "#a36532", wood3: "#c48747",
+  stone0: "#4d4a47", stone1: "#716d67", stone2: "#9c9589", stone3: "#b8ad9d",
+  fire0: "#b83124", fire1: "#ef5b25", fire2: "#ff9d24", fire3: "#ffe15b",
+  ink: "#17151d", white: "#fff4d8", flowerPink: "#ed6f9d", flowerWhite: "#fff8dc",
+  gold0: "#8f641e", gold1: "#ffd35d", gold2: "#ffe99b"
+});
+
+function rect(ctx, x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+}
+function shadow(ctx, x, y, w) {
+  ctx.save(); ctx.globalAlpha = .22; ctx.fillStyle = "#2a241e";
+  ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), Math.round(w), 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+}
+function pixelFlower(ctx, x, y, color) {
+  rect(ctx,x+3,y,2,2,color); rect(ctx,x,y+3,2,2,color); rect(ctx,x+6,y+3,2,2,color); rect(ctx,x+3,y+6,2,2,color); rect(ctx,x+3,y+3,2,2,"#ffd25d");
+}
+function drawGrassTuft(ctx,x,y) {
+  rect(ctx,x+2,y+3,2,5,C.grassDark); rect(ctx,x+5,y,2,8,C.grassDark); rect(ctx,x+8,y+3,2,5,C.grassDark);
+  rect(ctx,x+5,y+2,2,4,C.grassLight);
+}
+function drawFlowerPatch(ctx,x,y,large=false) {
+  const pts = large ? [[2,11],[14,2],[25,10],[8,21],[21,21]] : [[2,5],[13,2],[20,9]];
+  for (let i=0;i<pts.length;i++) pixelFlower(ctx,x+pts[i][0],y+pts[i][1], i%3===0?C.flowerPink:C.flowerWhite);
+  drawGrassTuft(ctx,x+8,y+12); if (large) drawGrassTuft(ctx,x+19,y+14);
+}
+function drawTreeBase(ctx,x,y) {
+  rect(ctx,x,y,32,32,C.grassDark);
+  rect(ctx,x+12,y+20,9,12,C.trunk0); rect(ctx,x+14,y+20,6,12,C.trunk2); rect(ctx,x+11,y+29,11,3,C.trunk0);
+}
+function drawTreeCanopy(ctx,x,y,seed=0) {
+  const yy=y-7;
+  rect(ctx,x+5,yy+3,22,5,C.leaf0); rect(ctx,x+1,yy+8,30,14,C.leaf0); rect(ctx,x+4,yy+4,24,20,C.leaf1);
+  rect(ctx,x+1,yy+11,7,9,C.leaf2); rect(ctx,x+23,yy+9,7,10,C.leaf2); rect(ctx,x+8,yy+2,15,7,C.leaf2);
+  rect(ctx,x+7+(seed%3)*4,yy+7,7,5,C.leaf3); rect(ctx,x+18,yy+13,7,5,C.leaf3); rect(ctx,x+11,yy+17,6,4,C.leafHi);
+  rect(ctx,x+4,yy+22,24,3,C.leaf0);
+}
+function drawBush(ctx,x,y,seed=0) {
+  shadow(ctx,x+20,y+29,17);
+  rect(ctx,x+5,y+10,30,18,C.leaf0); rect(ctx,x+2,y+14,36,12,C.leaf1); rect(ctx,x+8,y+5,22,20,C.leaf2);
+  rect(ctx,x+11,y+7,8,7,C.leaf3); rect(ctx,x+23,y+12,7,7,C.leaf3); rect(ctx,x+8,y+20,23,5,C.leaf1);
+  pixelFlower(ctx,x+10,y+10, seed%2?C.flowerPink:C.flowerWhite); pixelFlower(ctx,x+25,y+8,C.flowerWhite);
+  if(seed%2===0) pixelFlower(ctx,x+20,y+18,C.flowerPink);
+}
+function drawCampfire(ctx,it,cam,now) {
+  const x=it.x-cam.x, y=it.y-cam.y;
+  const cx=x+16, base=y+28;
+  ctx.save();
+  if(it.lit){
+    ctx.globalAlpha=.12+(Math.sin(now/130)+1)*.035; ctx.fillStyle=C.fire3; ctx.beginPath(); ctx.arc(cx,base-12,34,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+  }
+  shadow(ctx,cx,base+3,20);
+  const stones=[[-18,-2],[-12,-9],[-3,-12],[7,-10],[14,-4],[12,4],[3,8],[-8,8],[-16,4]];
+  stones.forEach((q,i)=>{ rect(ctx,cx+q[0],base+q[1],10,8,i%2?C.stone1:C.stone2); rect(ctx,cx+q[0]+2,base+q[1]+1,5,2,C.stone3); });
+  rect(ctx,cx-11,base-1,22,5,C.wood0); rect(ctx,cx-8,base-4,5,14,C.wood2); rect(ctx,cx+5,base-4,5,14,C.wood1);
+  if(it.lit){
+    const f=Math.floor(now/140)%3;
+    rect(ctx,cx-8,base-22+(f===1?2:0),16,18,C.fire1); rect(ctx,cx-5,base-28+(f===2?3:0),11,22,C.fire2); rect(ctx,cx-2,base-31+(f===0?2:0),6,19,C.fire3);
+    if(f===1){rect(ctx,cx+5,base-27,5,11,C.fire1);} else {rect(ctx,cx-10,base-18,5,9,C.fire2);}
+  }
+  ctx.restore();
+}
+function drawTent(ctx,it,cam,built=true) {
+  const ax=it.x+16-cam.x, by=it.y+30-cam.y;
+  if(!built){
+    shadow(ctx,ax,by+3,29); rect(ctx,ax-29,by-2,58,3,C.wood1); rect(ctx,ax-24,by-8,4,10,C.wood2); rect(ctx,ax+21,by-8,4,10,C.wood2);
+    rect(ctx,ax-17,by-7,34,7,C.blue1); rect(ctx,ax-13,by-10,26,3,C.blue3); return;
+  }
+  shadow(ctx,ax,by+5,34);
+  const top=by-56;
+  rect(ctx,ax-2,top-9,3,14,C.wood0); rect(ctx,ax+1,top-8,14,3,C.blue0); rect(ctx,ax+2,top-7,11,2,C.blue2);
+  rect(ctx,ax-31,by-6,62,8,C.blue0);
+  for(let i=0;i<7;i++){ const half=4+i*4; rect(ctx,ax-half,top+8+i*6,half*2,6,i%2?C.blue1:C.blue2); }
+  rect(ctx,ax-27,by-22,54,19,C.blue1); rect(ctx,ax-22,by-31,44,11,C.blue2); rect(ctx,ax-14,by-30,28,28,C.ink);
+  rect(ctx,ax-11,by-27,22,24,C.blue0); rect(ctx,ax-7,by-24,14,21,C.ink);
+  rect(ctx,ax-32,by-2,4,8,C.wood2); rect(ctx,ax+28,by-2,4,8,C.wood2);
+  rect(ctx,ax-37,by+2,10,3,C.gold1); rect(ctx,ax+27,by+2,10,3,C.gold1);
+}
+function drawWorkbench(ctx,it,cam,complete=false) {
+  const ax=it.x+16-cam.x, by=it.y+29-cam.y;
+  shadow(ctx,ax,by+4,35);
+  rect(ctx,ax-31,by-42,5,45,C.wood0); rect(ctx,ax+20,by-42,5,45,C.wood0); rect(ctx,ax-31,by-42,56,5,C.wood2);
+  rect(ctx,ax-24,by-34,4,16,C.wood1); rect(ctx,ax-20,by-31,5,8,C.ink); rect(ctx,ax-19,by-29,3,5,C.gold1);
+  rect(ctx,ax-35,by-10,69,7,C.wood0); rect(ctx,ax-33,by-16,65,8,C.wood2); rect(ctx,ax-27,by-13,31,5,C.blue2); rect(ctx,ax-27,by-10,31,5,C.blue1);
+  rect(ctx,ax-28,by-3,5,14,C.wood1); rect(ctx,ax+24,by-3,5,14,C.wood1);
+  rect(ctx,ax+10,by-27,22,14,C.wood1); rect(ctx,ax+12,by-25,18,10,C.wood3); rect(ctx,ax+18,by-31,7,8,C.stone3);
+  rect(ctx,ax-6,by+3,18,5,C.wood2); rect(ctx,ax-3,by+8,12,10,C.wood1);
+  if(complete){ rect(ctx,ax-15,by-26,10,8,C.white); rect(ctx,ax-13,by-24,6,2,C.blue1); pixelFlower(ctx,ax+25,by-31,C.flowerWhite); }
+  else { rect(ctx,ax-17,by-25,13,9,C.blue0); rect(ctx,ax-15,by-23,9,1,C.blue3); rect(ctx,ax-15,by-20,7,1,C.blue3); }
+}
+function drawDoor(ctx,x,y,open=false) {
+  if(open) return;
+  shadow(ctx,x+16,y+30,17); rect(ctx,x+3,y+6,27,27,C.wood0); rect(ctx,x+7,y+10,19,19,C.wood2); rect(ctx,x+10,y+13,13,13,C.ink); rect(ctx,x+14,y+17,5,5,C.gold1);
+}
+function drawPerson(ctx,entity,cam,style,dir="down",frame=0,isPlayer=false) {
+  const x=entity.x-cam.x-2, y=entity.y-cam.y-9+(entity.moving && frame%2 ? -1:0), cx=x+15;
+  shadow(ctx,cx,y+38,10);
+  const skin=style.skin||C.skin2, hair=style.hair||C.ink, main=style.main, dark=style.dark, accent=style.accent||C.white;
+  const side=dir==="left"||dir==="right", up=dir==="up";
+  if(side){
+    rect(ctx,x+9,y+2,14,5,hair); rect(ctx,x+7,y+7,18,10,hair); rect(ctx,x+10,y+9,13,11,skin); rect(ctx,x+21,y+12,3,3,C.ink);
+    rect(ctx,x+9,y+20,15,10,main); rect(ctx,x+8,y+24,5,9,dark); rect(ctx,x+20,y+24,5,9,dark);
+    const step=entity.moving?(frame%2?2:-2):0; rect(ctx,x+10+step,y+30,5,8,C.trunk0); rect(ctx,x+19-step,y+30,5,8,C.trunk0);
+  } else if(up){
+    rect(ctx,x+7,y+2,20,12,hair); rect(ctx,x+9,y+12,16,8,hair); rect(ctx,x+8,y+19,18,11,main); rect(ctx,x+11,y+20,12,4,style.accent||C.purple3);
+    const step=entity.moving?(frame%2?2:-2):0; rect(ctx,x+9+step,y+29,6,9,C.trunk0); rect(ctx,x+20-step,y+29,6,9,C.trunk0);
+  } else {
+    rect(ctx,x+7,y+2,20,7,hair); rect(ctx,x+6,y+8,22,7,hair); rect(ctx,x+9,y+8,16,12,skin); rect(ctx,x+11,y+12,3,3,C.ink); rect(ctx,x+22,y+12,3,3,C.ink);
+    rect(ctx,x+9,y+20,17,10,main); rect(ctx,x+7,y+23,5,8,dark); rect(ctx,x+24,y+23,5,8,dark); rect(ctx,x+13,y+22,9,3,accent);
+    const step=entity.moving?(frame%2?2:-2):0; rect(ctx,x+10+step,y+30,6,8,C.trunk0); rect(ctx,x+20-step,y+30,6,8,C.trunk0);
+  }
+  if(side && dir==="left") { /* La silueta lateral funciona en ambas direcciones; el detalle facial es mínimo. */ }
+}
+
+const TILE_DEF = {
+  G: { walkable: true, base: C.grass }, g: { walkable: true, base: C.grassDark },
+  P: { walkable: true, base: C.sand }, H: { walkable: true, base: C.path },
+  T: { walkable: false, base: C.grassDark }, D: { walkable: false, base: C.sand }
+};
+
+const ZONE = { "rows": 18, "cols": 26, "map": ["TTTTTTTTTTTTTTTTTTTTTTTTTT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TPPPPPPPPPPPPPPPPPPPPPPPPT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGDGGGGGGGGGGGGT", "TTTTTTTTTTTTTTTTTTTTTTTTTT"], "flags": { "fogataLit": false, "tiendaArmada": false, "campamentoListo": false, "senderoAbierto": false }, "npcs": [{ "id": "alizon", "x": 256, "y": 224, "w": 26, "h": 28, "sprite": "alizon", "asset": "npc_alizon", "name": "Alizon", "style": "blue", "dialogue": ["¡Qué claro tan enorme! Aquí tendremos sitio de sobra para el campamento.", "El Guardabosques dice que lo primero es planear: un buen dibujo de flujo nos dice qué hacer antes de hacer nada.", "Después toca fabricar. Cada pieza del refugio se construye con una función: una receta que recibe algo y devuelve un resultado.", "Y cuando el bosque nos haga decidir... ahí entra la lógica de las condiciones. Yo preparo la madera, tú escribes los planos."] }, { "id": "sabio", "x": 192, "y": 160, "w": 26, "h": 28, "sprite": "guardabosques", "asset": "npc_guardabosques", "name": "El Guardabosques", "style": "green", "dialogue": ["Bienvenido, viajero. Este es tu primer día en El Gran Backend. Aquí no hay botones mágicos: todo se construye con lógica.", "Lo primero que haremos es PLANEAR. En el Libro tienes los diagramas de flujo: el plano mental de cualquier tarea. Estúdialos antes de escribir una sola línea.", "Con el plano claro, fabricamos las piezas. Una función es como una receta: recibe ingredientes (parámetros) y devuelve un resultado (return).", "Y cuando el bosque nos obligue a decidir, usaremos la lógica de las condiciones: si esto, entonces aquello.", "Empecemos por el calor. Acércate al hogar de piedras."] }], "interactables": [{ "id": "fogata01", "type": "fogata", "asset": "campfire", "x": 128, "y": 128, "w": 32, "h": 32, "missionNode": "challenge1", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda01", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 128, "w": 32, "h": 32, "missionNode": "challenge2", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "fogata02", "type": "fogata", "asset": "campfire", "x": 128, "y": 384, "w": 32, "h": 32, "missionNode": "challenge3", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda02", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 384, "w": 32, "h": 32, "missionNode": "challenge4", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "campamento01", "type": "campamento", "asset": "workbench", "x": 448, "y": 256, "w": 32, "h": 32, "missionNode": "challenge5", "solid": { "x": -20, "y": 14, "w": 72, "h": 25 }, "sortOffset": 39 }], "decor": [{ "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 }, { "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 3 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 96, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 480, "y": 96, "w": 34, "h": 30, "seed": 2 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 320, "y": 512, "w": 34, "h": 30, "seed": 3 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 512, "y": 512, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 416, "w": 24, "h": 18, "seed": 2 }, { "kind": "grass", "asset": "grass_tufts", "x": 192, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 256, "y": 416, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 416, "w": 14, "h": 12 }], "doors": [{ "id": "sendero", "x": 384, "y": 512, "tileRow": 16, "tileCol": 12 }] };
+class World {
+  constructor() {
+    this.rows=ZONE.rows; this.cols=ZONE.cols; this.tiles=ZONE.map.map(r=>r.split("")); this.flags={...ZONE.flags};
+    this.npcs=ZONE.npcs.map(n=>({...n,dialogue:n.dialogue.slice()})); this.interactables=ZONE.interactables.map(i=>({...i,solid:{...i.solid}}));
+    this.decor=ZONE.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null})); this.doors=ZONE.doors.map(d=>({...d}));
+  }
+  tileAt(col,row){ if(row<0||row>=this.rows||col<0||col>=this.cols)return "T"; return this.tiles[row][col]; }
+  _pointInSolid(px,py,o){ if(!o.solid)return false; const r=o.solid; return px>=o.x+r.x&&px<o.x+r.x+r.w&&py>=o.y+r.y&&py<o.y+r.y+r.h; }
+  isWalkable(px,py){
+    const col=Math.floor(px/TILE), row=Math.floor(py/TILE); if(col<0||col>=this.cols||row<0||row>=this.rows)return false;
+    const t=this.tileAt(col,row); if(t==="D"&&!this.flags.senderoAbierto)return false; const def=TILE_DEF[t]||TILE_DEF.T; if(!def.walkable&&t!=="D")return false;
+    for(const d of this.decor) if(this._pointInSolid(px,py,d)) return false;
+    for(const it of this.interactables) if(this._pointInSolid(px,py,it)) return false;
+    for(const npc of this.npcs){ const r={x:npc.x+5,y:npc.y+18,w:18,h:12}; if(px>=r.x&&px<r.x+r.w&&py>=r.y&&py<r.y+r.h)return false; }
+    return true;
+  }
+  pixelWidth(){return this.cols*TILE;} pixelHeight(){return this.rows*TILE;}
+  abrirSendero(id){this.flags.senderoAbierto=true;for(const d of this.doors)if(!id||d.id===id)this.tiles[d.tileRow][d.tileCol]="P";}
+  encenderFogata(id){this.flags.fogataLit=true;const t=this.interactables.find(i=>i.id===id);if(t){t.lit=true;t.changedAt=performance.now();}}
+  armarTienda(id){this.flags.tiendaArmada=true;const t=this.interactables.find(i=>i.id===id);if(t){t.armada=true;t.changedAt=performance.now();}}
+  completarCampamento(){this.flags.campamentoListo=true;const t=this.interactables.find(i=>i.type==="campamento");if(t){t.completed=true;t.changedAt=performance.now();}}
+}
+
+class CollisionSystem {
+  static resolveMove(world,entity,dx,dy){
+    const insetX=6, insetTop=12, footH=13;
+    let nx=entity.x+dx;
+    if(dx!==0){ const px=dx>0?nx+entity.w-insetX:nx+insetX; const pts=[[px,entity.y+entity.h-footH],[px,entity.y+entity.h-2]]; if(pts.every(([x,y])=>world.isWalkable(x,y)))entity.x=nx; }
+    let ny=entity.y+dy;
+    if(dy!==0){ const py=dy>0?ny+entity.h-2:ny+entity.h-footH; const pts=[[entity.x+insetX,py],[entity.x+entity.w-insetX,py]]; if(pts.every(([x,y])=>world.isWalkable(x,y)))entity.y=ny; }
+  }
+}
+
+class Player {
+  constructor(){ this.x=307; this.y=216; this.w=26; this.h=28; this.speed=GAME_CONFIG.movement.speed; this.dir="up"; this.moving=false; this.animTime=0; this.frame=0; }
+  update(dt,moveVec,world){
+    this.moving=moveVec.x!==0||moveVec.y!==0;
+    if(this.moving){ if(Math.abs(moveVec.x)>Math.abs(moveVec.y))this.dir=moveVec.x>0?"right":"left";else this.dir=moveVec.y>0?"down":"up";
+      CollisionSystem.resolveMove(world,this,moveVec.x*this.speed*dt,moveVec.y*this.speed*dt); this.animTime+=dt; const ft=1/GAME_CONFIG.movement.animationFps; if(this.animTime>ft){this.animTime=0;this.frame=(this.frame+1)%4;}
+    } else this.frame=0;
+  }
+  center(){return{x:this.x+this.w/2,y:this.y+this.h/2};}
+}
+
+class Renderer {
+  constructor(ctx, particles) { this.ctx = ctx; this.particles = particles || null; }
+
+  _stateFor(it) {
+    if (it.type === "fogata") return it.lit ? "on" : "off";
+    if (it.type === "tienda") return it.armada ? "built" : "materials";
+    return "default";
+  }
+
+  _emitFromEffect(effectName, wx, wy) {
+    if (!this.particles || !ASSET_MANIFEST.effects) return;
+    const eff = ASSET_MANIFEST.effects[effectName];
+    if (!eff) return;
+    const vx0 = eff.velocity.x[0], vx1 = eff.velocity.x[1];
+    const vy0 = eff.velocity.y[0], vy1 = eff.velocity.y[1];
+    const lt0 = eff.lifetime[0], lt1 = eff.lifetime[1];
+    const color = eff.colors[Math.floor(Math.random() * eff.colors.length)];
+    this.particles.particles.push({
+      type: "spark", x: wx + (Math.random() - 0.5) * 6, y: wy,
+      vx: vx0 + Math.random() * (vx1 - vx0), vy: vy0 + Math.random() * (vy1 - vy0),
+      life: lt0 + Math.random() * (lt1 - lt0), maxLife: lt1, color
+    });
+  }
+
+  renderWorld(world, camera, canvasW, canvasH) {
+    const ctx = this.ctx; ctx.imageSmoothingEnabled = false;
+    rect(ctx, 0, 0, canvasW, canvasH, "#163a2c");
+    const now = performance.now();
+    const sc = Math.max(0, Math.floor(camera.x / TILE)), ec = Math.min(world.cols, Math.ceil((camera.x + canvasW) / TILE) + 1);
+    const sr = Math.max(0, Math.floor(camera.y / TILE)), er = Math.min(world.rows, Math.ceil((camera.y + canvasH) / TILE) + 1);
+    for (let row = sr; row < er; row++) for (let col = sc; col < ec; col++) {
+      const t = world.tiles[row][col], def = TILE_DEF[t] || TILE_DEF.T, sx = col * TILE - camera.x, sy = row * TILE - camera.y, seed = (row * 47 + col * 29) % 13;
+      rect(ctx, sx, sy, TILE, TILE, def.base);
+      if (t === "P" || t === "D") {
+        rect(ctx, sx + 4 + (seed % 4) * 6, sy + 7 + (seed % 3) * 7, 4, 2, seed % 2 ? C.sandDark : C.sandLight);
+        if (seed % 4 === 0) rect(ctx, sx + 22, sy + 23, 3, 3, C.sandDark);
+      } else if (t === "H") {
+        rect(ctx, sx, sy, 32, 2, C.pathDark); rect(ctx, sx + 4 + (seed % 3) * 8, sy + 9 + (seed % 2) * 12, 5, 2, C.pathLight);
+      } else if (t === "G" || t === "g") {
+        if (seed % 3 === 0) drawGrassTuft(ctx, sx + 4 + (seed % 4) * 5, sy + 12);
+        else rect(ctx, sx + 6 + (seed % 5) * 4, sy + 8 + (seed % 2) * 12, 2, 4, C.grassLight);
+      } else if (t === "T") {
+        ASSET_RENDERER.drawAsset(ctx, "tree_oak", "default", col * TILE + 32, row * TILE + 32, camera, now, { clipY: 45, clipH: 19 });
+      }
+      if (t === "D" && !world.flags.senderoAbierto) drawDoor(ctx, sx, sy, false);
+    }
+    for (const d of world.decor) {
+      if (d.kind === "flowers") ASSET_RENDERER.drawAsset(ctx, "flowers_mixed", "default", d.x + d.w / 2, d.y + d.h, camera, now);
+      else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
+    }
+    if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
+  }
+
+  renderDepthScene(world, player, camera) {
+    const ctx = this.ctx, now = performance.now(), items = [];
+    for (const d of world.decor) if (d.kind === "bush") items.push({ type: "decor", ref: d, y: d.y + d.h, asset: d.asset || "bush_flowers" });
+    for (const n of world.npcs) items.push({ type: "npc", ref: n, y: n.y + n.h, asset: n.asset || "npc_alizon" });
+    for (const it of world.interactables) items.push({ type: "interactable", ref: it, y: it.y + (it.sortOffset || it.h), asset: it.asset || it.type });
+    items.push({ type: "player", ref: player, y: player.y + player.h, asset: "player_viajero" });
+    items.sort((a, b) => a.y - b.y);
+    for (const item of items) {
+      if (item.type === "decor") {
+        const d = item.ref;
+        ASSET_RENDERER.drawAsset(ctx, item.asset, "default", d.x + d.w / 2, d.y + d.h, camera, now);
+        continue;
+      }
+      if (item.type === "player") {
+        const p = item.ref;
+        const st = (p.dir === "left" || p.dir === "right") ? "side" : p.dir;
+        const bob = (p.moving && p.frame % 2) ? -1 : 0;
+        ASSET_RENDERER.drawAsset(ctx, item.asset, st, p.x + p.w / 2, p.y + p.h + bob, camera, now, { flipX: p.dir === "left" });
+        continue;
+      }
+      if (item.type === "npc") {
+        const n = item.ref, bob = Math.sin((now + n.x * 3) / 560) * .5;
+        ASSET_RENDERER.drawAsset(ctx, item.asset, "down", n.x + n.w / 2, n.y + n.h + bob, camera, now);
+        continue;
+      }
+      const it = item.ref, age = it.changedAt ? Math.min(1, (now - it.changedAt) / 430) : 1;
+      const pop = (it.changedAt && age < 1) ? .72 + age * .28 : 1;
+      ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it), it.x + 16, it.y + 32, camera, now, { alpha: pop });
+      const meta = ASSET_RENDERER.asset(item.asset);
+      if (meta.light && it.type === "fogata" && it.lit) {
+        ctx.save(); ctx.globalAlpha = (meta.light.alpha || .16) * pop; ctx.fillStyle = meta.light.color || "#ffd35d";
+        ctx.beginPath(); ctx.arc(it.x + 16 - camera.x, it.y + 20 - camera.y, meta.light.radius || 70, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      }
+      if (it.type === "fogata" && it.lit) {
+        if (Math.random() < 0.1) this._emitFromEffect("smoke", it.x + 16, it.y + 4);
+        if (Math.random() < 0.07) this._emitFromEffect("sparks", it.x + 16, it.y - 4);
+      }
+    }
+  }
+
+  renderEntities(world, camera) {}
+  renderPlayer(player, camera) {}
+
+  renderCanopy(world, camera) {
+    const ctx = this.ctx, cw = ctx.canvas.width, ch = ctx.canvas.height, now = performance.now();
+    const sc = Math.max(0, Math.floor(camera.x / TILE)), ec = Math.min(world.cols, Math.ceil((camera.x + cw) / TILE) + 1);
+    const sr = Math.max(0, Math.floor(camera.y / TILE)), er = Math.min(world.rows, Math.ceil((camera.y + ch) / TILE) + 1);
+    for (let row = sr; row < er; row++) for (let col = sc; col < ec; col++) {
+      if (world.tiles[row][col] === "T") {
+        ASSET_RENDERER.drawAsset(ctx, "tree_oak", "default", col * TILE + 32, row * TILE + 32, camera, now, { clipY: 0, clipH: 45 });
+      }
+    }
+  }
+
+  renderInteractPrompt(ctx, x, y, camera) {
+    const time = performance.now() / 1000, bounce = Math.round(Math.sin(time * 7) * 2), sx = Math.round(x - camera.x), sy = Math.round(y - camera.y - 6 + bounce);
+    ctx.save(); rect(ctx, sx - 17, sy - 19, 34, 21, C.ink); rect(ctx, sx - 15, sy - 17, 30, 17, C.gold1); rect(ctx, sx - 13, sy - 15, 26, 13, C.gold2);
+    ctx.fillStyle = C.ink; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("E", sx, sy - 8);
+    rect(ctx, sx - 3, sy + 1, 6, 4, C.ink); rect(ctx, sx - 2, sy + 1, 4, 3, C.gold1); ctx.restore();
+  }
+
+  renderGuide(ctx, world, camera, activeTargetId, canvasW, canvasH) {
+    if (!activeTargetId) return; let target = world.interactables.find(i => i.id === activeTargetId) || world.npcs.find(n => n.id === activeTargetId); if (!target) return;
+    const tx = (target.x + 16) - camera.x, ty = (target.y - 8) - camera.y, time = performance.now() / 1000;
+    if (tx >= 12 && tx <= canvasW - 12 && ty >= 12 && ty <= canvasH - 12) {
+      const b = Math.round(Math.sin(time * 6) * 3); ctx.save(); rect(ctx, tx - 4, ty - 18 + b, 8, 8, C.gold0); rect(ctx, tx - 3, ty - 17 + b, 6, 6, C.gold1); rect(ctx, tx - 2, ty - 14 + b, 4, 8, C.gold1); ctx.restore();
+    } else {
+      const cx = canvasW / 2, cy = canvasH / 2, a = Math.atan2(ty - cy, tx - cx), pad = 25, ix = Math.max(pad, Math.min(canvasW - pad, cx + Math.cos(a) * (canvasW / 2 - pad))), iy = Math.max(pad, Math.min(canvasH - pad, cy + Math.sin(a) * (canvasH / 2 - pad)));
+      ctx.save(); ctx.translate(ix, iy); ctx.rotate(a); rect(ctx, -6, -6, 12, 12, C.gold0); rect(ctx, -3, -3, 10, 6, C.gold1); ctx.restore();
+    }
+  }
+}
+
+
+Object.assign(NS,{World,CollisionSystem,Player,Renderer,TILE_DEF,SPR,drawSpriteRows,TREE_TRUNK_TOP,CANOPY_H});
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const { MAX_EXECUTION_STEPS } = NS;
+
+/* =========================================================================
+   PythonEngine
+   ========================================================================= */
+class PythonEngine {
+  constructor() {
+    this.output = []; this.calls = []; this.vars = {}; this.functions = {}; this.steps = 0;
+  }
+  run(code) {
+    this.output = []; this.calls = []; this.vars = {}; this.functions = {}; this.steps = 0;
+    try {
+      const lines = code.replace(/\r\n/g, "\n").split("\n");
+      let i = 0;
+      while (i < lines.length) {
+        this.steps++;
+        if (this.steps > MAX_EXECUTION_STEPS) return this._err("RuntimeError", "Límite de pasos.", null);
+        const line = lines[i].trim();
+        if (line === "" || line.startsWith("#")) { i++; continue; }
+        const def = this._matchDef(lines, i);
+        if (def) { if (def.error) return def.error; i = def.consumed; continue; }
+        const res = this._execLine(line);
+        if (res && res.error) return res;
+        i++;
+      }
+      return { ok: true, output: this.output, calls: this.calls, error: null };
+    } catch (e) { return this._err("RuntimeError", "Error al ejecutar código.", null); }
+  }
+  _matchDef(lines, i) {
+    const m = lines[i].match(/^def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*:\s*$/);
+    if (!m) return null;
+    const name = m[1], paramsSrc = m[2].trim(), params = paramsSrc === "" ? [] : paramsSrc.split(",").map(p => p.trim()).filter(Boolean);
+    const body = []; let j = i + 1;
+    while (j < lines.length) { const raw = lines[j]; if (raw.trim() === "") { j++; continue; } if (/^\s/.test(raw)) { const ind = (raw.match(/^\s*/) || [""])[0].length; body.push({ ind, line: raw.trim() }); j++; } else break; }
+    if (body.length === 0) return { error: this._err("SyntaxError", "Función sin cuerpo.", "Usa al menos un return indentado.") };
+    this.functions[name] = { params, body };
+    return { consumed: j };
+  }
+  _err(type, message, hint) { return { ok: false, output: this.output, calls: this.calls, error: { type, message, hint } }; }
+  _execLine(line) {
+    if (/^return\b/.test(line)) return this._err("SyntaxError", "'return' fuera de función.", "Usa return solo dentro de def.");
+    const assign = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/);
+    if (assign && !/^==/.test(assign[2])) { const [, name, exprSrc] = assign; const val = this._parseExprTop(exprSrc); if (val && val.error) return val; this.vars[name] = val.value; return null; }
+    const call = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*$/);
+    if (call) {
+      const [, name, argsSrc] = call;
+      if (!line.endsWith(")")) return this._err("SyntaxError", "Falta ')'.", "Cierra el paréntesis.");
+      const args = this._evalCallArgs(argsSrc); if (args && args.error) return args;
+      if (name === "print") { this.output.push(args.values.map(v => String(v)).join(" ")); this.calls.push({ name, args: args.values }); return null; }
+      if (this.functions[name]) { const res = this._execFunctionWithArgs(name, args.values); if (res && res.error) return res; this.calls.push({ name, args: args.values }); return null; }
+      return this._err("NameError", "Función '" + name + "' no definida.", "Defínela con def antes.");
+    }
+    return this._err("SyntaxError", "Instrucción no reconocida.", "Usa def o print.");
+  }
+  _evalCallArgs(argsSrc) {
+    const src = argsSrc.trim(); if (src === "") return { values: [] };
+    const toks = this._tokenize(src); this._toks = toks; this._tokIdx = 0; const values = [];
+    if (this._peek().t !== "eof") { try { values.push(this._parseE()); } catch (e) { return this._fromThrow(e); } while (this._peek().v === ",") { this._next(); try { values.push(this._parseE()); } catch (e) { return this._fromThrow(e); } } }
+    return { values };
+  }
+  _execFunctionWithArgs(name, argValues) {
+    const fn = this.functions[name], savedVars = this.vars; this.vars = {};
+    for (let k = 0; k < fn.params.length; k++) this.vars[fn.params[k]] = argValues[k];
+    let retVal = null, hasRet = false, err = null;
+    const body = fn.body;
+    const isIf = (l) => /^if\s+.+:\s*$/.test(l);
+    const isElif = (l) => /^elif\s+.+:\s*$/.test(l);
+    const isElse = (l) => /^else:\s*$/.test(l);
+    let i = 0;
+    while (i < body.length) {
+      this.steps++; if (this.steps > MAX_EXECUTION_STEPS) { err = this._err("RuntimeError", "Límite superado.", null); break; }
+      const line = body[i].line;
+      if (line === "" || line.startsWith("#")) { i++; continue; }
+      if (isIf(line)) {
+        const baseInd = body[i].ind;
+        const conds = [{ condSrc: line.slice(3, -1).trim(), bodyStart: i + 1 }];
+        let scan = i + 1;
+        while (scan < body.length && body[scan].ind > baseInd) scan++;
+        conds[0].bodyEnd = scan;
+        while (scan < body.length && body[scan].ind === baseInd && (isElif(body[scan].line) || isElse(body[scan].line))) {
+          if (isElse(body[scan].line)) conds.push({ condSrc: null });
+          else conds.push({ condSrc: body[scan].line.slice(5, -1).trim() });
+          let s2 = scan + 1;
+          while (s2 < body.length && body[s2].ind > baseInd) s2++;
+          conds[conds.length - 1].bodyStart = scan + 1;
+          conds[conds.length - 1].bodyEnd = s2;
+          scan = s2;
+        }
+        let chosen = -1;
+        for (let ci = 0; ci < conds.length; ci++) {
+          if (conds[ci].condSrc === null) { chosen = ci; break; }
+          const cv = this._parseExprTop(conds[ci].condSrc);
+          if (cv && cv.error) { err = cv; break; }
+          if (cv.value) { chosen = ci; break; }
+        }
+        if (err) break;
+        if (chosen >= 0) {
+          for (let k = conds[chosen].bodyStart; k < conds[chosen].bodyEnd; k++) {
+            const l = body[k].line;
+            const retM = l.match(/^return\s+(.+)$/);
+            if (retM) { const v = this._parseExprTop(retM[1].trim()); if (v && v.error) { err = v; break; } retVal = v.value; hasRet = true; break; }
+            const res = this._execLine(l); if (res && res.error) { err = res; break; }
+          }
+          if (err || hasRet) break;
+        }
+        i = scan;
+        continue;
+      }
+      const retM = line.match(/^return\s+(.+)$/);
+      if (retM) { const v = this._parseExprTop(retM[1].trim()); if (v && v.error) { err = v; break; } retVal = v.value; hasRet = true; break; }
+      const res = this._execLine(line); if (res && res.error) { err = res; break; }
+      i++;
+    }
+    this.vars = savedVars; if (err) return err; return { value: hasRet ? retVal : null };
+  }
+  _execFunction(name, argsSrc) { const args = this._evalCallArgs(argsSrc); if (args && args.error) return args; return this._execFunctionWithArgs(name, args.values); }
+  _fromThrow(e) { if (e && e.type) return this._err(e.type, e.message, e.hint || null); return this._err("RuntimeError", "Error al evaluar.", null); }
+  _tokenize(src) {
+    const toks = []; let i = 0; const s = src;
+    while (i < s.length) {
+      const ch = s[i]; if (/\s/.test(ch)) { i++; continue; }
+      if (ch === '"' || ch === "'") { let j = i + 1, str = "", closed = false; while (j < s.length) { if (s[j] === ch) { closed = true; break; } str += s[j]; j++; } if (!closed) throw { type: "SyntaxError", message: "Falta cerrar comillas." }; toks.push({ t: "str", v: str }); i = j + 1; continue; }
+      if (/[0-9]/.test(ch) || (ch === "." && /[0-9]/.test(s[i + 1] || ""))) { let j = i; while (j < s.length && /[0-9.]/.test(s[j])) j++; toks.push({ t: "num", v: parseFloat(s.slice(i, j)) }); i = j; continue; }
+      if (/[A-Za-z_]/.test(ch)) { let j = i; while (j < s.length && /[A-Za-z0-9_]/.test(s[j])) j++; const w = s.slice(i, j);
+        if (w === "and" || w === "or") toks.push({ t: "op", v: w });
+        else if (w === "not") toks.push({ t: "not", v: w });
+        else if (w === "True") toks.push({ t: "bool", v: true });
+        else if (w === "False") toks.push({ t: "bool", v: false });
+        else toks.push({ t: "id", v: w });
+        i = j; continue; }
+      const two = s.slice(i, i + 2); if (["==", "!=", "<=", ">=", "**", "//"].includes(two)) { toks.push({ t: "op", v: two }); i += 2; continue; }
+      if ("+-*/%<>()=,".includes(ch)) { toks.push({ t: ch === "," ? "comma" : "op", v: ch }); i++; continue; }
+      throw { type: "SyntaxError", message: "Símbolo '" + ch + "' desconocido." };
+    }
+    toks.push({ t: "eof", v: "" }); return toks;
+  }
+  _peek() { return this._toks[this._tokIdx]; }
+  _next() { return this._toks[this._tokIdx++]; }
+  _parseExprTop(src) { try { this._toks = this._tokenize(src); this._tokIdx = 0; const val = this._parseE(); if (this._peek().t !== "eof") return this._err("SyntaxError", "Expresión inválida.", "Sobran símbolos."); return { value: val }; } catch (e) { return this._fromThrow(e); } }
+  _parseE() { let left = this._parseAnd(); while (this._peek().v === "or") { this._next(); const right = this._parseAnd(); left = left || right; } return left; }
+  _parseAnd() { let left = this._parseNot(); while (this._peek().v === "and") { this._next(); const right = this._parseNot(); left = left && right; } return left; }
+  _parseNot() { if (this._peek().t === "not") { this._next(); return !this._parseNot(); } return this._parseCmp(); }
+  _parseCmp() { let left = this._parseA(); while (["==", "!=", "<", ">", "<=", ">="].includes(this._peek().v)) { const op = this._next().v; const right = this._parseA(); if (op === "==") left = left === right; else if (op === "!=") left = left !== right; else if (op === "<") left = left < right; else if (op === ">") left = left > right; else if (op === "<=") left = left <= right; else if (op === ">=") left = left >= right; } return left; }
+  _parseA() { let left = this._parseM(); while (this._peek().v === "+" || this._peek().v === "-") { const op = this._next().v; const right = this._parseM(); left = op === "+" ? left + right : left - right; } return left; }
+  _parseM() { let left = this._parseU(); while (["*", "/", "%", "//"].includes(this._peek().v)) { const op = this._next().v; const right = this._parseU(); if (op === "*") left = left * right; else if (op === "/") left = left / right; else if (op === "%") left = left % right; else if (op === "//") left = Math.floor(left / right); } return left; }
+  _parseU() { if (this._peek().v === "-") { this._next(); return -this._parseU(); } return this._parseP(); }
+  _parseP() {
+    const t = this._peek();
+    if (t.v === "(") { this._next(); const v = this._parseE(); if (this._peek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._next(); return v; }
+    if (t.t === "num" || t.t === "str" || t.t === "bool") { this._next(); return t.v; }
+    if (t.t === "id") {
+      const name = t.v; this._next();
+      if (name === "True") return true;
+      if (name === "False") return false;
+      if (this._peek().v === "(") {
+        this._next(); const args = []; if (this._peek().v !== ")") { args.push(this._parseE()); while (this._peek().v === ",") { this._next(); args.push(this._parseE()); } }
+        if (this._peek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._next();
+        if (this.functions[name]) { const res = this._execFunctionWithArgs(name, args); if (res && res.error) throw res.error; return res.value; }
+        throw { type: "NameError", message: "Función '" + name + "' no definida." };
+      }
+      if (name === "True") return true; if (name === "False") return false; if (Object.prototype.hasOwnProperty.call(this.vars, name)) return this.vars[name];
+      throw { type: "NameError", message: "Variable '" + name + "' no existe." };
+    }
+    throw { type: "SyntaxError", message: "Expresión inválida." };
+  }
+}
+
+const PythonValidator = {
+  validatePrintCall(runResult, expectedText) {
+    if (!runResult.ok) return { valid: false, error: runResult.error };
+    const printCalls = runResult.calls.filter(c => c.name === "print");
+    if (printCalls.length === 0) return { valid: false, error: { type: "LogicError", message: "Falta print()." } };
+    const last = printCalls[printCalls.length - 1]; const text = String(last.args[0] ?? "").trim();
+    if (text === "") return { valid: false, error: { type: "LogicError", message: "print() vacío." } };
+    if (expectedText != null && text.toLowerCase() !== expectedText.toLowerCase()) return { valid: false, error: { type: "LogicError", message: `Se esperaba "${expectedText}".` } };
+    return { valid: true, printedText: text };
+  }
+};
+
+class WorldActions {
+  constructor(world, particles, audio) { this.world = world; this.particles = particles; this.audio = audio; }
+  encenderFogata(id, worldX, worldY) { this.world.encenderFogata(id); this.particles.spawnBurst(worldX, worldY, "#ff6b6b", 10); this.particles.spawnText(worldX, worldY - 10, "¡Fogata encendida!", "#ffd166"); this.audio.play("success"); }
+  armarTienda(id, worldX, worldY) { this.world.armarTienda(id); this.particles.spawnEmoji(worldX, worldY - 10, "⛺"); this.particles.spawnText(worldX, worldY - 24, "Tienda armada", "#4dd0e1"); this.audio.play("success"); }
+  abrirSendero(id, worldX, worldY) { this.world.abrirSendero(id); this.particles.spawnBurst(worldX, worldY, "#ffd166", 12); this.audio.play("open"); }
+  completarCampamento(worldX, worldY) { this.world.completarCampamento(); this.particles.spawnText(worldX, worldY - 20, "¡Campamento listo!", "#ffd166"); this.audio.play("complete"); }
+}
+
+class DialogueSystem {
+  constructor(ui) { this.ui = ui; this.queue = []; this.active = false; this.speaker = ""; this.onComplete = null; }
+  start(speaker, lines, onComplete) { this.speaker = speaker; this.queue = lines.slice(); this.active = true; this.onComplete = onComplete || null; this._showNext(); }
+  _showNext() { if (this.queue.length === 0) { this.active = false; this.ui.hideDialogue(); if (this.onComplete) { const cb = this.onComplete; this.onComplete = null; cb(); } return; }
+  this.ui.showDialogue(this.speaker, this.queue.shift()); }
+  advance() { if (this.active) this._showNext(); }
+}
+
+class InteractionSystem {
+  constructor(world) { this.world = world; this.range = NS.GAME_CONFIG.interactionRange; }
+  findNearby(player) {
+    const c = player.center(); let best = null, bestDist = this.range;
+    for (const npc of this.world.npcs) { const d = Math.hypot(c.x - (npc.x + 16), c.y - (npc.y + 16)); if (d < bestDist) { best = { kind: "npc", ref: npc }; bestDist = d; } }
+    for (const it of this.world.interactables) { const d = Math.hypot(c.x - (it.x + 16), c.y - (it.y + 16)); if (d < bestDist) { best = { kind: "interactable", ref: it }; bestDist = d; } }
+    for (const door of this.world.doors) { const dx = door.tileCol * 32 + 16, dy = door.tileRow * 32 + 16; const d = Math.hypot(c.x - dx, c.y - dy); if (d < bestDist && !this.world.flags.senderoAbierto) { best = { kind: "door", ref: door }; bestDist = d; } }
+    return best;
+  }
+}
+
+Object.assign(NS, { PythonEngine, PythonValidator, WorldActions, DialogueSystem, InteractionSystem });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const { PythonValidator } = NS;
+
+class PythonStructureAnalyzer {
+  static indent(line) { const m = line.match(/^[ \t]*/); return (m ? m[0] : "").replace(/\t/g, "    ").length; }
+  static cleanLine(line) {
+    let out = "", quote = null;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (quote) { out += ch; if (ch === quote && line[i - 1] !== "\\") quote = null; continue; }
+      if (ch === '"' || ch === "'") { quote = ch; out += ch; continue; }
+      if (ch === "#") break;
+      out += ch;
+    }
+    return out;
+  }
+  static analyze(code) {
+    const lines = code.replace(/\r\n/g, "\n").split("\n");
+    const classes = new Map();
+    const syntax = [];
+    for (let i = 0; i < lines.length; i++) {
+      const raw = this.cleanLine(lines[i]);
+      const trimmed = raw.trim();
+      if (!trimmed) continue;
+      if (/^(class|def)\s+/.test(trimmed) && !trimmed.endsWith(":")) syntax.push({ line: i + 1, message: "Falta ':' al final de la definición." });
+      const cm = trimmed.match(/^class\s+([A-Za-z_]\w*)(?:\([^)]*\))?\s*:\s*$/);
+      if (!cm) continue;
+      const classIndent = this.indent(raw), cls = { name: cm[1], methods: new Map(), attrs: new Set(), startLine: i + 1 };
+      let j = i + 1;
+      while (j < lines.length) {
+        const childRaw = this.cleanLine(lines[j]); const childTrim = childRaw.trim();
+        if (childTrim && this.indent(childRaw) <= classIndent) break;
+        const mm = childTrim.match(/^def\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*:\s*$/);
+        if (mm) {
+          const methodIndent = this.indent(childRaw);
+          const method = { name: mm[1], params: mm[2].split(",").map(x => x.trim()).filter(Boolean), body: [], returns: [] };
+          let k = j + 1;
+          while (k < lines.length) {
+            const bodyRaw = this.cleanLine(lines[k]); const bodyTrim = bodyRaw.trim();
+            if (bodyTrim && this.indent(bodyRaw) <= methodIndent) break;
+            if (bodyTrim) {
+              method.body.push(bodyTrim);
+              const rm = bodyTrim.match(/^return\s+(.+)$/); if (rm) method.returns.push(rm[1].trim());
+              for (const am of bodyTrim.matchAll(/self\.([A-Za-z_]\w*)\s*=/g)) cls.attrs.add(am[1]);
+            }
+            k++;
+          }
+          cls.methods.set(method.name, method); j = k; continue;
+        }
+        j++;
+      }
+      classes.set(cls.name, cls);
+    }
+    return { code, lines, classes, syntax };
+  }
+}
+
+function hasStringReturn(method, expected) {
+  if (!method) return false;
+  return method.returns.some(expr => {
+    const m = expr.match(/^["']([\s\S]*?)["']$/);
+    return m && m[1].trim().toLowerCase() === expected.trim().toLowerCase();
+  });
+}
+
+function hasInstantiation(code, className) {
+  const re = new RegExp("(?:^|\\n)\\s*[A-Za-z_]\\w*\\s*=\\s*" + className + "\\s*\\(", "m");
+  return re.test(code);
+}
+function hasMethodCall(code, methodName) {
+  const re = new RegExp("\\b[A-Za-z_]\\w*\\s*\\.\\s*" + methodName + "\\s*\\(");
+  return re.test(code);
+}
+
+const VALIDATORS = {
+  print_call(engine, code, spec) {
+    const run = engine.run(code);
+    return PythonValidator.validatePrintCall(run, spec.expectedText != null ? spec.expectedText : null);
+  },
+  def_exists(engine, code, spec) {
+    const run = engine.run(code);
+    if (!run.ok) return { valid: false, error: run.error };
+    const fn = engine.functions[spec.defName];
+    if (!fn) return { valid: false, error: {
+      type: "LogicError",
+      message: "No definiste la funcion '" + spec.defName + "'.",
+      hint: "Usa: def " + spec.defName + "(" + (spec.params || []).join(", ") + ")" } };
+    if (spec.params) {
+      const need = spec.params.join(",").replace(/\s/g, "").toLowerCase();
+      const have = (fn.params || []).join(",").replace(/\s/g, "").toLowerCase();
+      if (need !== have) return { valid: false, error: {
+        type: "LogicError",
+        message: "La firma de '" + spec.defName + "' no coincide con lo pedido.",
+        hint: "Define: def " + spec.defName + "(" + spec.params.join(", ") + ")" } };
+    }
+    return { valid: true };
+  },
+  def_return(engine, code, spec) {
+    const run = engine.run(code);
+    if (!run.ok) return { valid: false, error: run.error };
+    const fn = engine.functions[spec.defName];
+    if (!fn) return { valid: false, error: {
+      type: "LogicError",
+      message: "No definiste la funcion '" + spec.defName + "'.",
+      hint: "Usa: def " + spec.defName + "(" + (spec.params || []).join(", ") + ")" } };
+    if (spec.params) {
+      const need = spec.params.join(",").replace(/\s/g, "").toLowerCase();
+      const have = (fn.params || []).join(",").replace(/\s/g, "").toLowerCase();
+      if (need !== have) return { valid: false, error: {
+        type: "LogicError",
+        message: "La firma de '" + spec.defName + "' no coincide con lo pedido.",
+        hint: "Define: def " + spec.defName + "(" + spec.params.join(", ") + ")" } };
+    }
+    const sampleArgs = (spec.sampleArgs || []).slice();
+    const sampleDisp = sampleArgs.map(v => typeof v === "string" ? "\"" + v + "\"" : String(v)).join(",");
+    const result = engine._execFunctionWithArgs(spec.defName, sampleArgs);
+    if (result && result.error) return { valid: false, error: result.error };
+    const got = result.value;
+    if (spec.expected != null) {
+      const expect = spec.expected;
+      let okVal;
+      if (typeof got === "boolean" && (expect === "True" || expect === "False")) {
+        okVal = got === (expect === "True");
+      } else {
+        okVal = String(got) === String(expect);
+      }
+      if (!okVal) return { valid: false, error: {
+        type: "LogicError",
+        message: "'" + spec.defName + "(" + sampleDisp + ")' devolvio '" + String(got) + "' pero se esperaba '" + spec.expected + "'.",
+        hint: "Revisa tu return y el calculo dentro de la funcion." } };
+    } else if (spec.contains != null) {
+      if (String(got).indexOf(String(spec.contains)) === -1) return { valid: false, error: {
+        type: "LogicError",
+        message: "Tu funcion devolvio '" + String(got) + "' pero deberia incluir el texto '" + spec.contains + "'.",
+        hint: "Usa el parametro dentro del return, por ejemplo: return \"Hola \" + nombre" } };
+    } else {
+      if (got === null || got === undefined || String(got).trim() === "") return { valid: false, error: {
+        type: "LogicError",
+        message: "Tu funcion '" + spec.defName + "' no devuelve ningun valor.",
+        hint: "Agrega un return dentro de la funcion." } };
+    }
+    return { valid: true, returned: got };
+  },
+  structure(engine, code, spec) {
+    if (!code.trim()) return { valid: false, error: { type: "LogicError", message: "Escribe una solución antes de ejecutar." } };
+    const a = PythonStructureAnalyzer.analyze(code);
+    if (a.syntax.length) return { valid: false, error: { type: "SyntaxError", message: a.syntax[0].message, hint: "Revisa la línea " + a.syntax[0].line + "." } };
+
+    for (const req of (spec.classes || [])) {
+      const cls = a.classes.get(req.name);
+      if (!cls) return { valid: false, error: { type: "LogicError", message: `Falta definir la clase ${req.name}.`, hint: `Usa class ${req.name}:` } };
+      for (const attr of (req.attrs || [])) {
+        if (!cls.attrs.has(attr)) return { valid: false, error: { type: "LogicError", message: `La clase ${req.name} debe guardar self.${attr}.` } };
+      }
+      for (const mr of (req.methods || [])) {
+        const method = cls.methods.get(mr.name);
+        if (!method) return { valid: false, error: { type: "LogicError", message: `Falta el método ${mr.name}() en ${req.name}.` } };
+        if (mr.self !== false && !method.params.includes("self")) return { valid: false, error: { type: "LogicError", message: `${mr.name}() debe recibir self.` } };
+        if (mr.returnText && !hasStringReturn(method, mr.returnText)) return { valid: false, error: { type: "LogicError", message: `${mr.name}() debe retornar "${mr.returnText}".` } };
+      }
+    }
+    for (const className of (spec.instantiate || [])) {
+      if (!hasInstantiation(code, className)) return { valid: false, error: { type: "LogicError", message: `Debes crear un objeto de ${className}.`, hint: `El nombre de la variable puede ser cualquiera.` } };
+    }
+    for (const methodName of (spec.calls || [])) {
+      if (!hasMethodCall(code, methodName)) return { valid: false, error: { type: "LogicError", message: `Falta llamar al método ${methodName}().` } };
+    }
+    return { valid: true, analysis: a };
+  }
+};
+
+const ACTIONS = {
+  fogata(worldActions, world, spec) {
+    const it = world.interactables.find(i => i.id === spec.id); if (!it) return;
+    worldActions.encenderFogata(spec.id, it.x + 16, it.y); worldActions.particles.spawnEmoji(it.x + 16, it.y - 10, "🔥"); worldActions.particles.spawnBurst(it.x + 16, it.y, "#ff6b6b", 12); worldActions.audio.play("success");
+  },
+  tienda(worldActions, world, spec) {
+    const it = world.interactables.find(i => i.id === spec.id); if (!it) return;
+    worldActions.armarTienda(spec.id, it.x + 16, it.y); worldActions.particles.spawnEmoji(it.x + 16, it.y - 10, "⛺"); worldActions.particles.spawnBurst(it.x + 16, it.y, "#4dd0e1", 12); worldActions.audio.play("success");
+  },
+  campamento(worldActions, world, spec) {
+    const it = world.interactables.find(i => i.id === spec.id); if (it) worldActions.completarCampamento(it.x + 16, it.y);
+    if (world.doors && world.doors[0]) worldActions.abrirSendero(world.doors[0].id, 16 * 32, 4 * 32);
+    worldActions.particles.spawnBurst(10 * 32, 5 * 32, "#ffd166", 20); worldActions.audio.play("complete");
+  }
+};
+
+const LESSONS = {
+  "planos_del_viajero": {
+  id: "planos_del_viajero", title: "Capítulo 1 · Los Planos del Viajero", concept: "funciones_selectivas", zone: "claro_del_bosque", story: ["Capítulo 1 — Los Planos del Viajero.", "No basta con desear un refugio: hay que planearlo (diagramas), fabricarlo con funciones y decidir con condiciones. Solo así el claro se vuelve hogar."],
+  introDialogue: { speaker: "El Guardabosques", lines: ["Bienvenido al claro, viajero. Este será tu hogar, pero no está hecho: hay que construirlo.", "En el Libro encontrarás los diagramas de flujo: el plano mental que guía toda tarea. Estúdialos.", "Con el plano claro, fabricamos las piezas con funciones. Y cuando el bosque nos haga decidir, usaremos la lógica de las condiciones.", "Empecemos por lo esencial: el calor. Acércate al hogar de piedras."] },
+  objectives: { "intro": "Habla con El Guardabosques.", "challenge1": "Define encender(nombre) para despertar el hogar.", "challenge2": "Define promedio(a, b, c) para fabricar la lona de la tienda.", "challenge3": "Define mayor_de_tres(a, b, c) para avivar el fogón de cocina.", "challenge4": "Define clasificar_nota(n) para ordenar la despensa.", "challenge5": "Imprime el mensaje que sella el campamento." },
+  challenges: [
+    { id: "challenge1", title: "El Hogar Dormido", target: "fogata01", objective: "El hogar de piedras está dormido. Define la función encender(nombre) que reciba un nombre y devuelva un saludo que lo incluya, para despertar el fuego.", example: "def encender(nombre):\n    return \"Hola, \" + nombre + \"!\"", starterCode: "", hints: ["Una función se declara con def, su nombre y los parámetros entre paréntesis.", "Para devolver un valor usa return.", "El texto devuelto debe incluir el nombre que recibe la función."], validate: function(engine, code){ return VALIDATORS.def_return(engine, code, { "defName": "encender", "params": ["nombre"], "sampleArgs": ["Aprendiz"], "contains": "Aprendiz" }); }, onSuccess: function(wa, w){ return ACTIONS.fogata(wa, w, { "id": "fogata01" }); }, successDialogue: ["El hogar parpadea y despierta: \"¡Hola, Aprendiz!\" — una luz cálida ilumina el claro.", "El Guardabosques asiente: \"Bien. La primera función del refugio vuelve a vivir.\""], concepts: ["funciones", "def", "return"] },
+    { id: "challenge2", title: "La Lona de la Tienda", target: "tienda01", objective: "La tienda necesita su lona. Define la función promedio(a, b, c) que reciba tres números y devuelva su promedio, para calcular las medidas justas del tejido.", example: "def promedio(a, b, c):\n    return (a + b + c) / 3", starterCode: "", hints: ["La función recibe tres parámetros: a, b y c.", "Suma los tres y divide entre la cantidad.", "Devuelve el resultado con return."], validate: function(engine, code){ return VALIDATORS.def_return(engine, code, { "defName": "promedio", "params": ["a", "b", "c"], "sampleArgs": [6, 7, 8], "expected": "7" }); }, onSuccess: function(wa, w){ return ACTIONS.tienda(wa, w, { "id": "tienda01" }); }, successDialogue: ["La tienda se yergue firme: su lona mide exactamente lo que necesita el claro.", "Alizon sonríe: \"Con parámetros y retorno, el refugio fabrica lo que necesita.\""], concepts: ["funciones", "parametros", "return"] },
+    { id: "challenge3", title: "El Fogón Decidido", target: "fogata02", objective: "El fogón de cocina solo arde si recibe la pieza más pesada. Define mayor_de_tres(a, b, c) que devuelva el mayor de tres números, para elegir el tronco correcto.", example: "def mayor_de_tres(a, b, c):\n    if a > b and a > c:\n        return a\n    elif b > c:\n        return b\n    else:\n        return c", starterCode: "", hints: ["Compara los tres valores con condiciones if/elif/else.", "Puedes combinar condiciones con and.", "Cada rama devuelve el mayor con return."], validate: function(engine, code){ return VALIDATORS.def_return(engine, code, { "defName": "mayor_de_tres", "params": ["a", "b", "c"], "sampleArgs": [9, 3, 5], "expected": "9" }); }, onSuccess: function(wa, w){ return ACTIONS.fogata(wa, w, { "id": "fogata02" }); }, successDialogue: ["El fogón rugió: tomó el tronco más pesado, el 9, y arde con fuerza.", "El Guardabosques sonríe: \"Decidir es parte de sobrevivir. Bien usado el if.\""], concepts: ["selectivas", "if", "elif", "else", "operadores"] },
+    { id: "challenge4", title: "La Despensa Ordenada", target: "tienda02", objective: "La despensa clasifica las provisiones. Define clasificar_nota(n) que devuelva 'Reprobado' si n < 51, 'Aprobado' si 51 ≤ n ≤ 79, o 'Excelente' si n ≥ 80.", example: "def clasificar_nota(n):\n    if n < 51:\n        return \"Reprobado\"\n    elif n <= 79:\n        return \"Aprobado\"\n    else:\n        return \"Excelente\"", starterCode: "", hints: ["Usa if, elif y else para los tres rangos.", "El primer caso es n < 51.", "El último caso (else) cubre n >= 80."], validate: function(engine, code){ return VALIDATORS.def_return(engine, code, { "defName": "clasificar_nota", "params": ["n"], "sampleArgs": [65], "expected": "Aprobado" }); }, onSuccess: function(wa, w){ return ACTIONS.tienda(wa, w, { "id": "tienda02" }); }, successDialogue: ["La despensa quedó ordenada: cada provisión en su lugar, cada nota en su rango.", "Alizon asiente: \"La lógica selectiva es lo que separa el orden del caos.\""], concepts: ["selectivas", "if", "elif", "else", "rangos"] },
+    { id: "challenge5", title: "El Refugio Sella", target: "campamento01", objective: "Todo está en su sitio. Imprime el mensaje que declara al refugio habitable y cierra el Capítulo 1.", example: "print(\"El campamento esta listo\")", starterCode: "", hints: ["Usa print con el texto entre comillas.", "El mensaje exacto es: El campamento esta listo"], validate: function(engine, code){ return VALIDATORS.print_call(engine, code, { "expectedText": "El campamento esta listo" }); }, onSuccess: function(wa, w){ return ACTIONS.campamento(wa, w, { "id": "campamento01" }); }, successDialogue: ["El campamento se enciende por completo: un destello dorado cruza el claro y el refugio queda habitable.", "El Guardabosques posa la mano en tu hombro: \"Hoy planificaste, fabricaste y decidiste. Así se domina este bosque.\"", "Mira hacia el sendero. \"Pero la tormenta se acerca, y las provisiones están en peligro. Algo aguarda más allá de la luz del fuego... Continúa en el próximo capítulo.\""], concepts: ["print", "cierre", "campamento"] }
+  ]
+}
+};
+
+const BOOK_PAGES = [
+  { "id": "diagramas_flujo", "title": "Diagramas de Flujo (GL01)", "unlockedBy": "planos_del_viajero", "what": "El plano mental de cualquier tarea: representación gráfica de un algoritmo con símbolos conectados por flechas. Se estudia antes de escribir código.", "syntax": "Inicio → Proceso → Decisión → Fin", "example": "Símbolos: terminal (Inicio/Fin), proceso (rectángulo), entrada/salida (paralelogramo), decisión (rombo con Sí/No).", "commonError": "Dibujar un diagrama sin Inicio o sin Fin, o una decisión con una sola salida.", "tip": "Todo diagrama empieza en Inicio y termina en Fin; cada decisión tiene dos salidas: Sí y No." },
+  { "id": "funciones", "title": "Funciones (GL02)", "unlockedBy": "planos_del_viajero", "what": "Una función es una receta reutilizable: agrupa código con un nombre para invocarlo muchas veces.", "syntax": "def nombre(parametros):\n    # cuerpo\n    return resultado", "example": "def encender(nombre):\n    return \"Hola, \" + nombre + \"!\"\nprint(encender(\"Aprendiz\"))", "commonError": "Olvidar los dos puntos ':' o no indentar el cuerpo.", "tip": "El cuerpo de la función se escribe indentado con 4 espacios." },
+  { "id": "parametros_return", "title": "Parámetros y return (GL02)", "unlockedBy": "planos_del_viajero", "what": "Los parámetros son los valores de entrada que recibe la función; return finaliza la función y devuelve un resultado al punto donde fue llamada.", "syntax": "def promedio(a, b, c):\n    return (a + b + c) / 3", "example": "print(promedio(6, 7, 8))  # 7.0", "commonError": "Llamar a la función sin pasarle los argumentos que pide, o creer que sin return 'devuelve' algo (sin return devuelve None).", "tip": "Los parámetros son locales: solo existen dentro de la función." },
+  { "id": "selectivas", "title": "Estructuras Selectivas (GL03)", "unlockedBy": "planos_del_viajero", "what": "La toma de decisiones: ejecuta un bloque u otro según una condición lógica.", "syntax": "if condicion:\n    # bloque verdadero\nelif otra_condicion:\n    # otro bloque\nelse:\n    # bloque por defecto", "example": "def clasificar_nota(n):\n    if n < 51:\n        return \"Reprobado\"\n    elif n <= 79:\n        return \"Aprobado\"\n    else:\n        return \"Excelente\"", "commonError": "Olvidar los dos puntos, o que una condición anule a otra por un mal orden.", "tip": "Se evalúa en orden: solo se ejecuta el primer bloque cuya condición sea verdadera." },
+  { "id": "operadores", "title": "Operadores relacionales y lógicos (GL03)", "unlockedBy": "planos_del_viajero", "what": "Construyen las condiciones de las estructuras selectivas.", "syntax": "Relacionales: > < >= <= == !=\nLógicos: and or not", "example": "if a > b and a > c:\n    return a", "commonError": "Usar = (asignación) en lugar de == (comparación).", "tip": "and exige que ambas condiciones sean verdaderas; or, que al menos una lo sea." }
+];
+class BookSystem {
+  constructor(gameState) { this.state = gameState; }
+  unlock(conceptId) { if (!this.state.meta.unlockedConcepts.includes(conceptId)) this.state.meta.unlockedConcepts.push(conceptId); }
+  getPages() { return BOOK_PAGES.map(p => ({ ...p, unlocked: !p.locked || this.state.meta.unlockedConcepts.includes(p.id) })); }
+}
+
+class ChallengeSystem {
+  constructor(lesson, engine) {
+    this.lesson = lesson; this.engine = engine; this.index = 0;
+    this.records = lesson.challenges.map(c => ({ id: c.id, attempts: 0, errors: 0, hintsUsed: 0, startedAt: 0, timeMs: 0, solved: false })); this.hintLevel = 0;
+  }
+  current() { return this.lesson.challenges[this.index]; }
+  currentRecord() { return this.records[this.index]; }
+  isLast() { return this.index >= this.lesson.challenges.length - 1; }
+  start() { if (this.currentRecord()) this.currentRecord().startedAt = performance.now(); this.hintLevel = 0; }
+  requestHint() { const ch = this.current(); if (!ch) return null; if (this.hintLevel < ch.hints.length) { const hint = ch.hints[this.hintLevel]; this.hintLevel++; this.currentRecord().hintsUsed++; return hint; } return null; }
+  submit(code, worldActions, world) {
+    const ch = this.current(), rec = this.currentRecord(); rec.attempts++;
+    const result = ch.validate(this.engine, code);
+    if (!result.valid) { rec.errors++; return { success: false, error: result.error }; }
+    rec.timeMs = performance.now() - rec.startedAt; rec.solved = true; ch.onSuccess(worldActions, world); return { success: true, concepts: ch.concepts };
+  }
+  advance() { this.index++; this.start(); }
+}
+
+class StatisticsSystem {
+  constructor(lesson, challengeSystem) { this.lesson = lesson; this.cs = challengeSystem; this.missionStartedAt = performance.now(); }
+  compute() {
+    const records = this.cs.records, total = records.length, solved = records.filter(r => r.solved).length;
+    const resolution = total > 0 ? (solved / total) * 60 : 0, totalAttempts = records.reduce((s, r) => s + r.attempts, 0), totalErrors = records.reduce((s, r) => s + r.errors, 0);
+    const syntaxRatio = totalAttempts > 0 ? Math.max(0, 1 - totalErrors / (totalAttempts + 2)) : 1; const syntax = syntaxRatio * 20;
+    const logicalSolves = records.filter(r => r.solved && r.attempts <= 2).length; const logic = total > 0 ? (logicalSolves / total) * 10 : 0;
+    const totalHints = records.reduce((s, r) => s + r.hintsUsed, 0), maxHints = total * 3; const autonomyRatio = maxHints > 0 ? Math.max(0, 1 - totalHints / (maxHints + 1)) : 1; const autonomy = autonomyRatio * 10;
+    const score = Math.round(resolution + syntax + logic + autonomy), durationMs = performance.now() - this.missionStartedAt;
+    const concepts = Array.from(new Set(this.lesson.challenges.flatMap(c => c.concepts)));
+    return { lessonId: this.lesson.id, completed: solved === total, score: Math.max(0, Math.min(100, score)), syntaxScore: Math.round(syntax), logicScore: Math.round(logic), autonomyScore: Math.round(autonomy), resolutionScore: Math.round(resolution), hintsUsed: totalHints, attempts: totalAttempts, errors: totalErrors, duration: Math.round(durationMs / 1000), concepts, challenges: total, challengesSolved: solved };
+  }
+}
+
+Object.assign(NS, { LESSONS, BOOK_PAGES, VALIDATORS, ACTIONS, PythonStructureAnalyzer, BookSystem, ChallengeSystem, StatisticsSystem });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+
+class SaveSystem {
+  constructor(key = "titi:juegoart:progress") { this.key = key; this._mem = null; }
+  load() {
+    try { return JSON.parse(localStorage.getItem(this.key)) || this._mem; } catch (e) { return this._mem; }
+  }
+  save(data) {
+    this._mem = data;
+    try { localStorage.setItem(this.key, JSON.stringify(data)); } catch (e) {}
+    return true;
+  }
+  clear() { this._mem = null; try { localStorage.removeItem(this.key); } catch (e) {} }
+}
+
+class TitiBridge {
+  constructor(saveSystem) { this.saveSystem = saveSystem; this.mode = "demo"; this.hostConfig = null; }
+  async init() {
+    if (window.TitiAPI && typeof window.TitiAPI === "object") { this.mode = "titiapi"; return this.mode; }
+    if (window.parent && window.parent !== window) { try { window.parent.postMessage({ type: 'juegoart:handshake', version: 1 }, '*'); } catch (e) {} this.mode = 'postmessage'; return this.mode; }
+    this.mode = 'demo'; return this.mode;
+  }
+  getLesson(demoSelection) { return { lessonId: demoSelection || "planos_del_viajero", source: "demo" }; }
+  saveProgress(partial) { const current = this.saveSystem.load() || {}; this.saveSystem.save({ ...current, ...partial, savedAt: Date.now() }); }
+  completeLesson(payload) {
+    try {
+      if (this.mode === "titiapi" && typeof window.TitiAPI.completeLesson === "function") window.TitiAPI.completeLesson(payload);
+      else if (this.mode === "postmessage") window.parent.postMessage({ type: "juegoart:complete", payload }, "*");
+    } catch (e) {}
+  }
+  submitScore(payload) {
+    try {
+      if (this.mode === "titiapi" && typeof window.TitiAPI.submitScore === "function") { window.TitiAPI.submitScore(payload); return; }
+      if (this.mode === "postmessage") {
+        window.parent.postMessage({
+          source: "titi-html",
+          type: "TITI_SCORE",
+          score: Math.max(0, Math.min(100, Math.round(Number(payload && payload.score) || 0))),
+          attemptToken: window.__TITI_ATTEMPT_TOKEN,
+        }, "*");
+      }
+    } catch (e) {}
+  }
+}
+
+Object.assign(NS, { SaveSystem, TitiBridge });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const KEYWORDS = ["print", "if", "elif", "else", "for", "in", "range", "while", "def", "return", "class", "self", "True", "False", "None"];
+function escapeHtml(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function highlightPython(code) {
+  const lines = code.split("\n");
+  return lines.map(line => {
+    let out = "", i = 0;
+    while (i < line.length) {
+      const rest = line.slice(i);
+      const strMatch = rest.match(/^("([^"\\]|\\.)*"|'([^'\\]|\\.)*')/); if (strMatch) { out += `<span class="tok-str">${escapeHtml(strMatch[0])}</span>`; i += strMatch[0].length; continue; }
+      const numMatch = rest.match(/^\d+(\.\d+)?/); if (numMatch) { out += `<span class="tok-num">${escapeHtml(numMatch[0])}</span>`; i += numMatch[0].length; continue; }
+      const commentMatch = rest.match(/^#.*/); if (commentMatch) { out += `<span class="tok-com">${escapeHtml(commentMatch[0])}</span>`; i += commentMatch[0].length; continue; }
+      const wordMatch = rest.match(/^[A-Za-z_][A-Za-z0-9_]*/); if (wordMatch) { const w = wordMatch[0]; if (KEYWORDS.includes(w)) out += `<span class="tok-kw">${escapeHtml(w)}</span>`; else out += `<span class="tok-id">${escapeHtml(w)}</span>`; i += w.length; continue; }
+      out += escapeHtml(line[i]); i++;
+    } return out || "&nbsp;";
+  }).join("\n");
+}
+
+class UIManager {
+  constructor() { this.$ = (id) => document.getElementById(id); this._bindEditorSync(); this._bindGeneral(); }
+  _bindGeneral() {
+    this.$("bookBtn").addEventListener("click", () => this.onBookRequested && this.onBookRequested());
+    this.$("bookCloseBtn").addEventListener("click", () => this.closeBook());
+    this.$("btnCloseEditor").addEventListener("click", () => this.onEditorClose && this.onEditorClose());
+    this.$("dialogueBox").addEventListener("click", () => this.onDialogueAdvance && this.onDialogueAdvance());
+    this.$("btnRun").addEventListener("click", () => this.onRunCode && this.onRunCode(this.getEditorCode()));
+    this.$("btnHint").addEventListener("click", () => this.onHintRequested && this.onHintRequested());
+    this.$("btnBookInEditor").addEventListener("click", () => this.onBookRequested && this.onBookRequested());
+  }
+  _bindEditorSync() {
+    const ta = this.$("editorTextarea");
+    const sync = () => { const code = ta.value; this.$("editorHighlight").innerHTML = highlightPython(code) + "\n"; let gutter = ""; for (let i = 1; i <= code.split("\n").length; i++) gutter += i + "\n"; this.$("editorLineNumbers").textContent = gutter; };
+    ta.addEventListener("input", sync); ta.addEventListener("scroll", () => { this.$("editorHighlight").scrollTop = ta.scrollTop; this.$("editorHighlight").scrollLeft = ta.scrollLeft; this.$("editorLineNumbers").scrollTop = ta.scrollTop; });
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") { e.preventDefault(); const start = ta.selectionStart, end = ta.selectionEnd; ta.value = ta.value.slice(0, start) + "    " + ta.value.slice(end); ta.selectionStart = ta.selectionEnd = start + 4; sync(); return; }
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); this.onRunCode && this.onRunCode(this.getEditorCode()); return; }
+      if (e.key === "Enter") {
+        const start = ta.selectionStart; const before = ta.value.slice(0, start); const line = before.split("\n").pop() || "";
+        const indent = (line.match(/^\s*/) || [""])[0] + (line.trim().endsWith(":") ? "    " : "");
+        if (indent) { e.preventDefault(); ta.value = ta.value.slice(0, start) + "\n" + indent + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = start + 1 + indent.length; sync(); }
+      }
+    });
+    this._syncEditor = sync;
+  }
+  setObjective(text) { this.$("objectiveText").textContent = text; }
+  setMissionTitle(text) { this.$("missionTitleText").textContent = text; }
+  setProgress(current, total) { const dots = this.$("progressDots"); dots.innerHTML = ""; for (let i = 0; i < total; i++) { const d = document.createElement("span"); d.className = "progress-dot" + (i < current ? " filled" : ""); dots.appendChild(d); } }
+  showDialogue(speaker, text) { this.$("dialogueBox").classList.remove("hidden"); this.$("dialogueSpeaker").textContent = speaker; this.$("dialogueText").textContent = text; }
+  hideDialogue() { this.$("dialogueBox").classList.add("hidden"); }
+  showEditor(challenge, terminalLabel) { this.$("editorModal").classList.remove("hidden"); this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO"; this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase(); this.$("editorTitle").textContent = challenge.title; this.$("editorObjective").textContent = challenge.objective; this.$("editorExample").textContent = challenge.example; this.$("editorTextarea").value = challenge.starterCode || ""; this.$("editorOutput").innerHTML = ""; this.$("editorHintText").classList.add("hidden"); this._syncEditor(); setTimeout(() => this.$("editorTextarea").focus(), 30); }
+  hideEditor() { this.$("editorModal").classList.add("hidden"); }
+  getEditorCode() { return this.$("editorTextarea").value; }
+  showRunSuccess(message) { this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`; }
+  showRunError(error) { this.$("editorOutput").innerHTML = `<div class="out-line out-err">✕ ${escapeHtml(error.type)}</div><div class="out-line">${escapeHtml(error.message)}</div>` + (error.hint ? `<div class="out-line out-hint">💡 ${escapeHtml(error.hint)}</div>` : ""); }
+  showHint(text) { const el = this.$("editorHintText"); el.classList.remove("hidden"); el.textContent = "💡 " + text; }
+  showNoMoreHints() { const el = this.$("editorHintText"); el.classList.remove("hidden"); el.textContent = "Ya usaste todas las pistas. ¡Tú puedes!"; }
+  renderBook(pages) { const list = this.$("bookPagesList"); list.innerHTML = ""; pages.forEach((p, idx) => { const item = document.createElement("div"); item.className = "book-page-item" + (p.unlocked ? "" : " locked"); item.textContent = String(idx + 1).padStart(2, "0") + " " + (p.unlocked ? "✓ " : "🔒 ") + p.title; if (p.unlocked) item.addEventListener("click", () => this.showBookDetail(p)); list.appendChild(item); }); const first = pages.find(p => p.unlocked); if (first) this.showBookDetail(first); }
+  showBookDetail(page) { this.$("bookDetail").innerHTML = `<h3>${escapeHtml(page.title)}</h3><p class="book-label">Qué es</p><p>${escapeHtml(page.what || "")}</p><p class="book-label">Sintaxis</p><pre>${escapeHtml(page.syntax || "")}</pre><p class="book-label">Ejemplo</p><pre>${escapeHtml(page.example || "")}</pre>`; }
+  openBook() { this.$("bookModal").classList.remove("hidden"); } closeBook() { this.$("bookModal").classList.add("hidden"); }
+  showCompletion(stats) { this.$("completionScreen").classList.remove("hidden"); this.$("completionStats").innerHTML = `<div class="score-big">${stats.score} / 100</div><div class="stat-row"><span>Desafíos</span><span>${stats.challengesSolved} / ${stats.challenges}</span></div><div class="stat-row"><span>Intentos</span><span>${stats.attempts}</span></div><div class="stat-row"><span>Pistas</span><span>${stats.hintsUsed}</span></div><div class="stat-row"><span>Tiempo</span><span>${stats.duration}s</span></div>`; }
+  hideCompletion() { this.$("completionScreen").classList.add("hidden"); }
+  toast(text) { const el = this.$("toast"); el.textContent = text; el.classList.add("show"); clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => el.classList.remove("show"), 2200); }
+  showMissionSelector(lessons, onPick) { const modal = this.$("missionSelectorModal"); const list = this.$("missionSelectorList"); list.innerHTML = ""; lessons.forEach(l => { const btn = document.createElement("button"); btn.className = "mission-pick-btn"; btn.innerHTML = `<strong>${escapeHtml(l.title)}</strong><span>${escapeHtml(l.concept)}</span>`; btn.addEventListener("click", () => { modal.classList.add("hidden"); onPick(l.id); }); list.appendChild(btn); }); modal.classList.remove("hidden"); }
+  setDemoBadge(visible) { this.$("demoBadge").classList.toggle("hidden", !visible); }
+}
+
+Object.assign(NS, { UIManager, highlightPython });
+})();
+(function () {
+"use strict";
+const NS = window.__JuegoArt;
+const {
+  TILE, GameState, InputManager, Camera, AudioManager, ParticleSystem,
+  World, Player, Renderer, PythonEngine, WorldActions, DialogueSystem,
+  InteractionSystem, LESSONS, BookSystem, ChallengeSystem, StatisticsSystem,
+  SaveSystem, TitiBridge, UIManager
+} = NS;
+
+/* =========================================================================
+   Game
+   ========================================================================= */
+class Game {
+  constructor(canvas) {
+    this.canvas = canvas; this.ctx = canvas.getContext("2d");
+    this.input = new InputManager(); this.audio = new AudioManager(); this.particles = new ParticleSystem();
+    this.world = new World(); this.player = new Player(); this.camera = new Camera(canvas.width, canvas.height);
+    this.renderer = new Renderer(this.ctx, this.particles); this.engine = new PythonEngine();
+    this.worldActions = new WorldActions(this.world, this.particles, this.audio);
+    this.interaction = new InteractionSystem(this.world); this.book = new BookSystem(GameState);
+    this.saveSystem = new SaveSystem(); this.titiBridge = new TitiBridge(this.saveSystem);
+    this.ui = new UIManager(); this.dialogue = new DialogueSystem(this.ui);
+    this.lesson = null; this.challengeSystem = null; this.statistics = null; this.nearby = null;
+    this.introDone = false; this.missionComplete = false; this._lastTs = 0;
+    this._bindUiCallbacks(); this._bindMobileControls(); this._bindResize();
+  }
+
+  async boot() {
+    const mode = await this.titiBridge.init();
+    this.ui.setDemoBadge(mode === "demo");
+    const available = Object.values(LESSONS).map(l => ({ id: l.id, title: l.title, concept: l.concept }));
+    if (mode === "demo") { this.ui.showMissionSelector(available, (lessonId) => this.startLesson(lessonId)); }
+    else { const lessonRef = this.titiBridge.getLesson(); const lessonId = (lessonRef && lessonRef.lessonId) || Object.keys(LESSONS)[0]; this.startLesson(lessonId); }
+  }
+
+  startLesson(lessonId) {
+    this.lesson = LESSONS[lessonId] || LESSONS[Object.keys(LESSONS)[0]];
+    this.world = new World(); this.player = new Player(); this.camera.x = this.camera.y = 0;
+    this.worldActions = new WorldActions(this.world, this.particles, this.audio); this.interaction = new InteractionSystem(this.world);
+    this.engine = new PythonEngine(); this.challengeSystem = new ChallengeSystem(this.lesson, this.engine); this.statistics = new StatisticsSystem(this.lesson, this.challengeSystem);
+    this.challengeSystem.start(); GameState.lesson = this.lesson;
+    this.ui.setMissionTitle(this.lesson.title); this.ui.setProgress(0, this.lesson.challenges.length); this.ui.setObjective(this.lesson.objectives.intro);
+    this.introDone = false; this.missionComplete = false;
+    if (!this._loopStarted) { this._loopStarted = true; requestAnimationFrame((ts) => this._loop(ts)); }
+    setTimeout(() => { this.dialogue.start(this.lesson.introDialogue.speaker, this.lesson.introDialogue.lines, () => { this.introDone = true; this.ui.setObjective(this.lesson.objectives[this.challengeSystem.current().id]); }); }, 400);
+  }
+
+  _getActiveTargetId() {
+    if (!this.introDone) return "sabio";
+    if (this.missionComplete) return null;
+    const ch = this.challengeSystem ? this.challengeSystem.current() : null;
+    return ch ? ch.target : null;
+  }
+
+  _loop(ts) {
+    const dt = Math.min(0.05, (ts - (this._lastTs || ts)) / 1000); this._lastTs = ts;
+    this.update(dt); this.render();
+    requestAnimationFrame((t) => this._loop(t));
+  }
+
+  update(dt) {
+    const anyModalOpen = this._isModalOpen();
+    this.camera.follow(this.player, this.world.pixelWidth(), this.world.pixelHeight());
+    if (!anyModalOpen) {
+      const move = this.input.getMoveVector();
+      this.player.update(dt, move, this.world);
+      
+      // Efecto jugosito de movimiento (polvo/pisadas)
+      if (this.player.moving && Math.random() < 0.2) {
+         this.particles.spawnDust(this.player.x + this.player.w / 2, this.player.y + this.player.h);
+      }
+
+      this.nearby = this.interaction.findNearby(this.player);
+      if (this.input.wantsInteract()) this._handleInteract();
+    } else {
+      if (this.dialogue.active && this.input.wantsInteract()) this.dialogue.advance();
+      if (this.input.wantsClose()) this._closeTopModal();
+    }
+    this.camera.update(dt); this.particles.update(dt); this.input.update();
+  }
+
+  render() {
+    this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height);
+    this.renderer.renderDepthScene(this.world, this.player, this.camera);
+    this.renderer.renderCanopy(this.world, this.camera);
+
+    // Renderizado del Sistema de Guía
+    const targetId = this._getActiveTargetId();
+    this.renderer.renderGuide(this.ctx, this.world, this.camera, targetId, this.canvas.width, this.canvas.height);
+
+    this.particles.render(this.ctx, this.camera);
+    if (this.nearby && !this._isModalOpen()) {
+      const r = this.nearby.ref;
+      const x = r.x !== undefined ? r.x + 16 : r.tileCol * TILE + 16;
+      const y = r.y !== undefined ? r.y - 2 : r.tileRow * TILE - 6;
+      this.renderer.renderInteractPrompt(this.ctx, x, y, this.camera);
+    }
+  }
+
+  _handleInteract() {
+    if (!this.nearby) return;
+    if (this.nearby.kind === "npc") { const npc = this.nearby.ref; this.dialogue.start(npc.name, npc.dialogue); return; }
+    if (this.nearby.kind === "door") { this.ui.toast("El sendero está bloqueado."); return; }
+    if (this.nearby.kind === "interactable") {
+      const it = this.nearby.ref;
+      if (!this.introDone) { this.ui.toast("Habla primero con el Guardabosques."); return; }
+      const ch = this.challengeSystem.current(); if (!ch) return;
+      if (it.id !== ch.target) { this.ui.toast("Busca la flecha indicadora primero."); return; }
+      this.ui.showEditor(ch, "LIBRO DE PLANOS");
+    }
+  }
+
+  _bindUiCallbacks() {
+    this.ui.onDialogueAdvance = () => this.dialogue.advance();
+    this.ui.onEditorClose = () => this.ui.hideEditor();
+    this.ui.onRunCode = (code) => {
+      const ch = this.challengeSystem.current(); const result = this.challengeSystem.submit(code, this.worldActions, this.world);
+      this.ui.setProgress(this.challengeSystem.index, this.lesson.challenges.length);
+      if (!result.success) { this.audio.play("error"); this.ui.showRunError(result.error); return; }
+      this.audio.play("success"); this.ui.showRunSuccess("¡Correcto! El mundo respondió a tu código."); for (const concept of (result.concepts || [])) this.book.unlock(concept); this.titiBridge.saveProgress({ lessonId: this.lesson.id, challengeIndex: this.challengeSystem.index, code });
+      setTimeout(() => {
+        this.ui.hideEditor(); const successLines = ch.successDialogue || [];
+        const proceedAfterDialogue = () => { if (this.challengeSystem.isLast()) { this._completeMission(); } else { this.challengeSystem.advance(); this.ui.setObjective(this.lesson.objectives[this.challengeSystem.current().id]); this.ui.setProgress(this.challengeSystem.index, this.lesson.challenges.length); } };
+        if (successLines.length > 0) this.dialogue.start("El Guardabosques", successLines, proceedAfterDialogue); else proceedAfterDialogue();
+      }, 900);
+    };
+    this.ui.onHintRequested = () => { const hint = this.challengeSystem.requestHint(); this.audio.play("hint"); if (hint) this.ui.showHint(hint); else this.ui.showNoMoreHints(); };
+    this.ui.onBookRequested = () => { const pages = this.book.getPages(); this.ui.renderBook(pages); this.ui.openBook(); };
+  }
+
+  _completeMission() { this.missionComplete = true; const stats = this.statistics.compute(); this.titiBridge.completeLesson(stats); this.titiBridge.submitScore(stats); this.ui.setObjective("¡Misión completada!"); this.ui.showCompletion(stats); }
+  _isModalOpen() { return this.dialogue.active || !this.ui.$("editorModal").classList.contains("hidden") || !this.ui.$("bookModal").classList.contains("hidden") || !this.ui.$("completionScreen").classList.contains("hidden") || !this.ui.$("missionSelectorModal").classList.contains("hidden"); }
+  _closeTopModal() { if (!this.ui.$("bookModal").classList.contains("hidden")) return this.ui.closeBook(); if (!this.ui.$("editorModal").classList.contains("hidden")) return this.ui.hideEditor(); }
+
+  _bindMobileControls() {
+    const base = document.getElementById("joystickBase"), knob = document.getElementById("joystickKnob"), interactBtn = document.getElementById("interactBtn");
+    let dragging = false, originX = 0, originY = 0; const maxRadius = 34;
+    const setKnob = (dx, dy) => { knob.style.transform = `translate(${dx}px, ${dy}px)`; };
+    const start = (clientX, clientY) => { dragging = true; const rect = base.getBoundingClientRect(); originX = rect.left + rect.width / 2; originY = rect.top + rect.height / 2; };
+    const move = (clientX, clientY) => { if (!dragging) return; let dx = clientX - originX, dy = clientY - originY; const dist = Math.hypot(dx, dy); if (dist > maxRadius) { dx = (dx / dist) * maxRadius; dy = (dy / dist) * maxRadius; } setKnob(dx, dy); this.input.touchVector = { x: dx / maxRadius, y: dy / maxRadius }; };
+    const end = () => { dragging = false; setKnob(0, 0); this.input.touchVector = { x: 0, y: 0 }; };
+    base.addEventListener("touchstart", (e) => { e.preventDefault(); start(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    base.addEventListener("touchmove", (e) => { e.preventDefault(); move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    base.addEventListener("touchend", (e) => { e.preventDefault(); end(); }, { passive: false });
+    base.addEventListener("mousedown", (e) => start(e.clientX, e.clientY)); window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY)); window.addEventListener("mouseup", () => end());
+    interactBtn.addEventListener("touchstart", (e) => { e.preventDefault(); this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); }, { passive: false });
+    interactBtn.addEventListener("click", () => { this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); });
+  }
+
+  _bindResize() {
+    const resize = () => { const wrap = document.getElementById("canvasWrap"); const w = wrap.clientWidth, h = wrap.clientHeight; this.canvas.width = w; this.canvas.height = h; this.camera.resize(w, h); };
+    window.addEventListener("resize", resize); resize();
+  }
+}
+
+Object.assign(NS, { Game });
+
+window.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.getElementById("gameCanvas");
+  const game = new Game(canvas);
+  window.__juegoArtInstance = game;
+  game.boot();
+});
+})();
+
+</script>
+</body>
+</html>
