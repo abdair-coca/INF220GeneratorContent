@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'self' 'unsafe-inline' data: blob: https:; script-src 'unsafe-inline' 'unsafe-eval' https:; style-src 'unsafe-inline' https:; img-src data: blob: https:; font-src data: https:; connect-src https:;"><title>Estructuras Selectivas — Diagramas de Flujo y Python · GL03</title><style>
+<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'; frame-src 'none'; img-src data:; media-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline';"><title>Estructuras Selectivas — Diagramas de Flujo y Python · GL03</title><style>
 :root {
   --ink: #172033;
   --muted: #647083;
@@ -441,6 +441,7 @@ h1 {
   display: flex;
   justify-content: center;
   overflow: auto;
+  padding: 6px;
 }
 
 .diagrama .mermaid svg {
@@ -759,33 +760,7 @@ else:
     if b &gt; c:
         print(f&#x27;El mayor es {b}&#x27;)
     else:
-        print(f&#x27;El mayor es {c}&#x27;)</code></pre></div></li></ol></section><section class="section" id="sec-05"><div class="head"><div><span class="num">SECCIÓN 05</span><h2>Laboratorio Práctico interactivo</h2></div></div><p class="muted">Probá ejecutar los siguientes programas interactivos de toma de decisiones:</p><div class="cell" id="cell-1"><div class="cell-in"><span class="cell-tag">In [1]:</span><button class="btn-copy" data-codigo="def evaluar_triangulo(a, b, c):
-    if (a + b &gt; c) and (a + c &gt; b) and (b + c &gt; a):
-        if a == b == c:
-            return &#x27;Triángulo Equilátero&#x27;
-        elif a == b or a == c or b == c:
-            return &#x27;Triángulo Isósceles&#x27;
-        else:
-            return &#x27;Triángulo Escaleno&#x27;
-    return &#x27;No forma un triángulo válido&#x27;
-
-print(evaluar_triangulo(3, 3, 3))
-print(evaluar_triangulo(5, 5, 8))
-print(evaluar_triangulo(3, 4, 5))
-print(evaluar_triangulo(1, 2, 10))" title="Copiar código">⧉ copiar</button><button class="btn-run" data-n="1" data-codigo="def evaluar_triangulo(a, b, c):
-    if (a + b &gt; c) and (a + c &gt; b) and (b + c &gt; a):
-        if a == b == c:
-            return &#x27;Triángulo Equilátero&#x27;
-        elif a == b or a == c or b == c:
-            return &#x27;Triángulo Isósceles&#x27;
-        else:
-            return &#x27;Triángulo Escaleno&#x27;
-    return &#x27;No forma un triángulo válido&#x27;
-
-print(evaluar_triangulo(3, 3, 3))
-print(evaluar_triangulo(5, 5, 8))
-print(evaluar_triangulo(3, 4, 5))
-print(evaluar_triangulo(1, 2, 10))" title="Ejecutar en el navegador">▶ ejecutar</button><pre><code>def evaluar_triangulo(a, b, c):
+        print(f&#x27;El mayor es {c}&#x27;)</code></pre></div></li></ol></section><section class="section" id="sec-05"><div class="head"><div><span class="num">SECCIÓN 05</span><h2>Laboratorio Práctico interactivo</h2></div></div><p class="muted">Probá ejecutar los siguientes programas interactivos de toma de decisiones:</p><div class="cell" id="cell-1"><div class="cell-in"><span class="cell-tag">In [1]:</span><pre><code>def evaluar_triangulo(a, b, c):
     if (a + b &gt; c) and (a + c &gt; b) and (b + c &gt; a):
         if a == b == c:
             return &#x27;Triángulo Equilátero&#x27;
@@ -801,33 +776,7 @@ print(evaluar_triangulo(3, 4, 5))
 print(evaluar_triangulo(1, 2, 10))</code></pre></div><div class="cell-out"><span class="cell-tag">Out [1]:</span><pre class="out-pre">Triángulo Equilátero
 Triángulo Isósceles
 Triángulo Escaleno
-No forma un triángulo válido</pre></div></div><div class="cell" id="cell-2"><div class="cell-in"><span class="cell-tag">In [2]:</span><button class="btn-copy" data-codigo="def calcular_imc(peso, estatura):
-    imc = peso / (estatura ** 2)
-    if imc &lt; 18.5:
-        cat = &#x27;Bajo peso&#x27;
-    elif imc &lt; 25:
-        cat = &#x27;Normal&#x27;
-    elif imc &lt; 30:
-        cat = &#x27;Sobrepeso&#x27;
-    else:
-        cat = &#x27;Obesidad&#x27;
-    return f&#x27;IMC: {imc:.2f} - Categoría: {cat}&#x27;
-
-print(calcular_imc(70, 1.75))
-print(calcular_imc(95, 1.70))" title="Copiar código">⧉ copiar</button><button class="btn-run" data-n="2" data-codigo="def calcular_imc(peso, estatura):
-    imc = peso / (estatura ** 2)
-    if imc &lt; 18.5:
-        cat = &#x27;Bajo peso&#x27;
-    elif imc &lt; 25:
-        cat = &#x27;Normal&#x27;
-    elif imc &lt; 30:
-        cat = &#x27;Sobrepeso&#x27;
-    else:
-        cat = &#x27;Obesidad&#x27;
-    return f&#x27;IMC: {imc:.2f} - Categoría: {cat}&#x27;
-
-print(calcular_imc(70, 1.75))
-print(calcular_imc(95, 1.70))" title="Ejecutar en el navegador">▶ ejecutar</button><pre><code>def calcular_imc(peso, estatura):
+No forma un triángulo válido</pre></div></div><div class="cell" id="cell-2"><div class="cell-in"><span class="cell-tag">In [2]:</span><pre><code>def calcular_imc(peso, estatura):
     imc = peso / (estatura ** 2)
     if imc &lt; 18.5:
         cat = &#x27;Bajo peso&#x27;
@@ -841,7 +790,7 @@ print(calcular_imc(95, 1.70))" title="Ejecutar en el navegador">▶ ejecutar</bu
 
 print(calcular_imc(70, 1.75))
 print(calcular_imc(95, 1.70))</code></pre></div><div class="cell-out"><span class="cell-tag">Out [2]:</span><pre class="out-pre">IMC: 22.86 - Categoría: Normal
-IMC: 32.87 - Categoría: Obesidad</pre></div></div></section><section class="section" id="sec-06"><div class="head"><div><span class="num">SECCIÓN 06</span><h2>Autoevaluación</h2></div></div><p class="muted">Responde las siguientes preguntas sobre estructuras selectivas:</p><article class="quiz-card" data-q="1" data-correct="1"><p class="question">1. ¿Qué símbolo se utiliza en un diagrama de flujo para representar una toma de decisión condicional?</p><div class="options" role="group" aria-label="Opciones Pregunta 1"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Un rectángulo de proceso</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Un rombo con una entrada y dos salidas (Sí / No)</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Un paralelogramo de entrada y salida</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Un círculo conector</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="2" data-correct="2"><p class="question">2. En una estructura if-elif-else en Python, ¿cuántos bloques elif se pueden incluir?</p><div class="options" role="group" aria-label="Opciones Pregunta 2"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Solo uno</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Exactamente dos</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Tantos como sean necesarios según la lógica del programa</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Ninguno, elif no existe en Python</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="3" data-correct="0"><p class="question">3. ¿Cuál es la forma correcta de verificar si un número x está entre 10 y 20 inclusive en Python?</p><div class="options" role="group" aria-label="Opciones Pregunta 3"><button class="option" data-ans="0" type="button"><span class="letter">A</span> if 10 &lt;= x &lt;= 20:</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> if x = 10 and x = 20:</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> if 10 &lt; x y x &lt; 20:</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> if x between 10 and 20:</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="4" data-correct="2"><p class="question">4. ¿Qué ocurre si ninguna condición de un bloque if-elif resulta verdadera y no hay cláusula else?</p><div class="options" role="group" aria-label="Opciones Pregunta 4"><button class="option" data-ans="0" type="button"><span class="letter">A</span> El programa arroja un error de sintaxis</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> El programa se detiene inmediatamente</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> El programa no ejecuta ninguno de los bloques y continúa en la siguiente línea</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Se ejecuta el primer bloque por defecto</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><div class="score-card" id="titi-score-card"><div class="score-info"><b>Estado de Autoevaluación Titi</b><span id="score-text">Respondidas: 0 / 4</span><div class="titi-status" id="titi-status">Sincronización activa con entorno Titi</div></div><div class="score-badge"><div class="score-val" id="score-val">0%</div></div></div></section><section class="section" id="sec-07"><div class="head"><div><span class="num">SECCIÓN 07</span><h2>Práctica en clase</h2></div></div><p class="muted">Para cada uno de los siguientes 11 ejercicios, diseña el diagrama de flujo y escribe el código Python correspondiente:</p><ul class="list-custom"><li>1. Mayoría de edad: Lee la edad y determina si es mayor de edad (&gt;= 18) o menor.</li><li>2. Número positivo, negativo o cero: Determina la polaridad de un número.</li><li>3. Aprobación de una materia: Lee nota (0 a 100) y muestra &#x27;Aprobado&#x27; (&gt;= 51) o &#x27;Reprobado&#x27;.</li><li>4. El mayor de tres números: Determina el mayor de 3 números distintos usando condicionales anidados.</li><li>5. Clasificación de un triángulo: Verifica validez (a+b&gt;c) y clasifica en Equilátero, Isósceles o Escaleno.</li><li>6. Descuento por compra: Monto final con descuentos (0% &lt;100Bs, 5% 100-299.99Bs, 10% 300-699.99Bs, 15% &gt;=700Bs).</li><li>7. Año bisiesto: Determina si un año es bisiesto (divisible entre 4, excepto divisibles entre 100 no divisibles entre 400).</li><li>8. Clasificación de IMC: Calcula IMC = peso / estatura² y clasifica en Bajo peso, Normal, Sobrepeso u Obesidad.</li><li>9. Validación de contraseña: Verifica longitud &gt;= 8, al menos un número y al menos una letra mayúscula.</li><li>10. Calculadora básica con menú: Menú (1:suma, 2:resta, 3:multiplicación, 4:división) controlando división entre cero.</li><li>11. Cuadrante de un punto: Determina cuadrante (I, II, III, IV), ejes u origen para coordenadas (x, y).</li></ul></section><section class="section" id="sec-08"><div class="head"><div><span class="num">SECCIÓN 08</span><h2>Entregable</h2></div></div><p class="muted">Entregar el archivo de diagramas (draw.io exportado a PDF o imágenes) y el código fuente Python (.py o PDF).</p><div class="box-info highlight"><b>EJEMPLO</b><p>Formato de entrega: Practica_3_Apellido_Nombre.pdf / .py. Fecha límite: 25/08/2026.</p></div></section><section class="section" id="sec-09"><div class="head"><div><span class="num">SECCIÓN 09</span><h2>Rúbrica de evaluación</h2></div></div><div class="table-container"><table class="styled-table"><thead><tr><th>Criterio</th><th>Descripción</th><th style="width:100px;">Puntaje</th></tr></thead><tbody><tr><td><b>Simbología de Diagramas</b></td><td>Uso adecuado del rombo de decisión con salidas Sí y No rotuladas.</td><td class="pts">25 pts</td></tr><tr><td><b>Traducción a Python</b></td><td>Correspondencia exacta entre el diagrama de flujo y el código con estructuras if-elif-else.</td><td class="pts">25 pts</td></tr><tr><td><b>Lógica Algorítmica</b></td><td>Manejo correcto de condicionales anidados y casos límite (división entre cero, triángulo inválido).</td><td class="pts">25 pts</td></tr><tr><td><b>Presentación y Coherencia</b></td><td>Código limpio, diagramas claros y entregables completos (Inicio a Fin).</td><td class="pts">25 pts</td></tr></tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td class="pts">100 Pts</td></tr></tfoot></table></div></section><section class="section" id="sec-10"><div class="head"><div><span class="num">SECCIÓN 10</span><h2>Referencias</h2></div></div><ul class="list-custom"><li>Python Software Foundation — Conditional Statements: https://docs.python.org/3/tutorial/controlflow.html#if-statements</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato UX · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js'></script><script>
+IMC: 32.87 - Categoría: Obesidad</pre></div></div></section><section class="section" id="sec-06"><div class="head"><div><span class="num">SECCIÓN 06</span><h2>Autoevaluación</h2></div></div><p class="muted">Responde las siguientes preguntas sobre estructuras selectivas:</p><article class="quiz-card" data-q="1" data-correct="1"><p class="question">1. ¿Qué símbolo se utiliza en un diagrama de flujo para representar una toma de decisión condicional?</p><div class="options" role="group" aria-label="Opciones Pregunta 1"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Un rectángulo de proceso</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Un rombo con una entrada y dos salidas (Sí / No)</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Un paralelogramo de entrada y salida</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Un círculo conector</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="2" data-correct="2"><p class="question">2. En una estructura if-elif-else en Python, ¿cuántos bloques elif se pueden incluir?</p><div class="options" role="group" aria-label="Opciones Pregunta 2"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Solo uno</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Exactamente dos</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Tantos como sean necesarios según la lógica del programa</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Ninguno, elif no existe en Python</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="3" data-correct="0"><p class="question">3. ¿Cuál es la forma correcta de verificar si un número x está entre 10 y 20 inclusive en Python?</p><div class="options" role="group" aria-label="Opciones Pregunta 3"><button class="option" data-ans="0" type="button"><span class="letter">A</span> if 10 &lt;= x &lt;= 20:</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> if x = 10 and x = 20:</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> if 10 &lt; x y x &lt; 20:</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> if x between 10 and 20:</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="4" data-correct="2"><p class="question">4. ¿Qué ocurre si ninguna condición de un bloque if-elif resulta verdadera y no hay cláusula else?</p><div class="options" role="group" aria-label="Opciones Pregunta 4"><button class="option" data-ans="0" type="button"><span class="letter">A</span> El programa arroja un error de sintaxis</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> El programa se detiene inmediatamente</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> El programa no ejecuta ninguno de los bloques y continúa en la siguiente línea</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Se ejecuta el primer bloque por defecto</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><div class="score-card" id="titi-score-card"><div class="score-info"><b>Estado de Autoevaluación Titi</b><span id="score-text">Respondidas: 0 / 4</span><div class="titi-status" id="titi-status">Sincronización activa con entorno Titi</div></div><div class="score-badge"><div class="score-val" id="score-val">0%</div></div></div></section><section class="section" id="sec-07"><div class="head"><div><span class="num">SECCIÓN 07</span><h2>Práctica en clase</h2></div></div><p class="muted">Para cada uno de los siguientes 11 ejercicios, diseña el diagrama de flujo y escribe el código Python correspondiente:</p><ul class="list-custom"><li>1. Mayoría de edad: Lee la edad y determina si es mayor de edad (&gt;= 18) o menor.</li><li>2. Número positivo, negativo o cero: Determina la polaridad de un número.</li><li>3. Aprobación de una materia: Lee nota (0 a 100) y muestra &#x27;Aprobado&#x27; (&gt;= 51) o &#x27;Reprobado&#x27;.</li><li>4. El mayor de tres números: Determina el mayor de 3 números distintos usando condicionales anidados.</li><li>5. Clasificación de un triángulo: Verifica validez (a+b&gt;c) y clasifica en Equilátero, Isósceles o Escaleno.</li><li>6. Descuento por compra: Monto final con descuentos (0% &lt;100Bs, 5% 100-299.99Bs, 10% 300-699.99Bs, 15% &gt;=700Bs).</li><li>7. Año bisiesto: Determina si un año es bisiesto (divisible entre 4, excepto divisibles entre 100 no divisibles entre 400).</li><li>8. Clasificación de IMC: Calcula IMC = peso / estatura² y clasifica en Bajo peso, Normal, Sobrepeso u Obesidad.</li><li>9. Validación de contraseña: Verifica longitud &gt;= 8, al menos un número y al menos una letra mayúscula.</li><li>10. Calculadora básica con menú: Menú (1:suma, 2:resta, 3:multiplicación, 4:división) controlando división entre cero.</li><li>11. Cuadrante de un punto: Determina cuadrante (I, II, III, IV), ejes u origen para coordenadas (x, y).</li></ul></section><section class="section" id="sec-08"><div class="head"><div><span class="num">SECCIÓN 08</span><h2>Entregable</h2></div></div><p class="muted">Entregar el archivo de diagramas (draw.io exportado a PDF o imágenes) y el código fuente Python (.py o PDF).</p><div class="box-info highlight"><b>EJEMPLO</b><p>Formato de entrega: Practica_3_Apellido_Nombre.pdf / .py. Fecha límite: 25/08/2026.</p></div></section><section class="section" id="sec-09"><div class="head"><div><span class="num">SECCIÓN 09</span><h2>Rúbrica de evaluación</h2></div></div><div class="table-container"><table class="styled-table"><thead><tr><th>Criterio</th><th>Descripción</th><th style="width:100px;">Puntaje</th></tr></thead><tbody><tr><td><b>Simbología de Diagramas</b></td><td>Uso adecuado del rombo de decisión con salidas Sí y No rotuladas.</td><td class="pts">25 pts</td></tr><tr><td><b>Traducción a Python</b></td><td>Correspondencia exacta entre el diagrama de flujo y el código con estructuras if-elif-else.</td><td class="pts">25 pts</td></tr><tr><td><b>Lógica Algorítmica</b></td><td>Manejo correcto de condicionales anidados y casos límite (división entre cero, triángulo inválido).</td><td class="pts">25 pts</td></tr><tr><td><b>Presentación y Coherencia</b></td><td>Código limpio, diagramas claros y entregables completos (Inicio a Fin).</td><td class="pts">25 pts</td></tr></tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td class="pts">100 Pts</td></tr></tfoot></table></div></section><section class="section" id="sec-10"><div class="head"><div><span class="num">SECCIÓN 10</span><h2>Referencias</h2></div></div><ul class="list-custom"><li>Python Software Foundation — Conditional Statements: https://docs.python.org/3/tutorial/controlflow.html#if-statements</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato UX · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script>
 // ---------- Barra de progreso de lectura ----------
 const progressBar = document.getElementById('bar');
 window.addEventListener('scroll', () => {
@@ -859,61 +808,44 @@ const scoreValEl = document.getElementById('score-val');
 const scoreTextEl = document.getElementById('score-text');
 const titiStatusEl = document.getElementById('titi-status');
 
-let currentScore = 0;
 const userAnswers = {};
 
-function reportarScoreTiti(score, detail) {
-  currentScore = score;
+function reportarScoreTiti(score) {
+  const finalScore = Math.max(0, Math.min(100, Math.round(Number(score) || 0)));
   try {
     window.parent.postMessage({
       source: 'titi-html',
       type: 'TITI_SCORE',
-      score: score,
-      detail: detail || {},
+      score: finalScore,
       attemptToken: window.__TITI_ATTEMPT_TOKEN,
     }, '*');
-  } catch (err) {
-    // Ejecución en ventana independiente
-  }
+  } catch (e) { /* ejecución standalone */ }
 }
 
 function actualizarCalculoScore() {
-  const totalQuizzes = quizCards.length;
-  if (!totalQuizzes) return;
-
-  let answeredCount = 0;
-  let correctCount = 0;
-
+  const total = quizCards.length;
+  if (!total) return;
+  let answered = 0, correct = 0;
   quizCards.forEach(card => {
     const qId = card.dataset.q;
     if (userAnswers[qId] !== undefined) {
-      answeredCount++;
-      if (userAnswers[qId].isCorrect) {
-        correctCount++;
-      }
+      answered++;
+      if (userAnswers[qId].isCorrect) correct++;
     }
   });
-
-  const scorePercent = Math.round((correctCount / totalQuizzes) * 100);
-  
-  if (scoreValEl) scoreValEl.textContent = scorePercent + '%';
-  if (scoreTextEl) scoreTextEl.textContent = `Respondidas: ${answeredCount} / ${totalQuizzes} (${correctCount} correctas)`;
+  const pct = Math.round((correct / total) * 100);
+  if (scoreValEl) scoreValEl.textContent = pct + '%';
+  if (scoreTextEl) scoreTextEl.textContent = 'Respondidas: ' + answered + ' / ' + total + ' (' + correct + ' correctas)';
   if (titiStatusEl) {
-    titiStatusEl.textContent = answeredCount === totalQuizzes
-      ? '✓ Evaluación completada y enviada a Titi'
-      : 'Sincronización activa con entorno Titi';
+    titiStatusEl.textContent = answered === total
+      ? '\u2713 Evaluaci\u00f3n completada y enviada a Titi'
+      : 'Sincronizaci\u00f3n activa con entorno Titi';
   }
-
-  // Solo enviamos el score definitivo a Titi cuando la evaluación está completa.
-  // Enviarlo en cada respuesta haría que Titi registre el score parcial de la
-  // primera pregunta como si fuera la nota final.
-  if (answeredCount === totalQuizzes) {
-    reportarScoreTiti(scorePercent, {
-      total: totalQuizzes,
-      correct: correctCount,
-      answered: answeredCount
-    });
-    mostrarOverlayNota(scorePercent);
+  // Solo reportamos el score final cuando la evaluación está completa, para
+  // evitar que Titi registre el score parcial de la primera pregunta.
+  if (answered === total) {
+    reportarScoreTiti(pct);
+    mostrarOverlayNota(pct);
   }
 }
 
@@ -957,33 +889,23 @@ quizCards.forEach(card => {
   const correctAnswer = card.dataset.correct;
   const options = card.querySelectorAll('.option');
   const feedbackEl = card.querySelector('.feedback');
-
   options.forEach(btn => {
     btn.addEventListener('click', () => {
-      const selectedAns = btn.dataset.ans;
-      const isCorrect = selectedAns === correctAnswer;
-
-      userAnswers[qId] = { selected: selectedAns, isCorrect };
-
-      options.forEach(o => {
-        o.disabled = true;
-        o.classList.remove('ok', 'bad');
-      });
-
+      const selected = btn.dataset.ans;
+      const isCorrect = selected === correctAnswer;
+      userAnswers[qId] = { selected, isCorrect };
+      options.forEach(o => { o.disabled = true; o.classList.remove('ok', 'bad'); });
       btn.classList.add(isCorrect ? 'ok' : 'bad');
-
       if (!isCorrect) {
-        const correctBtn = card.querySelector(`.option[data-ans="${correctAnswer}"]`);
-        if (correctBtn) correctBtn.classList.add('ok');
+        const right = card.querySelector('.option[data-ans="' + correctAnswer + '"]');
+        if (right) right.classList.add('ok');
       }
-
       if (feedbackEl) {
         feedbackEl.className = 'feedback ' + (isCorrect ? 'ok' : 'bad');
         feedbackEl.textContent = isCorrect
-          ? '✓ ¡Excelente! Respuesta correcta.'
-          : '✗ Incorrecto. Revisa la teoría y vuelve a intentarlo.';
+          ? '\u2713 \u00a1Excelente! Respuesta correcta.'
+          : '\u2717 Incorrecto. Revisa la teor\u00eda y vuelve a intentarlo.';
       }
-
       actualizarCalculoScore();
     });
   });
@@ -994,113 +916,4 @@ window.addEventListener('message', (ev) => {
     actualizarCalculoScore();
   }
 });
-
-// ---------- carga de Pyodide (Python en el navegador) ----------
-let _pyodide = null;
-
-async function cargarPython() {
-  if (_pyodide) return _pyodide;
-  const bar = document.getElementById('cargando-bar');
-  if (bar) {
-    bar.style.display = 'block';
-    bar.textContent = 'Cargando entorno Python (primera vez tarda unos segundos)…';
-  }
-  _pyodide = await loadPyodide();
-  await _pyodide.loadPackage(['numpy', 'pandas', 'matplotlib', 'seaborn']);
-  await _pyodide.runPythonAsync(PRELUDE);
-  if (bar) {
-    bar.textContent = 'Entorno Python listo. Las celdas ▶ ejecutan de verdad.';
-    setTimeout(() => { bar.style.display = 'none'; }, 2500);
-  }
-  return _pyodide;
-}
-
-const PRELUDE = `
-import numpy as np
-import pandas as pd
-import matplotlib
-matplotlib.use('module://matplotlib_pyodide.html5_canvas_backend')
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-def load_iris():
-    try:
-        from sklearn.datasets import load_iris as _li
-        return _li()
-    except Exception:
-        rng = np.random.default_rng(42)
-        data = np.round(np.column_stack([
-            rng.normal(5.01, 0.35, 150), rng.normal(3.43, 0.38, 150),
-            rng.normal(3.76, 1.77, 150), rng.normal(1.20, 0.76, 150)]), 1)
-        iris = type('Iris', (), {})()
-        iris.data = data
-        iris.target = np.repeat([0, 1, 2], 50)
-        iris.target_names = np.array(['setosa', 'versicolor', 'virginica'])
-        return iris
-`;
-
-async function ejecutar(n, codigo) {
-  const cell = document.getElementById('cell-' + n);
-  if (!cell) return;
-  const outPre = cell.querySelector('.out-pre');
-  const btn = cell.querySelector('.btn-run');
-  btn.disabled = true;
-  btn.textContent = '⏳ …';
-  outPre.textContent = 'ejecutando…';
-  const canvasAntes = new Set([...document.querySelectorAll('canvas')]);
-  try {
-    const p = await cargarPython();
-    let prints = '';
-    p.setStdout({ batched: (s) => { prints += s + '\n'; } });
-    const val = await p.runPythonAsync(codigo);
-    p.globals.set('_last', val);
-    const reprTxt = await p.runPythonAsync('repr(_last)');
-    let texto = prints;
-    if (reprTxt && String(reprTxt) !== 'None' && String(reprTxt) !== '') {
-      texto += String(reprTxt);
-    }
-    outPre.textContent = texto || '(sin salida de texto — ver figura abajo)';
-    const nuevos = [...document.querySelectorAll('canvas')].filter(c => !canvasAntes.has(c));
-    for (const c of nuevos) {
-      c.classList.add('plot-canvas');
-      cell.querySelector('.cell-out').appendChild(c);
-    }
-  } catch (e) {
-    outPre.textContent = String(e.message || e);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '▶ ejecutar';
-  }
-}
-
-document.addEventListener('click', (ev) => {
-  const b = ev.target.closest('.btn-copy');
-  if (b) {
-    navigator.clipboard.writeText(b.dataset.codigo)
-      .then(() => { b.textContent = '✓ copiado'; setTimeout(() => { b.textContent = '⧉ copiar'; }, 1500); });
-  }
-});
-
-document.addEventListener('click', (ev) => {
-  const b = ev.target.closest('.btn-run');
-  if (b) ejecutar(Number(b.dataset.n), b.dataset.codigo);
-});
-
-// ---------- diagramas mermaid ----------
-if (window.mermaid) {
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'loose',
-    theme: 'base',
-    themeVariables: {
-      primaryColor: '#eeecff',
-      primaryBorderColor: '#5145cd',
-      primaryTextColor: '#172033',
-      lineColor: '#5145cd',
-      fontFamily: 'Segoe UI, sans-serif'
-    },
-    flowchart: { curve: 'basis', padding: 10, nodeSpacing: 32, rankSpacing: 40 }
-  });
-  mermaid.run({ nodes: document.querySelectorAll('.mermaid') });
-}
 </script><div id="titi-nota-overlay"><div class="nota-box" id="titi-nota-box"><div class="nota-spinner"></div><p class="nota-title" id="nota-title">Subiendo nota a Titi…</p><p class="nota-text" id="nota-text">Guardando tu resultado, espera un momento.</p><div class="nota-score hidden" id="nota-score"></div><button class="nota-btn hidden" id="nota-btn" type="button">Continuar</button></div></div></body></html>
