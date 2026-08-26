@@ -24,7 +24,7 @@ No cambiar el sandbox a `allow-same-origin`: pierde el aislamiento de seguridad.
 | Regla | Detalle |
 |---|---|
 | Autocontenido | CSS, JS e imágenes inline o `data:`. Prohibido `src` remoto, `link`, `iframe`, `object`, `embed`, `form`. |
-| **Nada de storage** | `localStorage`/`sessionStorage`/`indexedDB`/`document.cookie`/Cache API. Estado de partida → variables en memoria (el `SaveSystem` usa localStorage solo como respaldo best-effort con try/catch; nunca depende de él). |
+| **Nada de storage** | `localStorage`/`sessionStorage`/`indexedDB`/`document.cookie`/Cache API. Estado de partida vive solo en variables en memoria. |
 | **Nada de navegación** | `window.open`, `location.*`, `target="_blank"`. Links externos → texto plano `<code>`. |
 | **Nada de red** | `fetch`, `XMLHttpRequest`, `WebSocket` (CSP `connect-src 'none'`). |
 | CSP estricta | Incluir siempre (ver §4). |
@@ -121,12 +121,15 @@ python tools/game_generator.py --nuevo                                          
   `missionNode`/`target` que no existe, `validator.kind`/`successAction.kind`
   desconocidos, etc.).
 
-El script inyecta 4 placeholders en el template:
+El script inyecta 5 placeholders en el template:
 
 - `/*__ZONE_JS__*/` → el mapa, NPCs, interactuables y decoración de la zona.
 - `/*__LESSONS_JS__*/` → la misión (`challenges` con `validate`/`onSuccess`).
 - `/*__BOOK_JS__*/` → las páginas del Libro desbloqueables.
 - `/*__ASSETS_JS__*/` → subset del kit visual recortado por capítulo.
+- `/*__ASSET_RENDERER_JS__*/` → renderer canónico inline leído desde
+  `public/juegos/visual/el_refugio_asset_renderer.js`; el template instancia
+  `window.JuegoArtAssetRenderer` sin mantener una copia paralela.
 
 ### JSON de lección (`juego_gl01_clases.json`)
 
@@ -155,6 +158,11 @@ consistente y el motor mantiene los errores educativos.
     (o `contains` para texto). Soporta booleanos (`True`/`False`).
   - `def_exists` — solo existe la función con la firma pedida.
   - `print_call` — hay un `print()` con el texto esperado.
+
+En misiones abiertas se usa `validator.kind: "function_cases"` con una lista de
+funciones (`defName`, `params`, `cases` con `args` y `expected`) y
+`successAction.kind: "station_transition"`. El generador valida firmas, casos,
+targets y estados `pending`/`active`/`completed` antes de emitir el HTML.
 - `successAction.kind` (tema Refugio): `fogata` (enciende el hogar),
   `tienda` (arma la tienda), `campamento` (completa el campamento y abre el
   sendero). El `campamento` debe ser la acción del **último** desafío.
@@ -250,6 +258,7 @@ El backend de Titi además valida en el servidor (`validateHtmlLessonResource`):
 - [ ] CSP estricta presente.
 - [ ] Sin storage / sin navegación / sin fetch / sin `_blank`.
 - [ ] `TitiBridge.submitScore` envía `TITI_SCORE` con `__TITI_ATTEMPT_TOKEN`.
+- [ ] En modo libre, score configurado se envía una sola vez al resolver todos los retos.
 - [ ] Score sanitizado 0..100.
 - [ ] Autocontenido (< 1 MB).
 - [ ] Probado dentro del iframe de Titi (no solo abriendo el archivo).
