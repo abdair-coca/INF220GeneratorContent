@@ -20,13 +20,13 @@ class JuegoArtAssetRenderer {
   }
 
   resolveState(asset,state,timeMs){
-    const states=asset.states||{};
+    const states=Object.assign({},asset.states||{},asset.extraStates||{});
     const key = state && states[state] ? state : Object.keys(states)[0];
     const def=states[key];
     if(!def) return {draw:[],state:key,frame:0};
     if(def.frames && def.frames.length){
       const fps=def.fps||6;
-      const frame=Math.floor((timeMs||0)/1000*fps)%def.frames.length;
+      const frame=Math.floor((timeMs == null ? 0 : timeMs)/1000*fps)%def.frames.length;
       return {draw:def.frames[frame].draw||[],state:key,frame};
     }
     return {draw:def.draw||[],state:key,frame:0};
@@ -34,7 +34,7 @@ class JuegoArtAssetRenderer {
 
   drawPrimitive(ctx,p,ox,oy){
     ctx.save();
-    ctx.globalAlpha = p.alpha == null ? 1 : p.alpha;
+    ctx.globalAlpha *= p.alpha == null ? 1 : p.alpha;
     ctx.fillStyle = p.color || "#fff";
     ctx.strokeStyle = p.color || "#fff";
     if(p.type==="rect"){
@@ -68,18 +68,28 @@ class JuegoArtAssetRenderer {
     const opt=options||{};
     const topX=worldX-asset.anchor.x-cam.x;
     const topY=worldY-asset.anchor.y-cam.y;
-    const resolved=this.resolveState(asset,state,timeMs||performance.now());
+    const resolved=this.resolveState(asset,state,timeMs == null ? performance.now() : timeMs);
 
     ctx.save();
     ctx.imageSmoothingEnabled=false;
     if(opt.alpha!=null) ctx.globalAlpha*=opt.alpha;
+    ctx.translate(Math.round(topX),Math.round(topY));
     if(opt.flipX){
-      ctx.translate(Math.round(topX+asset.size.w),Math.round(topY));
+      ctx.translate(asset.size.w,0);
       ctx.scale(-1,1);
-      for(const p of resolved.draw) this.drawPrimitive(ctx,p,0,0);
-    } else {
-      for(const p of resolved.draw) this.drawPrimitive(ctx,p,topX,topY);
     }
+    if(opt.clipY != null || opt.clipH != null){
+      const clipY=opt.clipY == null ? 0 : opt.clipY;
+      const clipH=opt.clipH == null ? asset.size.h-clipY : opt.clipH;
+      if(clipH<=0){
+        ctx.restore();
+        return {asset,state:resolved.state,frame:resolved.frame,topX,topY};
+      }
+      ctx.beginPath();
+      ctx.rect(0,clipY,asset.size.w,clipH);
+      ctx.clip();
+    }
+    for(const p of resolved.draw) this.drawPrimitive(ctx,p,0,0);
     ctx.restore();
     return {asset,state:resolved.state,frame:resolved.frame,topX,topY};
   }
@@ -94,7 +104,9 @@ class JuegoArtAssetRenderer {
 
   depthY(id,worldY){
     const a=this.asset(id);
-    return worldY + ((a.depth&&a.depth.offsetY)||0);
+    const depth=a.depth||{};
+    // worldY is anchor point; footY is local bottom used for y-sort.
+    return depth.footY != null ? worldY-a.anchor.y+depth.footY : worldY+(depth.offsetY||0);
   }
 
   sortInstances(instances){
