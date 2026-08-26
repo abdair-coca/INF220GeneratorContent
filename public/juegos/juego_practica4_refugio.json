@@ -1,0 +1,173 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "PRACTICA4",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "El Refugio Lógico: Protocolo Tormenta",
+    "subtitulo": "Diez estaciones para estabilizar el refugio mediante funciones, decisiones y ciclos.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "Práctica abierta",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "chapter": "practica_4_estaciones",
+  "zone": {
+    "rows": 18,
+    "cols": 24,
+    "map": [
+      "TTTTTTTTTTTTTTTTTTTTTTTT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGHHHHHHHHHHHHHHHHHHHHHT",
+      "TGHHHHHHHHHHHHHHHHHHHHHT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "THHHHHHHHHHHHHHHHHHHHHHT",
+      "THHHHHHHHHHHHHHHHHHHHHHT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGHHHHHHHHHHGGGGGGT",
+      "TGGGGGGHHHHHHHHHHGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    "flags": {},
+    "routes": [
+      {"id":"ruta_norte_oeste","from":"hub","to":"station_signal_tower","width":2},
+      {"id":"ruta_norte_este","from":"hub","to":"station_supply_sorter","width":2},
+      {"id":"ruta_sur_oeste","from":"hub","to":"station_resource_depot","width":2},
+      {"id":"ruta_sur_este","from":"hub","to":"station_energy_console","width":2},
+      {"id":"ruta_nucleo","from":"hub","to":"storm_core","width":2}
+    ],
+    "npcs": [
+      {
+        "id": "alizon",
+        "x": 352,
+        "y": 256,
+        "w": 26,
+        "h": 28,
+        "asset": "npc_alizon",
+        "name": "Alizon",
+        "dialogue": [
+          "La tormenta no avanza por el reloj, sino por lo que todavía no entendemos.",
+          "Las diez estaciones están disponibles desde este hub. Elegí cualquier ruta y dejá que cada función pruebe sus propios límites.",
+          "Yo vigilaré los instrumentos mientras vos escribís la lógica. Cuando una estación responda, su señal quedará conectada."
+        ]
+      }
+    ],
+    "interactables": [
+      {"id":"station_signal_tower","type":"station","asset":"station_signal_tower","markerAsset":"marker_station_signal","x":64,"y":58,"w":64,"h":96,"missionNode":"signal","stateMap":{"pending":"apagada","active":"transmitting","completed":"connected"},"solid":{"x":18,"y":74,"w":28,"h":14},"sortOffset":88},
+      {"id":"station_sensor_pillar","type":"station","asset":"station_sensor_pillar","markerAsset":"marker_station_sensor","x":272,"y":58,"w":48,"h":80,"missionNode":"sensor","stateMap":{"pending":"inactive","active":"scanning","completed":"diagnosed"},"solid":{"x":13,"y":59,"w":22,"h":13},"sortOffset":72},
+      {"id":"station_supply_sorter","type":"station","asset":"station_supply_sorter","markerAsset":"marker_station_supply","x":480,"y":58,"w":80,"h":64,"missionNode":"supply","stateMap":{"pending":"messy","active":"sorting","completed":"organized"},"solid":{"x":8,"y":43,"w":64,"h":13},"sortOffset":56},
+      {"id":"station_ration_board","type":"station","asset":"station_ration_board","markerAsset":"marker_station_ration","x":656,"y":58,"w":80,"h":72,"missionNode":"ration","stateMap":{"pending":"empty","active":"calculating","completed":"stocked"},"solid":{"x":8,"y":49,"w":64,"h":15},"sortOffset":64},
+      {"id":"station_frequency_beacon","type":"station","asset":"station_frequency_beacon","markerAsset":"marker_station_frequency","x":64,"y":218,"w":56,"h":88,"missionNode":"frequency","stateMap":{"pending":"off","active":"searching","completed":"active"},"solid":{"x":13,"y":68,"w":30,"h":12},"sortOffset":80},
+      {"id":"station_resource_depot","type":"station","asset":"station_resource_depot","markerAsset":"marker_station_resource","x":240,"y":218,"w":96,"h":72,"missionNode":"resource","stateMap":{"pending":"mixed","active":"separating","completed":"classified"},"solid":{"x":8,"y":48,"w":80,"h":16},"sortOffset":64},
+      {"id":"station_reverse_beacon","type":"station","asset":"station_reverse_beacon","markerAsset":"marker_station_reverse","x":480,"y":218,"w":64,"h":88,"missionNode":"reverse","stateMap":{"pending":"locked","active":"decoding","completed":"decoded"},"solid":{"x":14,"y":67,"w":36,"h":13},"sortOffset":80},
+      {"id":"station_energy_console","type":"station","asset":"station_energy_console","markerAsset":"marker_station_energy","x":656,"y":218,"w":72,"h":64,"missionNode":"energy","stateMap":{"pending":"broken","active":"repairing","completed":"online"},"solid":{"x":9,"y":43,"w":54,"h":13},"sortOffset":56},
+      {"id":"station_stability_monitor","type":"station","asset":"station_stability_monitor","markerAsset":"marker_station_stability","x":240,"y":402,"w":80,"h":72,"missionNode":"stability","stateMap":{"pending":"alert","active":"analyzing","completed":"stable"},"solid":{"x":8,"y":49,"w":64,"h":15},"sortOffset":64},
+      {"id":"storm_core","type":"station","asset":"storm_core","markerAsset":"marker_storm_core","x":480,"y":402,"w":80,"h":80,"missionNode":"core","stateMap":{"pending":"sealed","active":"unstable","completed":"activated"},"solid":{"x":15,"y":58,"w":50,"h":14},"sortOffset":72}
+    ],
+    "decor": [
+      {"kind":"storm","asset":"storm_cloud","x":142,"y":12,"w":96,"h":48},
+      {"kind":"storm","asset":"storm_cloud","x":530,"y":10,"w":96,"h":48},
+      {"kind":"storm","asset":"puddle","x":150,"y":174,"w":64,"h":24},
+      {"kind":"storm","asset":"puddle","x":540,"y":350,"w":64,"h":24},
+      {"kind":"storm","asset":"fallen_branch","x":360,"y":116,"w":64,"h":32},
+      {"kind":"storm","asset":"lightning_scorch","x":92,"y":356,"w":48,"h":32},
+      {"kind":"storm","asset":"wind_debris","x":352,"y":78,"w":64,"h":48}
+    ],
+    "doors": []
+  },
+  "lesson": {
+    "id": "practica4_refugio",
+    "title": "El Refugio Lógico: Protocolo Tormenta",
+    "concept": "funciones, decisiones y ciclos",
+    "zone": "hub_de_estaciones",
+    "introTarget": "alizon",
+    "story": [
+      "El Gran Backend entra en fase de tormenta. Diez estaciones antiguas sostienen el refugio y cada una espera una función que traduzca señales en decisiones.",
+      "La tormenta solo cambia cuando una estación queda resuelta. No hay reloj ni castigo por explorar: el protocolo se completa al estabilizar las diez señales."
+    ],
+    "introDialogue": {"speaker":"Alizon","lines":["El protocolo está abierto. Las diez estaciones esperan desde el inicio.","Elegí cualquier marcador del radar. Una respuesta correcta estabiliza esa estación; tus intentos y pistas no reducen la nota."]},
+    "objectives": {
+      "intro": "Habla con Alizon y elegí cualquier estación del radar.",
+      "signal": "Transmite saludo según franja horaria. Retorna: Buenos días (0–11), Buenas tardes (12–18) o Buenas noches (19–23), siempre con nombre.",
+      "sensor": "Diagnostica signo y paridad. Retorna lista [signo, paridad], con cero clasificado como cero y par.",
+      "supply": "Calcula factorial de cantidad_cajas mediante un bucle. Retorna 1 para cero y None para cantidades negativas.",
+      "ration": "Construye diez productos racion_diaria × 1 hasta racion_diaria × 10 usando un bucle.",
+      "frequency": "Implementa prueba de primalidad y búsqueda de primos hasta límite inclusive. Retorna booleano y lista ordenada.",
+      "resource": "Cuenta pares e impares en intervalo inclusivo. Retorna lista [pares, impares] y [0, 0] si intervalo está invertido.",
+      "reverse": "Invierte dígitos de entero positivo con operaciones aritméticas. Retorna None para negativos y 0 para cero.",
+      "energy": "Implementa cargar, gastar, multiplicar, repartir y despacho por opción. Repartir devuelve [cociente, resto] o [] si personas es cero.",
+      "stability": "Calcula promedio con un bucle y clasifica estable si promedio >= 51. Sin lecturas retorna [0, sin lecturas].",
+      "core": "Suma dígitos y reduce repetidamente hasta raíz digital. Retorna None para códigos negativos y 0 para cero."
+    },
+    "progression": {"mode":"free"},
+    "completion": {"score":100},
+    "ui": {"bookTitle":"Bitácora de Emergencia","editorLabel":"PROTOCOLO · CONSOLA DE ESTACIÓN","showDuration":false},
+    "storm": {"thresholds":[{"maxSolved":2,"phase":"solved_0_2"},{"maxSolved":5,"phase":"solved_3_5"},{"maxSolved":8,"phase":"solved_6_8"},{"maxSolved":9,"phase":"solved_9"},{"maxSolved":10,"phase":"solved_10"}]},
+    "challenges": [
+      {
+        "id":"signal","title":"Torre de señal · Saludo por franjas","target":"station_signal_tower","objective":"Define transmitir_saludo(nombre, hora). Debe incluir nombre y devolver exactamente Buenos días, Buenas tardes o Buenas noches según 0–11, 12–18 y 19–23.","starterCode":"","hints":["Separá tres franjas con comparaciones ordenadas.","Los límites 11, 12, 18 y 19 cambian de franja.","El resultado debe conservar nombre dentro del saludo, no imprimirlo."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"transmitir_saludo","params":["nombre","hora"],"cases":[{"args":["Luz",0],"expected":"Buenos días, Luz"},{"args":["Luz",11],"expected":"Buenos días, Luz"},{"args":["Luz",12],"expected":"Buenas tardes, Luz"},{"args":["Luz",18],"expected":"Buenas tardes, Luz"},{"args":["Luz",19],"expected":"Buenas noches, Luz"},{"args":["Luz",23],"expected":"Buenas noches, Luz"}]}]},
+        "successAction":{"kind":"station_transition","id":"station_signal_tower"},"successDialogue":["La torre transmite una secuencia limpia. La señal del refugio vuelve a tener voz."],"concepts":["funciones","if","elif","else"]
+      },
+      {
+        "id":"sensor","title":"Pilar sensor · Diagnóstico dual","target":"station_sensor_pillar","objective":"Define diagnosticar_senal(valor). Retorna [signo, paridad]: positivo/negativo/cero y par/impar.","starterCode":"","hints":["Primero resolvé signo con tres ramas.","Después usá módulo 2 para paridad; funciona también con negativos.","Empaquetá ambos textos en una lista en el return."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"diagnosticar_senal","params":["valor"],"cases":[{"args":[0],"expected":["cero","par"]},{"args":[7],"expected":["positivo","impar"]},{"args":[-4],"expected":["negativo","par"]},{"args":[-3],"expected":["negativo","impar"]}]}]},
+        "successAction":{"kind":"station_transition","id":"station_sensor_pillar"},"successDialogue":["El pilar separa signo y paridad sin perder el cero. Diagnóstico confirmado."],"concepts":["condiciones","módulo","listas"]
+      },
+      {
+        "id":"supply","title":"Clasificador · Factorial de cajas","target":"station_supply_sorter","objective":"Define ordenar_provisiones(cantidad_cajas). Para cantidades no negativas retorna factorial mediante un bucle; para negativas retorna None.","starterCode":"","hints":["Un acumulador factorial comienza en 1.","Iterá desde 1 hasta cantidad_cajas inclusive.","Validá negativo antes del bucle y conservá caso cero."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"ordenar_provisiones","params":["cantidad_cajas"],"cases":[{"args":[-1],"expected":null},{"args":[0],"expected":1},{"args":[1],"expected":1},{"args":[5],"expected":120},{"args":[7],"expected":5040}]}]},
+        "successAction":{"kind":"station_transition","id":"station_supply_sorter"},"successDialogue":["Las cajas pasan por la tolva en orden. El acumulador resistió incluso el caso cero."],"concepts":["for","range","acumulador"]
+      },
+      {
+        "id":"ration","title":"Tablero de raciones · Diez días","target":"station_ration_board","objective":"Define planificar_raciones(racion_diaria). Retorna una lista con racion_diaria multiplicada por cada día del 1 al 10.","starterCode":"","hints":["Comenzá con una lista vacía.","El rango debe visitar diez posiciones y el producto usa el índice del día.","Agregá cada producto con append y devolvé la lista."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"planificar_raciones","params":["racion_diaria"],"cases":[{"args":[0],"expected":[0,0,0,0,0,0,0,0,0,0]},{"args":[2],"expected":[2,4,6,8,10,12,14,16,18,20]},{"args":[-1],"expected":[-1,-2,-3,-4,-5,-6,-7,-8,-9,-10]}]}]},
+        "successAction":{"kind":"station_transition","id":"station_ration_board"},"successDialogue":["El tablero muestra diez raciones alineadas. Alizon guarda la lista para la expedición."],"concepts":["listas","for","append"]
+      },
+      {
+        "id":"frequency","title":"Baliza de frecuencia · Primos seguros","target":"station_frequency_beacon","objective":"Define es_frecuencia_segura(numero) y buscar_frecuencias_seguras(limite). Un primo es mayor que 1 y solo divisible por 1 y por sí mismo; la búsqueda incluye límite.","starterCode":"","hints":["Para probar divisores, recorré desde 2 hasta el número anterior.","Un número menor que 2 no es primo.","La búsqueda puede reutilizar tu función de prueba y agregar cada primo."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"es_frecuencia_segura","params":["numero"],"cases":[{"args":[-3],"expected":false},{"args":[0],"expected":false},{"args":[1],"expected":false},{"args":[2],"expected":true},{"args":[9],"expected":false},{"args":[13],"expected":true}]},{"defName":"buscar_frecuencias_seguras","params":["limite"],"cases":[{"args":[0],"expected":[]},{"args":[2],"expected":[2]},{"args":[10],"expected":[2,3,5,7]},{"args":[-2],"expected":[]}]}]},
+        "successAction":{"kind":"station_transition","id":"station_frequency_beacon"},"successDialogue":["La baliza encuentra frecuencias primas y descarta ruido compuesto. El canal queda activo."],"concepts":["funciones","for","módulo","booleanos"]
+      },
+      {
+        "id":"resource","title":"Depósito · Conteo inclusivo","target":"station_resource_depot","objective":"Define separar_recursos(inicio, fin). Retorna [cantidad_pares, cantidad_impares] contando ambos extremos; intervalo invertido retorna [0, 0].","starterCode":"","hints":["El intervalo incluye fin, por eso el rango necesita ajustar su límite.","Mantené dos contadores separados.","Decidí qué hacer si inicio es mayor que fin antes de iterar."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"separar_recursos","params":["inicio","fin"],"cases":[{"args":[1,1],"expected":[0,1]},{"args":[1,4],"expected":[2,2]},{"args":[-2,2],"expected":[3,2]},{"args":[5,3],"expected":[0,0]}]}]},
+        "successAction":{"kind":"station_transition","id":"station_resource_depot"},"successDialogue":["Madera, metal y piedra quedan contados en compartimentos pares e impares."],"concepts":["intervalos","for","módulo","contadores"]
+      },
+      {
+        "id":"reverse","title":"Baliza inversa · Código aritmético","target":"station_reverse_beacon","objective":"Define descifrar_codigo(codigo). Invierte un entero positivo usando división entera y módulo, sin texto ni slicing; negativo retorna None.","starterCode":"","hints":["El último dígito sale con módulo 10.","Desplazá dígitos con división entera entre 10.","Acumulá resultado multiplicando por 10 antes de sumar cada dígito."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"descifrar_codigo","params":["codigo"],"cases":[{"args":[-12],"expected":null},{"args":[0],"expected":0},{"args":[7],"expected":7},{"args":[12030],"expected":3021},{"args":[987654],"expected":456789}]}]},
+        "successAction":{"kind":"station_transition","id":"station_reverse_beacon"},"successDialogue":["Los anillos invierten el código sin convertirlo en texto. La baliza reconoce la secuencia."],"concepts":["while","módulo","división entera"]
+      },
+      {
+        "id":"energy","title":"Consola de energía · Despacho","target":"station_energy_console","objective":"Define cargar_energia, gastar_energia, multiplicar_materiales, repartir_raciones y operar_consola. Cargar suma 10; gastar nunca baja de cero; repartir devuelve [cociente, resto] o [] con divisor cero.","starterCode":"","hints":["Cada operación debe vivir en una función propia.","Para gastar, compará antes de restar y devolvé cero si gasto supera energía.","operar_consola debe seleccionar por opción y delegar, no repetir cálculos."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"cargar_energia","params":["cantidad"],"cases":[{"args":[0],"expected":10},{"args":[7],"expected":17},{"args":[-2],"expected":8}]},{"defName":"gastar_energia","params":["energia","gasto"],"cases":[{"args":[10,3],"expected":7},{"args":[3,10],"expected":0},{"args":[0,0],"expected":0}]},{"defName":"multiplicar_materiales","params":["a","b"],"cases":[{"args":[0,8],"expected":0},{"args":[-2,4],"expected":-8}]},{"defName":"repartir_raciones","params":["total","personas"],"cases":[{"args":[10,3],"expected":[3,1]},{"args":[10,0],"expected":[]},{"args":[0,4],"expected":[0,0]}]},{"defName":"operar_consola","params":["opcion","a","b"],"cases":[{"args":["cargar",5,0],"expected":15},{"args":["gastar",5,2],"expected":3},{"args":["multiplicar",3,4],"expected":12},{"args":["repartir",10,3],"expected":[3,1]},{"args":["otra",1,2],"expected":null}]}]},
+        "successAction":{"kind":"station_transition","id":"station_energy_console"},"successDialogue":["La consola vuelve a línea. Cada operación delega su responsabilidad en una función clara."],"concepts":["funciones","despacho","división entera","cero"]
+      },
+      {
+        "id":"stability","title":"Monitor · Promedio de estabilidad","target":"station_stability_monitor","objective":"Define evaluar_estabilidad(lecturas). Calcula promedio con un bucle; retorna [promedio, estable] si promedio >= 51, o [promedio, inestable]. Lista vacía retorna [0, sin lecturas].","starterCode":"","hints":["No uses sum automática: acumulá lecturas dentro de un bucle.","Separá caso de lista vacía antes de dividir.","El umbral estable incluye exactamente 51."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"evaluar_estabilidad","params":["lecturas"],"cases":[{"args":[[]],"expected":[0,"sin lecturas"]},{"args":[[50]],"expected":[50,"inestable"]},{"args":[[50,51,52]],"expected":[51,"estable"]},{"args":[[100,0]],"expected":[50,"inestable"]},{"args":[[-2,4]],"expected":[1,"inestable"]}]}]},
+        "successAction":{"kind":"station_transition","id":"station_stability_monitor"},"successDialogue":["El monitor deja de alarmar. El promedio alcanza el umbral y la estructura se mantiene estable."],"concepts":["listas","len","for","promedios"]
+      },
+      {
+        "id":"core","title":"Núcleo de tormenta · Raíz digital","target":"storm_core","objective":"Define sumar_digitos_frecuencia(codigo) y reducir_frecuencia(codigo). Sumá dígitos con operaciones aritméticas y repetí hasta obtener un solo dígito; negativos retornan None.","starterCode":"","hints":["Módulo 10 obtiene último dígito y división entera lo elimina.","La reducción necesita repetir mientras el valor tenga dos o más dígitos.","Podés llamar sumar_digitos_frecuencia desde reducir_frecuencia."],
+        "validator":{"kind":"function_cases","functions":[{"defName":"sumar_digitos_frecuencia","params":["codigo"],"cases":[{"args":[-8],"expected":null},{"args":[0],"expected":0},{"args":[407],"expected":11},{"args":[9999],"expected":36}]},{"defName":"reducir_frecuencia","params":["codigo"],"cases":[{"args":[-8],"expected":null},{"args":[0],"expected":0},{"args":[407],"expected":2},{"args":[987],"expected":6},{"args":[9999],"expected":9}]}]},
+        "successAction":{"kind":"station_transition","id":"storm_core"},"successDialogue":["El núcleo se activa cuando la raíz digital converge. Alizon cierra el protocolo desde el refugio."],"concepts":["while","funciones","módulo","raíz digital"]
+      }
+    ]
+  },
+  "book_pages": [
+    {"id":"franjas","title":"Decisiones por franjas","what":"Una estructura condicional separa regiones de valores. Los límites pertenecen a una sola región y deben quedar definidos sin ambigüedad.","commonError":"Cambiar el orden de comparaciones puede ocultar una franja completa.","tip":"Probá siempre valores justo antes, justo en y justo después de cada límite."},
+    {"id":"acumuladores","title":"Acumuladores","what":"Un acumulador conserva un resultado parcial mientras un bucle recorre datos o números.","commonError":"Inicializarlo con un valor incorrecto rompe el caso cero o una lista vacía.","tip":"Preguntate qué valor debe representar cero iteraciones antes de iniciar el bucle."},
+    {"id":"listas","title":"Listas como resultados","what":"Una lista puede reunir resultados producidos por un recorrido y devolverlos en el mismo orden en que fueron construidos.","commonError":"Confundir posición con valor produce listas desplazadas o incompletas.","tip":"Definí primero qué representa cada posición del resultado."},
+    {"id":"divisibilidad","title":"Módulo y división entera","what":"El módulo separa un residuo; la división entera reduce un número sin conservar parte decimal. Juntos permiten inspeccionar dígitos y divisibilidad.","commonError":"No tratar divisor cero provoca un fallo de ejecución en vez de una decisión educativa.","tip":"Identificá divisores potencialmente cero antes de operar."},
+    {"id":"funciones","title":"Funciones que colaboran","what":"Una función puede resolver una parte del problema y otra puede reutilizarla. Los parámetros y retornos forman un contrato entre ambas.","commonError":"Repetir lógica en el despacho hace que dos ramas evolucionen de manera distinta.","tip":"Cuando una operación ya tiene nombre y contrato, llamala en vez de copiarla."},
+    {"id":"pruebas","title":"Casos de frontera","what":"Los casos ocultos exploran cero, límites, negativos permitidos, listas vacías y valores extremos para comprobar que la regla general sea sólida.","commonError":"Probar solo un caso cómodo puede esconder una condición faltante.","tip":"Antes de terminar, imaginá el valor más pequeño y el cambio exacto de cada condición."},
+    {"id":"tormenta","title":"Progreso sin castigo","what":"La tormenta representa progreso conceptual: cambia únicamente cuando aumenta la cantidad de estaciones resueltas.","commonError":"Usar tiempo, orden o cantidad de pistas como daño mezcla evaluación con presión externa.","tip":"El estado del mundo debe derivarse del mapa de registros completados."}
+  ]
+}
