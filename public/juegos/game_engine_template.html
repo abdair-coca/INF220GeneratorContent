@@ -44,11 +44,11 @@ html, body {
   z-index: 20;
   flex-shrink: 0;
 }
-#hudLeft { display: flex; flex-direction: column; gap: 2px; }
+#hudLeft { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
 #missionTitleText { font-size: 13px; color: var(--accent); font-weight: bold; letter-spacing: 0.5px; }
 #objectiveRow { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
 #objectiveRow::before { content: "🎯"; }
-#progressDots { display: flex; gap: 4px; }
+  #progressDots { display: flex; gap: 4px; }
 .progress-dot {
   width: 9px; height: 9px; border-radius: 2px;
   background: #33304a; border: 1px solid var(--panel-border);
@@ -58,12 +58,12 @@ html, body {
 #bookBtn {
   background: var(--panel); border: 2px solid var(--panel-border);
   color: var(--accent); font-size: 18px; padding: 6px 10px;
-  cursor: pointer; border-radius: 6px;
+  cursor: pointer; border-radius: 6px; flex-shrink: 0; margin-left: 6px;
 }
 #bookBtn:active { transform: scale(0.95); }
 
 #demoBadge {
-  position: absolute; top: 6px; right: 12px;
+  position: absolute; top: 64px; left: 8px;
   background: var(--accent2); color: #10202a; font-size: 9px; font-weight: bold;
   padding: 2px 8px; border-radius: 4px; z-index: 25; letter-spacing: 0.5px;
 }
@@ -77,6 +77,7 @@ html, body {
   display: block; width: 100%; height: 100%;
   image-rendering: pixelated; image-rendering: crisp-edges;
 }
+#radarCanvas { position:absolute; top:8px; right:8px; width:214px; height:82px; z-index:18; pointer-events:none; image-rendering:pixelated; }
 
 /* ---------------- Diálogo ---------------- */
 #dialogueBox {
@@ -207,6 +208,7 @@ html, body {
   background: #1a1729; border: 3px solid var(--panel-border); border-radius: 10px;
   display: flex; flex-direction: column; overflow: hidden;
 }
+.editor-example-block.hidden { display:none; }
 .book-header {
   display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;
   border-bottom: 2px solid var(--panel-border); background: #14111f;
@@ -334,9 +336,11 @@ html, body {
   #hud { min-height: 54px; padding: 6px 8px; }
   #missionTitleText { max-width: 58vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   #objectiveRow { max-width: 62vw; }
+  #progressDots { display: none; }
   #dialogueBox { bottom: 112px; }
   .code-editor-wrap { height: 170px; }
   .editor-actions { padding: 8px; gap: 5px; }
+  #radarCanvas { top:6px; right:6px; width:154px; height:64px; }
 }
 
 </style>
@@ -351,11 +355,12 @@ html, body {
         <div id="objectiveRow"><span id="objectiveText">Cargando...</span></div>
       </div>
       <div id="progressDots"></div>
-      <button id="bookBtn" title="Libro de Python">📖</button>
+      <button id="bookBtn" title="Bitácora de Emergencia">📋</button>
     </header>
 
     <div id="canvasWrap">
       <canvas id="gameCanvas"></canvas>
+      <canvas id="radarCanvas" width="428" height="164" aria-label="Radar de estaciones"></canvas>
 
       <div id="dialogueBox" class="hidden">
         <div id="dialogueSpeaker">—</div>
@@ -384,8 +389,7 @@ html, body {
         <div class="editor-brief">
           <h4 id="editorTitle">Desafío</h4>
           <p id="editorObjective">Objetivo</p>
-          <p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p>
-          <pre id="editorExample"></pre>
+          <div class="editor-example-block" id="editorExampleBlock"><p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p><pre id="editorExample"></pre></div>
         </div>
         <div class="code-editor-wrap">
           <div id="editorLineNumbers">1</div>
@@ -405,11 +409,11 @@ html, body {
       </div>
     </div>
 
-    <!-- Libro de Python -->
+    <!-- Bitácora de Emergencia -->
     <div id="bookModal" class="modal-overlay hidden">
       <div class="modal-panel">
         <div class="book-header">
-          <h3>📖 Libro de Python</h3>
+          <h3 id="bookTitle">📋 Bitácora de Emergencia</h3>
           <button id="bookCloseBtn">✕</button>
         </div>
         <div class="book-body">
@@ -716,120 +720,10 @@ Object.assign(window.__JuegoArt, {
 const NS = window.__JuegoArt;
 const { TILE, drawSprite, PALETTE, GAME_CONFIG } = NS;
 
-class JuegoArtAssetRenderer {
-  constructor(manifest){
-    if(!manifest || !manifest.assets) throw new Error("Manifest de assets invalido.");
-    this.manifest = manifest;
-    this.assets = manifest.assets;
-  }
-  asset(id){
-    const a=this.assets[id];
-    if(!a) throw new Error("Asset no encontrado: "+id);
-    return a;
-  }
-  resolveState(asset,state,timeMs){
-    const states=asset.states||{};
-    const key = state && states[state] ? state : Object.keys(states)[0];
-    const def=states[key];
-    if(!def) return {draw:[],state:key,frame:0};
-    if(def.frames && def.frames.length){
-      const fps=def.fps||6;
-      const frame=Math.floor((timeMs||0)/1000*fps)%def.frames.length;
-      return {draw:def.frames[frame].draw||[],state:key,frame};
-    }
-    return {draw:def.draw||[],state:key,frame:0};
-  }
-  drawPrimitive(ctx,p,ox,oy){
-    ctx.save();
-    ctx.globalAlpha = p.alpha == null ? 1 : p.alpha;
-    ctx.fillStyle = p.color || "#fff";
-    ctx.strokeStyle = p.color || "#fff";
-    if(p.type==="rect"){
-      ctx.fillRect(Math.round(ox+p.x),Math.round(oy+p.y),Math.round(p.w),Math.round(p.h));
-    } else if(p.type==="ellipse"){
-      ctx.beginPath();
-      ctx.ellipse(ox+p.x,oy+p.y,p.rx,p.ry,0,0,Math.PI*2);
-      ctx.fill();
-    } else if(p.type==="polygon"){
-      if(p.points && p.points.length){
-        ctx.beginPath();
-        ctx.moveTo(ox+p.points[0][0],oy+p.points[0][1]);
-        for(let i=1;i<p.points.length;i++) ctx.lineTo(ox+p.points[i][0],oy+p.points[i][1]);
-        ctx.closePath();
-        ctx.fill();
-      }
-    } else if(p.type==="line"){
-      ctx.lineWidth=p.width||1;
-      ctx.lineCap="square";
-      ctx.beginPath();
-      ctx.moveTo(ox+p.x1,oy+p.y1);
-      ctx.lineTo(ox+p.x2,oy+p.y2);
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-  drawAsset(ctx,id,state,worldX,worldY,camera,timeMs,options){
-    const asset=this.asset(id);
-    const cam=camera||{x:0,y:0};
-    const opt=options||{};
-    const topX=worldX-asset.anchor.x-cam.x;
-    const topY=worldY-asset.anchor.y-cam.y;
-    const resolved=this.resolveState(asset,state,timeMs||performance.now());
-    ctx.save();
-    ctx.imageSmoothingEnabled=false;
-    if(opt.alpha!=null) ctx.globalAlpha*=opt.alpha;
-    if(opt.clipY!=null){
-      ctx.beginPath();
-      ctx.rect(Math.round(topX),Math.round(topY+opt.clipY),asset.size.w,opt.clipH);
-      ctx.clip();
-    }
-    if(opt.flipX){
-      ctx.translate(Math.round(topX+asset.size.w),Math.round(topY));
-      ctx.scale(-1,1);
-      for(const p of resolved.draw) this.drawPrimitive(ctx,p,0,0);
-    } else {
-      for(const p of resolved.draw) this.drawPrimitive(ctx,p,topX,topY);
-    }
-    ctx.restore();
-    return {asset,state:resolved.state,frame:resolved.frame,topX,topY};
-  }
-  worldHitbox(id,worldX,worldY){
-    const a=this.asset(id);
-    if(!a.hitbox) return null;
-    const left=worldX-a.anchor.x+a.hitbox.x;
-    const top=worldY-a.anchor.y+a.hitbox.y;
-    return {x:left,y:top,w:a.hitbox.w,h:a.hitbox.h};
-  }
-  depthY(id,worldY){
-    const a=this.asset(id);
-    return worldY + ((a.depth&&a.depth.offsetY)||0);
-  }
-  sortInstances(instances){
-    return [...instances].sort((a,b)=>{
-      const ay=this.depthY(a.asset,a.y);
-      const by=this.depthY(b.asset,b.y);
-      return ay-by;
-    });
-  }
-  drawInstances(ctx,instances,camera,timeMs){
-    for(const it of this.sortInstances(instances)){
-      this.drawAsset(ctx,it.asset,it.state,it.x,it.y,camera,timeMs,it.options);
-    }
-  }
-  drawPrefab(ctx,prefabId,originX,originY,camera,timeMs){
-    const p=this.manifest.prefabs&&this.manifest.prefabs[prefabId];
-    if(!p) throw new Error("Prefab no encontrado: "+prefabId);
-    const list=(p.objects||[]).map(o=>({
-      asset:o.asset,state:o.state,
-      x:originX+o.x,y:originY+o.y,
-      options:o.options
-    }));
-    this.drawInstances(ctx,list,camera,timeMs);
-  }
-}
+/*__ASSET_RENDERER_JS__*/
 
 const ASSET_MANIFEST = /*__ASSETS_JS__*/;
-const ASSET_RENDERER = new JuegoArtAssetRenderer(ASSET_MANIFEST);
+const ASSET_RENDERER = new window.JuegoArtAssetRenderer(ASSET_MANIFEST);
 
 const TREE_TRUNK_TOP = TILE - 8;
 const CANOPY_H = TREE_TRUNK_TOP;
@@ -975,7 +869,7 @@ const ZONE = /*__ZONE_JS__*/;
 class World {
   constructor() {
     this.rows=ZONE.rows; this.cols=ZONE.cols; this.tiles=ZONE.map.map(r=>r.split("")); this.flags={...ZONE.flags};
-    this.npcs=ZONE.npcs.map(n=>({...n,dialogue:n.dialogue.slice()})); this.interactables=ZONE.interactables.map(i=>({...i,solid:{...i.solid}}));
+     this.npcs=ZONE.npcs.map(n=>({...n,dialogue:n.dialogue.slice(),visualState:n.initialState||"down"})); this.interactables=ZONE.interactables.map(i=>({...i,solid:{...i.solid},stateMap:i.stateMap?{...i.stateMap}:null}));
     this.decor=ZONE.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null})); this.doors=ZONE.doors.map(d=>({...d}));
   }
   tileAt(col,row){ if(row<0||row>=this.rows||col<0||col>=this.cols)return "T"; return this.tiles[row][col]; }
@@ -993,6 +887,7 @@ class World {
   encenderFogata(id){this.flags.fogataLit=true;const t=this.interactables.find(i=>i.id===id);if(t){t.lit=true;t.changedAt=performance.now();}}
   armarTienda(id){this.flags.tiendaArmada=true;const t=this.interactables.find(i=>i.id===id);if(t){t.armada=true;t.changedAt=performance.now();}}
   completarCampamento(){this.flags.campamentoListo=true;const t=this.interactables.find(i=>i.type==="campamento");if(t){t.completed=true;t.changedAt=performance.now();}}
+  setNpcState(id,state){const npc=this.npcs.find(n=>n.id===id);if(npc)npc.visualState=state;}
 }
 
 class CollisionSystem {
@@ -1019,7 +914,8 @@ class Player {
 class Renderer {
   constructor(ctx, particles) { this.ctx = ctx; this.particles = particles || null; }
 
-  _stateFor(it) {
+  _stateFor(it, challengeSystem) {
+    if (it.stateMap && challengeSystem) return it.stateMap[challengeSystem.status(it.missionNode)] || it.stateMap.pending;
     if (it.type === "fogata") return it.lit ? "on" : "off";
     if (it.type === "tienda") return it.armada ? "built" : "materials";
     return "default";
@@ -1040,7 +936,7 @@ class Renderer {
     });
   }
 
-  renderWorld(world, camera, canvasW, canvasH) {
+  renderWorld(world, camera, canvasW, canvasH, challengeSystem) {
     const ctx = this.ctx; ctx.imageSmoothingEnabled = false;
     rect(ctx, 0, 0, canvasW, canvasH, "#163a2c");
     const now = performance.now();
@@ -1062,18 +958,24 @@ class Renderer {
       }
       if (t === "D" && !world.flags.senderoAbierto) drawDoor(ctx, sx, sy, false);
     }
-    for (const d of world.decor) {
-      if (d.kind === "flowers") ASSET_RENDERER.drawAsset(ctx, "flowers_mixed", "default", d.x + d.w / 2, d.y + d.h, camera, now);
-      else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
-    }
-    if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
+     for (const d of world.decor) {
+       if (d.kind === "flowers") ASSET_RENDERER.drawAsset(ctx, "flowers_mixed", "default", d.x + d.w / 2, d.y + d.h, camera, now);
+       else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
+       else if (d.asset) ASSET_RENDERER.drawAsset(ctx, d.asset, d.state || "default", d.x + d.w / 2, d.y + d.h, camera, now);
+     }
+     if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
+     if (challengeSystem && challengeSystem.lesson.storm) {
+       const phase = challengeSystem.stormPhase();
+       const alpha = { solved_0_2:.22, solved_3_5:.16, solved_6_8:.10, solved_9:.04, solved_10:0 }[phase] || 0;
+       if (alpha) { ctx.save(); ctx.globalAlpha = alpha; rect(ctx, 0, 0, canvasW, canvasH, "#24154b"); ctx.restore(); }
+     }
   }
 
-  renderDepthScene(world, player, camera) {
+   renderDepthScene(world, player, camera, challengeSystem) {
     const ctx = this.ctx, now = performance.now(), items = [];
     for (const d of world.decor) if (d.kind === "bush") items.push({ type: "decor", ref: d, y: d.y + d.h, asset: d.asset || "bush_flowers" });
     for (const n of world.npcs) items.push({ type: "npc", ref: n, y: n.y + n.h, asset: n.asset || "npc_alizon" });
-    for (const it of world.interactables) items.push({ type: "interactable", ref: it, y: it.y + (it.sortOffset || it.h), asset: it.asset || it.type });
+    for (const it of world.interactables) items.push({ type: "interactable", ref: it, y: it.y + (it.sortOffset || it.h || 32), asset: it.asset || it.type });
     items.push({ type: "player", ref: player, y: player.y + player.h, asset: "player_viajero" });
     items.sort((a, b) => a.y - b.y);
     for (const item of items) {
@@ -1090,13 +992,13 @@ class Renderer {
         continue;
       }
       if (item.type === "npc") {
-        const n = item.ref, bob = Math.sin((now + n.x * 3) / 560) * .5;
-        ASSET_RENDERER.drawAsset(ctx, item.asset, "down", n.x + n.w / 2, n.y + n.h + bob, camera, now);
+         const n = item.ref, bob = Math.sin((now + n.x * 3) / 560) * .5;
+         ASSET_RENDERER.drawAsset(ctx, item.asset, n.visualState || "down", n.x + n.w / 2, n.y + n.h + bob, camera, now);
         continue;
       }
       const it = item.ref, age = it.changedAt ? Math.min(1, (now - it.changedAt) / 430) : 1;
       const pop = (it.changedAt && age < 1) ? .72 + age * .28 : 1;
-      ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it), it.x + 16, it.y + 32, camera, now, { alpha: pop });
+       ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it, challengeSystem), it.x + (it.w || 32) / 2, it.y + (it.h || 32), camera, now, { alpha: pop });
       const meta = ASSET_RENDERER.asset(item.asset);
       if (meta.light && it.type === "fogata" && it.lit) {
         ctx.save(); ctx.globalAlpha = (meta.light.alpha || .16) * pop; ctx.fillStyle = meta.light.color || "#ffd35d";
@@ -1132,13 +1034,30 @@ class Renderer {
 
   renderGuide(ctx, world, camera, activeTargetId, canvasW, canvasH) {
     if (!activeTargetId) return; let target = world.interactables.find(i => i.id === activeTargetId) || world.npcs.find(n => n.id === activeTargetId); if (!target) return;
-    const tx = (target.x + 16) - camera.x, ty = (target.y - 8) - camera.y, time = performance.now() / 1000;
+    const tx = (target.x + (target.w || 32) / 2) - camera.x, ty = (target.y - 8) - camera.y, time = performance.now() / 1000;
     if (tx >= 12 && tx <= canvasW - 12 && ty >= 12 && ty <= canvasH - 12) {
       const b = Math.round(Math.sin(time * 6) * 3); ctx.save(); rect(ctx, tx - 4, ty - 18 + b, 8, 8, C.gold0); rect(ctx, tx - 3, ty - 17 + b, 6, 6, C.gold1); rect(ctx, tx - 2, ty - 14 + b, 4, 8, C.gold1); ctx.restore();
     } else {
       const cx = canvasW / 2, cy = canvasH / 2, a = Math.atan2(ty - cy, tx - cx), pad = 25, ix = Math.max(pad, Math.min(canvasW - pad, cx + Math.cos(a) * (canvasW / 2 - pad))), iy = Math.max(pad, Math.min(canvasH - pad, cy + Math.sin(a) * (canvasH / 2 - pad)));
       ctx.save(); ctx.translate(ix, iy); ctx.rotate(a); rect(ctx, -6, -6, 12, 12, C.gold0); rect(ctx, -3, -3, 10, 6, C.gold1); ctx.restore();
     }
+  }
+
+  renderRadar(ctx, world, challengeSystem) {
+    const w = ctx.canvas.width, h = ctx.canvas.height, now = performance.now();
+    ctx.clearRect(0, 0, w, h); ctx.save();
+    ctx.fillStyle = "rgba(17,21,29,.92)"; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 4; ctx.strokeRect(2, 2, w - 4, h - 4);
+    ctx.fillStyle = "#fff4d8"; ctx.font = "bold 16px monospace"; ctx.fillText("RADAR · ESTACIONES", 14, 22);
+    const items = world.interactables.filter(it => it.missionNode && it.markerAsset);
+    items.forEach((it, index) => {
+      const col = index % 5, row = Math.floor(index / 5), x = 38 + col * 84, y = 58 + row * 76;
+      const status = challengeSystem ? challengeSystem.status(it.missionNode) : "pending";
+       ASSET_RENDERER.drawAsset(ctx, it.markerAsset, status, x, y, {x:0,y:0}, now);
+      ctx.fillStyle = status === "completed" ? "#57c86f" : status === "active" ? "#55b8d9" : "#b7c4cc";
+      ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.fillText(String(index + 1).padStart(2, "0"), x, y + 24); ctx.textAlign = "left";
+    });
+    ctx.restore();
   }
 }
 
@@ -1313,6 +1232,97 @@ class PythonEngine {
     }
     throw { type: "SyntaxError", message: "Expresión inválida." };
   }
+
+  /* Parser seguro por bloques: no transforma el código del alumno en JavaScript. */
+  _safeClean(line) { let out = "", quote = null; for (let i = 0; i < line.length; i++) { const c = line[i]; if (quote) { out += c; if (c === quote && line[i - 1] !== "\\") quote = null; } else if (c === "'" || c === '"') { quote = c; out += c; } else if (c === "#") break; else out += c; } return out.trimEnd(); }
+  _safeIndent(line) { return (line.match(/^\s*/) || [""])[0].replace(/\t/g, "    ").length; }
+  _safeNextIndent(lines, from, parent) { for (let i = from; i < lines.length; i++) { if (!lines[i].trim()) continue; const n = this._safeIndent(lines[i]); return n > parent ? n : null; } return null; }
+  _safeParse(code) {
+    const lines = code.replace(/\r\n/g, "\n").split("\n").map(l => this._safeClean(l));
+    const parseBlock = (from, indent) => {
+      const nodes = []; let i = from;
+      while (i < lines.length) {
+        if (!lines[i].trim()) { i++; continue; }
+        const raw = lines[i], level = this._safeIndent(raw), line = raw.trim();
+        if (level < indent) break;
+        if (level > indent) throw { type: "IndentationError", message: "La indentación no coincide con el bloque." };
+        if (/^(elif|else)\b/.test(line)) break;
+        const child = (node, error) => { const childIndent = this._safeNextIndent(lines, i + 1, indent); if (childIndent == null) throw { type: "IndentationError", message: error || "Bloque sin instrucciones indentadas." }; const parsed = parseBlock(i + 1, childIndent); node.body = parsed.nodes; return parsed.index; };
+        let m = line.match(/^def\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*:\s*$/);
+        if (m) { const params = m[2].trim() ? m[2].split(",").map(p => p.trim()) : []; if (params.some(p => !/^[A-Za-z_]\w*$/.test(p))) throw { type: "SyntaxError", message: "Nombre de parámetro inválido." }; const node = { type: "def", name: m[1], params, body: [] }; i = child(node, "Función sin cuerpo indentado."); nodes.push(node); continue; }
+        m = line.match(/^if\s+(.+)\s*:\s*$/);
+        if (m) {
+          const node = { type: "if", branches: [], elseBody: [] }, first = { test: m[1], body: [] }; const childIndent = this._safeNextIndent(lines, i + 1, indent); if (childIndent == null) throw { type: "IndentationError", message: "Condición sin cuerpo indentado." }; let parsed = parseBlock(i + 1, childIndent); first.body = parsed.nodes; node.branches.push(first); i = parsed.index;
+          while (i < lines.length && lines[i].trim() && this._safeIndent(lines[i]) === indent) { const next = lines[i].trim(), em = next.match(/^elif\s+(.+)\s*:\s*$/); if (em) { const ci = this._safeNextIndent(lines, i + 1, indent); if (ci == null) throw { type: "IndentationError", message: "elif sin cuerpo indentado." }; parsed = parseBlock(i + 1, ci); node.branches.push({ test: em[1], body: parsed.nodes }); i = parsed.index; continue; } if (next === "else:") { const ci = this._safeNextIndent(lines, i + 1, indent); if (ci == null) throw { type: "IndentationError", message: "else sin cuerpo indentado." }; parsed = parseBlock(i + 1, ci); node.elseBody = parsed.nodes; i = parsed.index; } break; }
+          nodes.push(node); continue;
+        }
+        m = line.match(/^for\s+([A-Za-z_]\w*)\s+in\s+(.+)\s*:\s*$/); if (m) { const node = { type: "for", name: m[1], expr: m[2], body: [] }; i = child(node); nodes.push(node); continue; }
+        m = line.match(/^while\s+(.+)\s*:\s*$/); if (m) { const node = { type: "while", test: m[1], body: [] }; i = child(node); nodes.push(node); continue; }
+        if (/^(def|if|elif|else|for|while)\b/.test(line)) throw { type: "SyntaxError", message: "Cabecera de bloque inválida." };
+        nodes.push({ type: "line", line }); i++;
+      }
+      return { nodes, index: i };
+    };
+    const parsed = parseBlock(0, 0);
+    for (let i = parsed.index; i < lines.length; i++) {
+      if (lines[i].trim()) throw { type: "SyntaxError", message: "Bloque inesperado: '" + lines[i].trim() + "'." };
+    }
+    return parsed.nodes;
+  }
+  _safeTick() { this.steps++; if (this.steps > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "El código superó el límite seguro de 1000 pasos.", hint: "Revisa la condición de tu bucle y asegúrate de que avance." }; }
+  _safeLookup(name, env) { if (Object.prototype.hasOwnProperty.call(env, name)) return env[name]; if (Object.prototype.hasOwnProperty.call(this.globals || {}, name)) return this.globals[name]; if (["True", "False", "None"].includes(name)) return name === "True" ? true : name === "False" ? false : null; if (this.functions[name] || ["print", "len", "range"].includes(name)) return { __callable: name }; throw { type: "NameError", message: "Variable '" + name + "' no existe." }; }
+  _safeAssign(target, value, env) { const simple = target.match(/^([A-Za-z_]\w*)$/); if (simple) { env[simple[1]] = value; return; } const indexed = target.match(/^([A-Za-z_]\w*)\[(.+)\]$/); if (!indexed) throw { type: "SyntaxError", message: "Destino de asignación inválido." }; const list = this._safeLookup(indexed[1], env), index = this._safeExpr(indexed[2], env); if (!Array.isArray(list) || !Number.isInteger(index)) throw { type: "TypeError", message: "Solo se puede asignar a un índice de lista." }; list[index] = value; }
+   _safeExecBlock(nodes, env, inFunction, inLoop) { for (const node of nodes) { if (node.type === "def") continue; const flow = this._safeExecNode(node, env, inFunction, inLoop); if (flow) return flow; } return null; }
+   _safeExecNode(node, env, inFunction, inLoop) {
+    this._safeTick();
+     if (node.type === "line") return this._safeLine(node.line, env, inFunction, inLoop);
+     if (node.type === "if") { for (const branch of node.branches) if (this._safeTruthy(this._safeExpr(branch.test, env))) return this._safeExecBlock(branch.body, env, inFunction, inLoop); return this._safeExecBlock(node.elseBody, env, inFunction, inLoop); }
+     if (node.type === "for") { const values = this._safeExpr(node.expr, env); if (!Array.isArray(values)) throw { type: "TypeError", message: "for necesita una lista o range()." }; for (const value of values) { this._safeTick(); env[node.name] = value; const flow = this._safeExecBlock(node.body, env, inFunction, true); if (flow && flow.type === "break") break; if (flow && flow.type === "return") return flow; } return null; }
+     if (node.type === "while") { let iterations = 0; while (this._safeTruthy(this._safeExpr(node.test, env))) { this._safeTick(); if (++iterations > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "El código superó el límite seguro de 1000 pasos.", hint: "Revisa la condición de tu bucle y asegúrate de que avance." }; const flow = this._safeExecBlock(node.body, env, inFunction, true); if (flow && flow.type === "break") break; if (flow && flow.type === "return") return flow; } return null; }
+  }
+   _safeLine(line, env, inFunction, inLoop) {
+    if (/^(import|from|input|eval|exec|open|__import__)\b/.test(line)) throw { type: "SecurityError", message: "Esta operación no está disponible en el refugio.", hint: "Usa parámetros, variables, bucles y funciones." };
+     if (line === "break") { if (!inLoop) throw { type: "SyntaxError", message: "break debe estar dentro de un bucle." }; return { type: "break" }; }
+    const ret = line.match(/^return(?:\s+(.+))?$/); if (ret) { if (!inFunction) throw { type: "SyntaxError", message: "return está fuera de una función." }; return { type: "return", value: ret[1] == null ? null : this._safeExpr(ret[1], env) }; }
+    const aug = line.match(/^(.+?)\s*(\+=|-=|\*=)\s*(.+)$/); if (aug) { const old = this._safeExpr(aug[1], env), right = this._safeExpr(aug[3], env), op = aug[2][0]; this._safeAssign(aug[1].trim(), op === "+" ? old + right : op === "-" ? old - right : old * right, env); return null; }
+    const assign = line.match(/^([A-Za-z_]\w*(?:\[[^\]]+\])?)\s*=\s*(?![=])(.+)$/); if (assign) { this._safeAssign(assign[1], this._safeExpr(assign[2], env), env); return null; }
+    this._safeExpr(line, env); return null;
+  }
+  _safeCall(name, args) {
+    if (name === "print") { this.output.push(args.map(v => this._display(v)).join(" ")); this.calls.push({ name, args }); return null; }
+    if (name === "len") { if (args.length !== 1 || (typeof args[0] !== "string" && !Array.isArray(args[0]))) throw { type: "TypeError", message: "len() recibe una lista o texto." }; return args[0].length; }
+    if (name === "range") { if (args.length < 1 || args.length > 3) throw { type: "TypeError", message: "range() recibe entre 1 y 3 argumentos." }; const start = args.length === 1 ? 0 : args[0], end = args.length === 1 ? args[0] : args[1], step = args.length === 3 ? args[2] : 1; if (![start, end, step].every(Number.isFinite) || step === 0) throw { type: "ValueError", message: "range() necesita números y paso distinto de cero." }; const out = []; for (let n = start; step > 0 ? n < end : n > end; n += step) { out.push(n); if (out.length > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "range() supera el límite seguro de 1000 pasos." }; } return out; }
+    const tokens = this._safeTokens, index = this._safeIndex;
+    const result = this._execFunctionWithArgs(name, args);
+    this._safeTokens = tokens; this._safeIndex = index;
+    if (result.error) throw result.error; this.calls.push({ name, args }); return result.value;
+  }
+  _display(value) { if (value === null) return "None"; if (value === true) return "True"; if (value === false) return "False"; if (Array.isArray(value)) return "[" + value.map(v => this._display(v)).join(", ") + "]"; return String(value); }
+   _execFunctionWithArgs(name, args) { const fn = this.functions[name]; if (!fn) return { error: { type: "NameError", message: "Función '" + name + "' no definida." } }; if (args.length !== fn.params.length) return { error: { type: "TypeError", message: "'" + name + "' esperaba " + fn.params.length + " argumentos y recibió " + args.length + "." } }; const env = {}; fn.params.forEach((p, i) => { env[p] = args[i]; }); try { const flow = this._safeExecBlock(fn.body, env, true, false); return { value: flow && flow.type === "return" ? flow.value : null }; } catch (e) { return { error: e && e.type ? e : { type: "RuntimeError", message: "Error al ejecutar la función." } }; } }
+  _safeTokensOf(src) {
+    const out = []; let i = 0; const decode = raw => raw.replace(/\\([\\'"nrt])/g, (_, c) => ({ n: "\n", r: "\r", t: "\t" }[c] || c));
+    while (i < src.length) { const ch = src[i]; if (/\s/.test(ch)) { i++; continue; } if ((ch === "f" || ch === "F") && (src[i + 1] === '"' || src[i + 1] === "'")) { const q = src[i + 1]; let j = i + 2, raw = ""; while (j < src.length && src[j] !== q) raw += src[j++]; if (j >= src.length) throw { type: "SyntaxError", message: "Falta cerrar f-string." }; out.push({ t: "fstr", v: raw }); i = j + 1; continue; } if (ch === '"' || ch === "'") { const q = ch; let j = i + 1, raw = ""; while (j < src.length && src[j] !== q) { if (src[j] === "\\" && j + 1 < src.length) raw += src[j++]; raw += src[j++]; } if (j >= src.length) throw { type: "SyntaxError", message: "Falta cerrar comillas." }; out.push({ t: "str", v: decode(raw) }); i = j + 1; continue; } if (/[0-9]/.test(ch) || (ch === "." && /[0-9]/.test(src[i + 1] || ""))) { let j = i; while (j < src.length && /[0-9.]/.test(src[j])) j++; out.push({ t: "num", v: Number(src.slice(i, j)) }); i = j; continue; } if (/[A-Za-z_]/.test(ch)) { let j = i; while (j < src.length && /[A-Za-z0-9_]/.test(src[j])) j++; const word = src.slice(i, j); out.push({ t: "id", v: word }); i = j; continue; } const two = src.slice(i, i + 2); if (["==", "!=", "<=", ">=", "//", "**"].includes(two)) { out.push({ t: "op", v: two }); i += 2; continue; } if ("+-*/%<>()[],.".includes(ch)) { out.push({ t: "op", v: ch }); i++; continue; } throw { type: "SyntaxError", message: "Símbolo '" + ch + "' desconocido." }; }
+    out.push({ t: "eof", v: "" }); return out;
+  }
+  _safeExpr(src, env) { this._safeTokens = this._safeTokensOf(src); this._safeIndex = 0; const value = this._safeOr(env, true); if (this._safePeek().t !== "eof") throw { type: "SyntaxError", message: "Expresión inválida.", hint: "Revisa paréntesis, comas e índices." }; return value; }
+  _safePeek() { return this._safeTokens[this._safeIndex]; } _safeTake() { return this._safeTokens[this._safeIndex++]; }
+  _safeTruthy(value) { if (value == null || value === false || value === 0 || value === "") return false; if (Array.isArray(value)) return value.length > 0; return true; }
+  _safeOr(env, evaluate) { let v = this._safeAnd(env, evaluate); while (this._safePeek().v === "or") { this._safeTake(); const skip = evaluate && this._safeTruthy(v), right = this._safeAnd(env, evaluate && !skip); if (evaluate && !skip) v = right; } return evaluate ? v : null; }
+  _safeAnd(env, evaluate) { let v = this._safeNot(env, evaluate); while (this._safePeek().v === "and") { this._safeTake(); const skip = evaluate && !this._safeTruthy(v), right = this._safeNot(env, evaluate && !skip); if (evaluate && !skip) v = right; } return evaluate ? v : null; }
+  _safeNot(env, evaluate) { if (this._safePeek().v === "not") { this._safeTake(); const value = this._safeNot(env, evaluate); return evaluate ? !this._safeTruthy(value) : null; } return this._safeCompare(env, evaluate); }
+  _safeCompare(env, evaluate) { let left = this._safeAdd(env, evaluate), result = true, compared = false, active = evaluate; while (["==", "!=", "<", ">", "<=", ">="].includes(this._safePeek().v)) { const op = this._safeTake().v, right = this._safeAdd(env, active); compared = true; if (active) { const ok = op === "==" ? this._deepEqual(left, right) : op === "!=" ? !this._deepEqual(left, right) : op === "<" ? left < right : op === ">" ? left > right : op === "<=" ? left <= right : left >= right; result = result && ok; left = right; if (!result) active = false; } } return evaluate ? (compared ? result : left) : null; }
+  _safeAdd(env, evaluate) { let v = this._safeMul(env, evaluate); while (["+", "-"].includes(this._safePeek().v)) { const op = this._safeTake().v, r = this._safeMul(env, evaluate); if (evaluate) v = op === "+" ? v + r : v - r; } return evaluate ? v : null; }
+  _safeMul(env, evaluate) { let v = this._safeUnary(env, evaluate); while (["*", "/", "%", "//"].includes(this._safePeek().v)) { const op = this._safeTake().v, r = this._safeUnary(env, evaluate); if (evaluate) { if ((op === "/" || op === "%" || op === "//") && r === 0) throw { type: "ZeroDivisionError", message: "No se puede dividir entre cero." }; v = op === "*" ? v * r : op === "/" ? v / r : op === "%" ? v % r : Math.floor(v / r); } } return evaluate ? v : null; }
+  _safePower(env, evaluate) { let v = this._safePostfix(env, evaluate); if (this._safePeek().v === "**") { this._safeTake(); const right = this._safeUnary(env, evaluate); if (evaluate) v = Math.pow(v, right); } return evaluate ? v : null; }
+  _safeUnary(env, evaluate) { if (this._safePeek().v === "-") { this._safeTake(); const value = this._safeUnary(env, evaluate); return evaluate ? -value : null; } if (this._safePeek().v === "+") { this._safeTake(); const value = this._safeUnary(env, evaluate); return evaluate ? +value : null; } return this._safePower(env, evaluate); }
+  _safePostfix(env, evaluate) { let v = this._safePrimary(env, evaluate); while (true) { if (this._safePeek().v === "[") { this._safeTake(); const index = this._safeOr(env, evaluate); if (this._safePeek().v !== "]") throw { type: "SyntaxError", message: "Falta ']'." }; this._safeTake(); if (evaluate) { if (!Array.isArray(v) && typeof v !== "string") throw { type: "TypeError", message: "Solo puedes indexar listas o textos." }; v = v[index]; } continue; } if (this._safePeek().v === ".") { this._safeTake(); const attr = this._safeTake(); if (attr.v !== "append") throw { type: "NameError", message: "Método no disponible en sandbox." }; v = evaluate ? { __method: "append", target: v } : null; continue; } if (this._safePeek().v === "(") { this._safeTake(); const args = []; if (this._safePeek().v !== ")") { args.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); args.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake(); if (evaluate) { if (v && v.__method === "append") { if (!Array.isArray(v.target) || args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.target.push(args[0]); v = null; } else if (v && v.__callable) v = this._safeCall(v.__callable, args); else throw { type: "TypeError", message: "Ese valor no se puede llamar." }; } continue; } break; } return evaluate ? v : null; }
+  _safePrimary(env, evaluate) { const t = this._safeTake(); if (t.t === "num" || t.t === "str") return evaluate ? t.v : null; if (t.t === "fstr") { if (!evaluate) return null; const tokens = this._safeTokens, index = this._safeIndex; const value = t.v.replace(/\{([^{}]+)\}/g, (_, expr) => this._display(this._safeExpr(expr, env))); this._safeTokens = tokens; this._safeIndex = index; return value; } if (t.v === "(") { const first = this._safeOr(env, evaluate), values = [first]; while (this._safePeek().v === ",") { this._safeTake(); if (this._safePeek().v === ")") break; values.push(this._safeOr(env, evaluate)); } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake(); return evaluate ? (values.length > 1 ? values : first) : null; } if (t.v === "[") { const values = []; if (this._safePeek().v !== "]") { values.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); if (this._safePeek().v === "]") break; values.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== "]") throw { type: "SyntaxError", message: "Falta ']' de lista." }; this._safeTake(); return evaluate ? values : null; } if (t.t === "id") { if (!evaluate) return null; if (t.v === "True") return true; if (t.v === "False") return false; if (t.v === "None") return null; return this._safeLookup(t.v, env); } throw { type: "SyntaxError", message: "Expresión inválida." }; }
+  _deepEqual(a, b) { if (Array.isArray(a) || Array.isArray(b)) return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => this._deepEqual(v, b[i])); return a === b; }
+  run(code) {
+    this.output = []; this.calls = []; this.vars = {}; this.globals = {}; this.functions = {}; this.steps = 0;
+     try { const program = this._safeParse(code); for (const node of program) if (node.type === "def") this.functions[node.name] = { params: node.params, body: node.body }; const flow = this._safeExecBlock(program, this.globals, false, false); if (flow && flow.type === "return") return this._err("SyntaxError", "return está fuera de una función.", "Usa return dentro de def."); return { ok: true, output: this.output, calls: this.calls, error: null }; }
+    catch (e) { return this._fromThrow(e); }
+  }
 }
 
 const PythonValidator = {
@@ -1348,7 +1358,7 @@ class InteractionSystem {
   findNearby(player) {
     const c = player.center(); let best = null, bestDist = this.range;
     for (const npc of this.world.npcs) { const d = Math.hypot(c.x - (npc.x + 16), c.y - (npc.y + 16)); if (d < bestDist) { best = { kind: "npc", ref: npc }; bestDist = d; } }
-    for (const it of this.world.interactables) { const d = Math.hypot(c.x - (it.x + 16), c.y - (it.y + 16)); if (d < bestDist) { best = { kind: "interactable", ref: it }; bestDist = d; } }
+    for (const it of this.world.interactables) { const d = Math.hypot(c.x - (it.x + (it.w || 32) / 2), c.y - (it.y + (it.h || 32))); if (d < bestDist) { best = { kind: "interactable", ref: it }; bestDist = d; } }
     for (const door of this.world.doors) { const dx = door.tileCol * 32 + 16, dy = door.tileRow * 32 + 16; const d = Math.hypot(c.x - dx, c.y - dy); if (d < bestDist && !this.world.flags.senderoAbierto) { best = { kind: "door", ref: door }; bestDist = d; } }
     return best;
   }
@@ -1501,6 +1511,22 @@ const VALIDATORS = {
     }
     return { valid: true, returned: got };
   },
+  function_cases(engine, code, spec) {
+    const run = engine.run(code); if (!run.ok) return { valid: false, error: run.error };
+    const functions = spec.functions || [{ defName: spec.defName, params: spec.params, cases: spec.cases }];
+    for (const fnSpec of functions) {
+      const fn = engine.functions[fnSpec.defName];
+      if (!fn) return { valid: false, error: { type: "LogicError", message: "No definiste la función '" + fnSpec.defName + "'.", hint: "Respeta nombre y parámetros indicados." } };
+      const need = (fnSpec.params || []).join(",").replace(/\s/g, "").toLowerCase(), have = (fn.params || []).join(",").replace(/\s/g, "").toLowerCase();
+      if (need !== have) return { valid: false, error: { type: "LogicError", message: "La firma de '" + fnSpec.defName + "' no coincide con lo pedido.", hint: "Revisa cantidad y orden de parámetros." } };
+      for (let i = 0; i < fnSpec.cases.length; i++) {
+        const test = fnSpec.cases[i], result = engine._execFunctionWithArgs(fnSpec.defName, test.args);
+        if (result.error) return { valid: false, error: result.error };
+        if (!engine._deepEqual(result.value, test.expected)) return { valid: false, error: { type: "LogicError", message: "La función no supera uno de los casos de prueba.", hint: "Compara límites, acumuladores y valor de retorno sin asumir un único caso." } };
+      }
+    }
+    return { valid: true };
+  },
   structure(engine, code, spec) {
     if (!code.trim()) return { valid: false, error: { type: "LogicError", message: "Escribe una solución antes de ejecutar." } };
     const a = PythonStructureAnalyzer.analyze(code);
@@ -1542,6 +1568,10 @@ const ACTIONS = {
     const it = world.interactables.find(i => i.id === spec.id); if (it) worldActions.completarCampamento(it.x + 16, it.y);
     if (world.doors && world.doors[0]) worldActions.abrirSendero(world.doors[0].id, 16 * 32, 4 * 32);
     worldActions.particles.spawnBurst(10 * 32, 5 * 32, "#ffd166", 20); worldActions.audio.play("complete");
+  },
+  station_transition(worldActions, world, spec) {
+    const it = world.interactables.find(i => i.id === spec.id); if (!it) return;
+    it.changedAt = performance.now(); worldActions.particles.spawnBurst(it.x + (it.w || 32) / 2, it.y + (it.h || 32) / 2, "#57c86f", 10); worldActions.audio.play("success");
   }
 };
 
@@ -1556,32 +1586,37 @@ class BookSystem {
 
 class ChallengeSystem {
   constructor(lesson, engine) {
-    this.lesson = lesson; this.engine = engine; this.index = 0;
-    this.records = lesson.challenges.map(c => ({ id: c.id, attempts: 0, errors: 0, hintsUsed: 0, startedAt: 0, timeMs: 0, solved: false })); this.hintLevel = 0;
+     this.lesson = lesson; this.engine = engine; this.index = 0; this.selectedId = lesson.progression && lesson.progression.mode === "free" ? null : (lesson.challenges[0] ? lesson.challenges[0].id : null);
+    this.records = new Map(lesson.challenges.map(c => [c.id, { id: c.id, attempts: 0, errors: 0, hintsUsed: 0, startedAt: 0, timeMs: 0, solved: false }])); this.hintLevel = 0;
   }
-  current() { return this.lesson.challenges[this.index]; }
-  currentRecord() { return this.records[this.index]; }
-  isLast() { return this.index >= this.lesson.challenges.length - 1; }
+  current() { return this.selectedId ? this.lesson.challenges.find(c => c.id === this.selectedId) : null; }
+  currentRecord() { return this.selectedId ? this.records.get(this.selectedId) : null; }
+  status(id) { const record = this.records.get(id); if (record && record.solved) return "completed"; return id === this.selectedId ? "active" : "pending"; }
+  get completedCount() { return Array.from(this.records.values()).filter(r => r.solved).length; }
+   stormPhase() { const count = this.completedCount, thresholds = (((this.lesson || {}).storm || {}).thresholds || []).slice().sort((a, b) => a.maxSolved - b.maxSolved); const match = thresholds.find(t => count <= t.maxSolved); return match ? match.phase : (count === this.lesson.challenges.length ? "solved_10" : "solved_0_2"); }
+  select(id) { const record = this.records.get(id); if (!record || record.solved) return null; this.selectedId = id; this.index = this.lesson.challenges.findIndex(c => c.id === id); this.start(); return this.current(); }
+  isLast() { return this.completedCount === this.lesson.challenges.length - 1; }
   start() { if (this.currentRecord()) this.currentRecord().startedAt = performance.now(); this.hintLevel = 0; }
   requestHint() { const ch = this.current(); if (!ch) return null; if (this.hintLevel < ch.hints.length) { const hint = ch.hints[this.hintLevel]; this.hintLevel++; this.currentRecord().hintsUsed++; return hint; } return null; }
   submit(code, worldActions, world) {
-    const ch = this.current(), rec = this.currentRecord(); rec.attempts++;
+    const ch = this.current(), rec = this.currentRecord(); if (!ch || !rec || rec.solved) return { success: false, error: { type: "LogicError", message: "Ese desafío ya está completado." } }; rec.attempts++;
     const result = ch.validate(this.engine, code);
     if (!result.valid) { rec.errors++; return { success: false, error: result.error }; }
     rec.timeMs = performance.now() - rec.startedAt; rec.solved = true; ch.onSuccess(worldActions, world); return { success: true, concepts: ch.concepts };
   }
-  advance() { this.index++; this.start(); }
+  advance() { const next = this.lesson.challenges.find(c => !this.records.get(c.id).solved); if (next) this.select(next.id); }
 }
 
 class StatisticsSystem {
   constructor(lesson, challengeSystem) { this.lesson = lesson; this.cs = challengeSystem; this.missionStartedAt = performance.now(); }
   compute() {
-    const records = this.cs.records, total = records.length, solved = records.filter(r => r.solved).length;
+    const records = Array.from(this.cs.records.values()), total = records.length, solved = records.filter(r => r.solved).length;
     const resolution = total > 0 ? (solved / total) * 60 : 0, totalAttempts = records.reduce((s, r) => s + r.attempts, 0), totalErrors = records.reduce((s, r) => s + r.errors, 0);
     const syntaxRatio = totalAttempts > 0 ? Math.max(0, 1 - totalErrors / (totalAttempts + 2)) : 1; const syntax = syntaxRatio * 20;
     const logicalSolves = records.filter(r => r.solved && r.attempts <= 2).length; const logic = total > 0 ? (logicalSolves / total) * 10 : 0;
     const totalHints = records.reduce((s, r) => s + r.hintsUsed, 0), maxHints = total * 3; const autonomyRatio = maxHints > 0 ? Math.max(0, 1 - totalHints / (maxHints + 1)) : 1; const autonomy = autonomyRatio * 10;
-    const score = Math.round(resolution + syntax + logic + autonomy), durationMs = performance.now() - this.missionStartedAt;
+    const configuredScore = this.lesson.completion && this.lesson.completion.score;
+    const score = configuredScore != null ? Number(configuredScore) : Math.round(resolution + syntax + logic + autonomy), durationMs = performance.now() - this.missionStartedAt;
     const concepts = Array.from(new Set(this.lesson.challenges.flatMap(c => c.concepts)));
     return { lessonId: this.lesson.id, completed: solved === total, score: Math.max(0, Math.min(100, score)), syntaxScore: Math.round(syntax), logicScore: Math.round(logic), autonomyScore: Math.round(autonomy), resolutionScore: Math.round(resolution), hintsUsed: totalHints, attempts: totalAttempts, errors: totalErrors, duration: Math.round(durationMs / 1000), concepts, challenges: total, challengesSolved: solved };
   }
@@ -1594,16 +1629,10 @@ Object.assign(NS, { LESSONS, BOOK_PAGES, VALIDATORS, ACTIONS, PythonStructureAna
 const NS = window.__JuegoArt;
 
 class SaveSystem {
-  constructor(key = "titi:juegoart:progress") { this.key = key; this._mem = null; }
-  load() {
-    try { return JSON.parse(localStorage.getItem(this.key)) || this._mem; } catch (e) { return this._mem; }
-  }
-  save(data) {
-    this._mem = data;
-    try { localStorage.setItem(this.key, JSON.stringify(data)); } catch (e) {}
-    return true;
-  }
-  clear() { this._mem = null; try { localStorage.removeItem(this.key); } catch (e) {} }
+  constructor() { this._mem = null; }
+  load() { return this._mem; }
+  save(data) { this._mem = data; return true; }
+  clear() { this._mem = null; }
 }
 
 class TitiBridge {
@@ -1689,7 +1718,8 @@ class UIManager {
   setProgress(current, total) { const dots = this.$("progressDots"); dots.innerHTML = ""; for (let i = 0; i < total; i++) { const d = document.createElement("span"); d.className = "progress-dot" + (i < current ? " filled" : ""); dots.appendChild(d); } }
   showDialogue(speaker, text) { this.$("dialogueBox").classList.remove("hidden"); this.$("dialogueSpeaker").textContent = speaker; this.$("dialogueText").textContent = text; }
   hideDialogue() { this.$("dialogueBox").classList.add("hidden"); }
-  showEditor(challenge, terminalLabel) { this.$("editorModal").classList.remove("hidden"); this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO"; this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase(); this.$("editorTitle").textContent = challenge.title; this.$("editorObjective").textContent = challenge.objective; this.$("editorExample").textContent = challenge.example; this.$("editorTextarea").value = challenge.starterCode || ""; this.$("editorOutput").innerHTML = ""; this.$("editorHintText").classList.add("hidden"); this._syncEditor(); setTimeout(() => this.$("editorTextarea").focus(), 30); }
+   setLessonUi(config) { const title = config && config.bookTitle || "Libro de Supervivencia"; this.$("bookTitle").textContent = "📋 " + title; this.$("bookBtn").title = title; this.$("editorTerminalLabel").textContent = config && config.editorLabel || "CONSOLA DE CAMPO"; }
+   showEditor(challenge, terminalLabel) { this.$("editorModal").classList.remove("hidden"); this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO"; this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase(); this.$("editorTitle").textContent = challenge.title; this.$("editorObjective").textContent = challenge.objective; this.$("editorExample").textContent = challenge.example || ""; this.$("editorExampleBlock").classList.toggle("hidden", !challenge.example); this.$("editorTextarea").value = challenge.starterCode || ""; this.$("editorOutput").innerHTML = ""; this.$("editorHintText").classList.add("hidden"); this._syncEditor(); setTimeout(() => this.$("editorTextarea").focus(), 30); }
   hideEditor() { this.$("editorModal").classList.add("hidden"); }
   getEditorCode() { return this.$("editorTextarea").value; }
   showRunSuccess(message) { this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`; }
@@ -1697,9 +1727,9 @@ class UIManager {
   showHint(text) { const el = this.$("editorHintText"); el.classList.remove("hidden"); el.textContent = "💡 " + text; }
   showNoMoreHints() { const el = this.$("editorHintText"); el.classList.remove("hidden"); el.textContent = "Ya usaste todas las pistas. ¡Tú puedes!"; }
   renderBook(pages) { const list = this.$("bookPagesList"); list.innerHTML = ""; pages.forEach((p, idx) => { const item = document.createElement("div"); item.className = "book-page-item" + (p.unlocked ? "" : " locked"); item.textContent = String(idx + 1).padStart(2, "0") + " " + (p.unlocked ? "✓ " : "🔒 ") + p.title; if (p.unlocked) item.addEventListener("click", () => this.showBookDetail(p)); list.appendChild(item); }); const first = pages.find(p => p.unlocked); if (first) this.showBookDetail(first); }
-  showBookDetail(page) { this.$("bookDetail").innerHTML = `<h3>${escapeHtml(page.title)}</h3><p class="book-label">Qué es</p><p>${escapeHtml(page.what || "")}</p><p class="book-label">Sintaxis</p><pre>${escapeHtml(page.syntax || "")}</pre><p class="book-label">Ejemplo</p><pre>${escapeHtml(page.example || "")}</pre>`; }
+   showBookDetail(page) { let html = `<h3>${escapeHtml(page.title)}</h3>`; if (page.what) html += `<p class="book-label">Concepto</p><p>${escapeHtml(page.what)}</p>`; if (page.commonError) html += `<p class="book-label">Atención</p><p>${escapeHtml(page.commonError)}</p>`; if (page.tip) html += `<p class="book-label">Pista conceptual</p><p>${escapeHtml(page.tip)}</p>`; if (page.syntax) html += `<p class="book-label">Sintaxis</p><pre>${escapeHtml(page.syntax)}</pre>`; if (page.example) html += `<p class="book-label">Ejemplo</p><pre>${escapeHtml(page.example)}</pre>`; this.$("bookDetail").innerHTML = html; }
   openBook() { this.$("bookModal").classList.remove("hidden"); } closeBook() { this.$("bookModal").classList.add("hidden"); }
-  showCompletion(stats) { this.$("completionScreen").classList.remove("hidden"); this.$("completionStats").innerHTML = `<div class="score-big">${stats.score} / 100</div><div class="stat-row"><span>Desafíos</span><span>${stats.challengesSolved} / ${stats.challenges}</span></div><div class="stat-row"><span>Intentos</span><span>${stats.attempts}</span></div><div class="stat-row"><span>Pistas</span><span>${stats.hintsUsed}</span></div><div class="stat-row"><span>Tiempo</span><span>${stats.duration}s</span></div>`; }
+   showCompletion(stats) { this.$("completionScreen").classList.remove("hidden"); const duration = stats.showDuration ? `<div class="stat-row"><span>Duración</span><span>${stats.duration}s</span></div>` : ""; this.$("completionStats").innerHTML = `<div class="score-big">${stats.score} / 100</div><div class="stat-row"><span>Estaciones</span><span>${stats.challengesSolved} / ${stats.challenges}</span></div><div class="stat-row"><span>Intentos</span><span>${stats.attempts}</span></div><div class="stat-row"><span>Pistas</span><span>${stats.hintsUsed}</span></div>${duration}`; }
   hideCompletion() { this.$("completionScreen").classList.add("hidden"); }
   toast(text) { const el = this.$("toast"); el.textContent = text; el.classList.add("show"); clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => el.classList.remove("show"), 2200); }
   showMissionSelector(lessons, onPick) { const modal = this.$("missionSelectorModal"); const list = this.$("missionSelectorList"); list.innerHTML = ""; lessons.forEach(l => { const btn = document.createElement("button"); btn.className = "mission-pick-btn"; btn.innerHTML = `<strong>${escapeHtml(l.title)}</strong><span>${escapeHtml(l.concept)}</span>`; btn.addEventListener("click", () => { modal.classList.add("hidden"); onPick(l.id); }); list.appendChild(btn); }); modal.classList.remove("hidden"); }
@@ -1750,18 +1780,26 @@ class Game {
     this.worldActions = new WorldActions(this.world, this.particles, this.audio); this.interaction = new InteractionSystem(this.world);
     this.engine = new PythonEngine(); this.challengeSystem = new ChallengeSystem(this.lesson, this.engine); this.statistics = new StatisticsSystem(this.lesson, this.challengeSystem);
     this.challengeSystem.start(); GameState.lesson = this.lesson;
-    this.ui.setMissionTitle(this.lesson.title); this.ui.setProgress(0, this.lesson.challenges.length); this.ui.setObjective(this.lesson.objectives.intro);
-    this.introDone = false; this.missionComplete = false;
+    this.ui.setLessonUi(this.lesson.ui || {}); this.ui.setMissionTitle(this.lesson.title); this.ui.setProgress(0, this.lesson.challenges.length); this.ui.setObjective(this.lesson.objectives.intro);
+     this.introDone = false; this.missionComplete = false; this._syncWorldState();
     if (!this._loopStarted) { this._loopStarted = true; requestAnimationFrame((ts) => this._loop(ts)); }
-    setTimeout(() => { this.dialogue.start(this.lesson.introDialogue.speaker, this.lesson.introDialogue.lines, () => { this.introDone = true; this.ui.setObjective(this.lesson.objectives[this.challengeSystem.current().id]); }); }, 400);
+     setTimeout(() => { this.dialogue.start(this.lesson.introDialogue.speaker, this.lesson.introDialogue.lines, () => { this.introDone = true; this._syncWorldState(); const current = this.challengeSystem.current(); this.ui.setObjective(current ? (this.lesson.objectives[current.id] || current.objective) : "Elegí cualquier estación pendiente en el radar."); }); }, 400);
   }
 
-  _getActiveTargetId() {
-    if (!this.introDone) return "sabio";
-    if (this.missionComplete) return null;
-    const ch = this.challengeSystem ? this.challengeSystem.current() : null;
-    return ch ? ch.target : null;
-  }
+   _getActiveTargetId() {
+     if (!this.introDone) return this.lesson.introTarget || "sabio";
+     if (this.missionComplete) return null;
+     const ch = this.challengeSystem ? this.challengeSystem.current() : null;
+     return ch ? ch.target : null;
+   }
+
+   _syncWorldState(forcedState) {
+     const npc = this.world.npcs[0]; if (!npc) return;
+     if (this.missionComplete) this.world.setNpcState(npc.id, "sheltering");
+     else if (!this.introDone) this.world.setNpcState(npc.id, "worried");
+     else if (forcedState) this.world.setNpcState(npc.id, forcedState);
+     else this.world.setNpcState(npc.id, "working");
+   }
 
   _loop(ts) {
     const dt = Math.min(0.05, (ts - (this._lastTs || ts)) / 1000); this._lastTs = ts;
@@ -1791,18 +1829,19 @@ class Game {
   }
 
   render() {
-    this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height);
-    this.renderer.renderDepthScene(this.world, this.player, this.camera);
+     this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height, this.challengeSystem);
+     this.renderer.renderDepthScene(this.world, this.player, this.camera, this.challengeSystem);
     this.renderer.renderCanopy(this.world, this.camera);
 
     // Renderizado del Sistema de Guía
     const targetId = this._getActiveTargetId();
     this.renderer.renderGuide(this.ctx, this.world, this.camera, targetId, this.canvas.width, this.canvas.height);
 
-    this.particles.render(this.ctx, this.camera);
+     this.particles.render(this.ctx, this.camera);
+     const radar = document.getElementById("radarCanvas"); if (radar && this.challengeSystem) this.renderer.renderRadar(radar.getContext("2d"), this.world, this.challengeSystem);
     if (this.nearby && !this._isModalOpen()) {
       const r = this.nearby.ref;
-      const x = r.x !== undefined ? r.x + 16 : r.tileCol * TILE + 16;
+       const x = r.x !== undefined ? r.x + (r.w || 32) / 2 : r.tileCol * TILE + 16;
       const y = r.y !== undefined ? r.y - 2 : r.tileRow * TILE - 6;
       this.renderer.renderInteractPrompt(this.ctx, x, y, this.camera);
     }
@@ -1814,10 +1853,15 @@ class Game {
     if (this.nearby.kind === "door") { this.ui.toast("El sendero está bloqueado."); return; }
     if (this.nearby.kind === "interactable") {
       const it = this.nearby.ref;
-      if (!this.introDone) { this.ui.toast("Habla primero con el Guardabosques."); return; }
-      const ch = this.challengeSystem.current(); if (!ch) return;
-      if (it.id !== ch.target) { this.ui.toast("Busca la flecha indicadora primero."); return; }
-      this.ui.showEditor(ch, "LIBRO DE PLANOS");
+       if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
+       const free = this.lesson.progression && this.lesson.progression.mode === "free";
+       if (it.missionNode) {
+         const record = this.challengeSystem.records.get(it.missionNode);
+         if (record && record.solved) { this.ui.toast("Esta estación ya está completada."); return; }
+         const ch = free ? this.challengeSystem.select(it.missionNode) : this.challengeSystem.current(); if (!ch) return;
+         if (!free && it.id !== ch.target) { this.ui.toast("Sigue la estación indicada."); return; }
+         this._syncWorldState(); this.ui.setObjective(this.lesson.objectives[ch.id] || ch.objective); this.ui.showEditor(ch, (this.lesson.ui && this.lesson.ui.editorLabel) || "CONSOLA DE CAMPO");
+       }
     }
   }
 
@@ -1825,21 +1869,21 @@ class Game {
     this.ui.onDialogueAdvance = () => this.dialogue.advance();
     this.ui.onEditorClose = () => this.ui.hideEditor();
     this.ui.onRunCode = (code) => {
-      const ch = this.challengeSystem.current(); const result = this.challengeSystem.submit(code, this.worldActions, this.world);
-      this.ui.setProgress(this.challengeSystem.index, this.lesson.challenges.length);
+       const ch = this.challengeSystem.current(); if (!ch) return; const result = this.challengeSystem.submit(code, this.worldActions, this.world);
+       this.ui.setProgress(this.challengeSystem.completedCount, this.lesson.challenges.length);
       if (!result.success) { this.audio.play("error"); this.ui.showRunError(result.error); return; }
-      this.audio.play("success"); this.ui.showRunSuccess("¡Correcto! El mundo respondió a tu código."); for (const concept of (result.concepts || [])) this.book.unlock(concept); this.titiBridge.saveProgress({ lessonId: this.lesson.id, challengeIndex: this.challengeSystem.index, code });
+        this.audio.play("success"); this.ui.showRunSuccess("¡Correcto! La estación respondió a tu código."); for (const concept of (result.concepts || [])) this.book.unlock(concept); this._syncWorldState("celebrating");
       setTimeout(() => {
-        this.ui.hideEditor(); const successLines = ch.successDialogue || [];
-        const proceedAfterDialogue = () => { if (this.challengeSystem.isLast()) { this._completeMission(); } else { this.challengeSystem.advance(); this.ui.setObjective(this.lesson.objectives[this.challengeSystem.current().id]); this.ui.setProgress(this.challengeSystem.index, this.lesson.challenges.length); } };
-        if (successLines.length > 0) this.dialogue.start("El Guardabosques", successLines, proceedAfterDialogue); else proceedAfterDialogue();
+         this.ui.hideEditor(); const successLines = ch.successDialogue || [];
+         const proceedAfterDialogue = () => { if (this.challengeSystem.completedCount === this.lesson.challenges.length) { this._completeMission(); } else { const free = this.lesson.progression && this.lesson.progression.mode === "free"; if (free) { this.challengeSystem.selectedId = null; this.ui.setObjective("Elegí cualquier estación pendiente en el radar."); } else { this.challengeSystem.advance(); const next = this.challengeSystem.current(); this.ui.setObjective(this.lesson.objectives[next.id] || next.objective); } this._syncWorldState(); this.ui.setProgress(this.challengeSystem.completedCount, this.lesson.challenges.length); } };
+         if (successLines.length > 0) this.dialogue.start((this.world.npcs[0] && this.world.npcs[0].name) || "Alizon", successLines, proceedAfterDialogue); else proceedAfterDialogue();
       }, 900);
     };
     this.ui.onHintRequested = () => { const hint = this.challengeSystem.requestHint(); this.audio.play("hint"); if (hint) this.ui.showHint(hint); else this.ui.showNoMoreHints(); };
     this.ui.onBookRequested = () => { const pages = this.book.getPages(); this.ui.renderBook(pages); this.ui.openBook(); };
   }
 
-  _completeMission() { this.missionComplete = true; const stats = this.statistics.compute(); this.titiBridge.completeLesson(stats); this.titiBridge.submitScore(stats); this.ui.setObjective("¡Misión completada!"); this.ui.showCompletion(stats); }
+   _completeMission() { if (this.missionComplete) return; this.missionComplete = true; this._syncWorldState(); const stats = this.statistics.compute(); stats.showDuration = !!(this.lesson.ui && this.lesson.ui.showDuration); this.titiBridge.completeLesson(stats); this.titiBridge.submitScore(stats); this.ui.setObjective("¡Protocolo completado!"); this.ui.showCompletion(stats); }
   _isModalOpen() { return this.dialogue.active || !this.ui.$("editorModal").classList.contains("hidden") || !this.ui.$("bookModal").classList.contains("hidden") || !this.ui.$("completionScreen").classList.contains("hidden") || !this.ui.$("missionSelectorModal").classList.contains("hidden"); }
   _closeTopModal() { if (!this.ui.$("bookModal").classList.contains("hidden")) return this.ui.closeBook(); if (!this.ui.$("editorModal").classList.contains("hidden")) return this.ui.hideEditor(); }
 

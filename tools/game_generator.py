@@ -26,12 +26,13 @@ SALIDA_DIR = ROOT / "inf-220-g2" / "clases"
 TEMPLATE = JUEGOS_DIR / "game_engine_template.html"
 STORY_ARC = JUEGOS_DIR / "story_arc.json"
 VISUAL_KIT = JUEGOS_DIR / "visual" / "el_refugio_visual_assets_v1.json"
+ASSET_RENDERER = JUEGOS_DIR / "visual" / "el_refugio_asset_renderer.js"
 
 VALIDATORS_REGISTRY = {  # kinds soportados (ver template -> VALIDATORS)
-    "print_call", "def_exists", "def_return", "structure",
+    "print_call", "def_exists", "def_return", "function_cases", "structure",
 }
 ACTIONS_REGISTRY = {  # kinds soportados (ver template -> ACTIONS)
-    "fogata", "tienda", "campamento",
+    "fogata", "tienda", "campamento", "station_transition",
 }
 
 
@@ -97,7 +98,7 @@ def build_lessons_js(lesson):
             "title: " + js_str(c["title"]),
             "target: " + js_str(c["target"]),
             "objective: " + js_str(c["objective"]),
-            "example: " + js_str(c["example"]),
+            "example: " + js_str(c.get("example", "")),
             "starterCode: " + js_str(c.get("starterCode", "")),
             "hints: " + js_list(c["hints"]),
         ]
@@ -110,17 +111,23 @@ def build_lessons_js(lesson):
         ch_js.append("{ " + ", ".join(parts) + " }")
     lesson_js = (
         "{\n"
-        "  id: %s, title: %s, concept: %s, zone: %s, story: %s,\n"
+        "  id: %s, title: %s, concept: %s, zone: %s, story: %s, introTarget: %s,\n"
         "  introDialogue: { speaker: %s, lines: %s },\n"
         "  objectives: %s,\n"
+        "  progression: %s, completion: %s, ui: %s, storm: %s,\n"
         "  challenges: [\n    %s\n  ]\n"
         "}" % (
             js_str(lesson["id"]), js_str(lesson["title"]),
             js_str(lesson["concept"]), js_str(lesson["zone"]),
             js_list(lesson["story"]),
+            js_str(lesson.get("introTarget", "sabio")),
             js_str(lesson["introDialogue"]["speaker"]),
             js_list(lesson["introDialogue"]["lines"]),
             js_dict(lesson["objectives"]),
+            js_dict(lesson.get("progression", {})),
+            js_dict(lesson.get("completion", {})),
+            js_dict(lesson.get("ui", {})),
+            js_dict(lesson.get("storm", {})),
             ",\n    ".join(ch_js),
         )
     )
@@ -152,6 +159,8 @@ def _zone_asset_ids(zone):
     for it in zone.get("interactables", []):
         if it.get("asset"):
             ids.add(it["asset"])
+        if it.get("markerAsset"):
+            ids.add(it["markerAsset"])
     for d in zone.get("decor", []):
         if d.get("asset"):
             ids.add(d["asset"])
@@ -192,7 +201,7 @@ def _err(campo, mensaje):
     raise SchemaError(f"[{campo}] {mensaje}")
 
 
-def validar_esquema(data, fuente):
+def validar_esquema(data, fuente, manifest=None):
     """Valida la estructura del JSON de lección antes de generar. Lanza
     SchemaError con contexto si algo no cumple el esquema documentado."""
     nombre = fuente.name
@@ -216,6 +225,8 @@ def validar_esquema(data, fuente):
     if filas != zone["rows"]:
         _err("zone.rows", f"map tiene {filas} filas pero zone.rows={zone['rows']}")
     ancho = len(mapa[0]) if mapa else 0
+    if ancho != zone["cols"]:
+        _err("zone.cols", f"map tiene {ancho} columnas pero zone.cols={zone['cols']}")
     for i, fila in enumerate(mapa):
         if len(fila) != ancho:
             _err("zone.map", f"fila {i} tiene {len(fila)} chars, se esperaba {ancho}")
@@ -251,10 +262,13 @@ def validar_esquema(data, fuente):
     ch_ids = _ids_unicos(challenges, "lesson.challenges")
 
     interact_ids = {i["id"] for i in zone["interactables"]}
+    npc_ids = {n["id"] for n in zone["npcs"]}
     for ch in challenges:
         cid = ch["id"]
         target = ch.get("target")
-        if target and target not in interact_ids:
+        if not target:
+            _err(f"lesson.challenges[{cid}].target", "campo requerido vacío.")
+        if target not in interact_ids:
             _err(f"lesson.challenges[{cid}].target",
                  f"apunta a interactable '{target}' que no existe en la zona")
         v = ch.get("validator", {})
@@ -264,11 +278,76 @@ def validar_esquema(data, fuente):
         a = ch.get("successAction", {})
         if a.get("kind") not in ACTIONS_REGISTRY:
             _err(f"lesson.challenges[{cid}].successAction.kind",
-                 f"kind desconocido: {a.get('kind')}. Válidos: {sorted(ACTIONS_REGISTRY)}")
+                  f"kind desconocido: {a.get('kind')}. Válidos: {sorted(ACTIONS_REGISTRY)}")
+        if not a.get("id") or a.get("id") not in interact_ids:
+            _err(f"lesson.challenges[{cid}].successAction.id", "debe apuntar a un interactable existente.")
+        if v.get("kind") == "function_cases":
+            specs = v.get("functions") or [v]
+            if not isinstance(specs, list) or not specs:
+                _err(f"lesson.challenges[{cid}].validator.functions", "debe contener funciones a verificar.")
+            for s, fn_spec in enumerate(specs):
+                if not fn_spec.get("defName") or not isinstance(fn_spec.get("params"), list):
+                    _err(f"lesson.challenges[{cid}].validator.functions[{s}]", "requiere defName y params[].")
+                cases = fn_spec.get("cases")
+                if not isinstance(cases, list) or not cases:
+                    _err(f"lesson.challenges[{cid}].validator.functions[{s}].cases", "debe contener al menos un caso oculto.")
+                for n, case in enumerate(cases):
+                    if not isinstance(case, dict) or not isinstance(case.get("args"), list) or "expected" not in case:
+                        _err(f"lesson.challenges[{cid}].validator.functions[{s}].cases[{n}]", "requiere args[] y expected.")
+                    if len(case["args"]) != len(fn_spec["params"]):
+                        _err(f"lesson.challenges[{cid}].validator.functions[{s}].cases[{n}]", "cantidad de argumentos no coincide con params.")
+        if a.get("kind") == "station_transition":
+            if a.get("id") != target:
+                _err(f"lesson.challenges[{cid}].successAction.id", "debe coincidir con target en una transición de estación.")
+            station = next(it for it in zone["interactables"] if it["id"] == target)
+            if station.get("missionNode") != cid:
+                _err(f"lesson.challenges[{cid}].target", "la estación target debe enlazar este desafío mediante missionNode.")
+
+    if manifest:
+        assets = manifest.get("assets", {})
+        for section in ("npcs", "interactables", "decor"):
+            for item in zone.get(section, []):
+                asset_id = item.get("asset")
+                if asset_id and asset_id not in assets:
+                    _err(f"zone.{section}[{item.get('id', item.get('kind', '?'))}].asset", f"asset '{asset_id}' inexistente.")
+
+    for it in zone["interactables"]:
+        node = it.get("missionNode")
+        if node and node not in ch_ids:
+            _err(f"zone.interactables[{it['id']}].missionNode", f"apunta a desafío '{node}' inexistente.")
+        if manifest:
+            marker_id = it.get("markerAsset")
+            if marker_id and marker_id not in manifest.get("assets", {}):
+                _err(f"zone.interactables[{it['id']}].markerAsset", f"asset '{marker_id}' inexistente.")
+        state_map = it.get("stateMap")
+        if state_map is not None:
+            missing_states = {"pending", "active", "completed"} - set(state_map)
+            if missing_states:
+                _err(f"zone.interactables[{it['id']}].stateMap", f"faltan estados: {sorted(missing_states)}")
+            if manifest:
+                asset = manifest.get("assets", {}).get(it.get("asset"), {})
+                available = set(asset.get("states", {})) | set(asset.get("extraStates", {}))
+                unknown = set(state_map.values()) - available
+                if unknown:
+                    _err(f"zone.interactables[{it['id']}].stateMap", f"estados no presentes en asset: {sorted(unknown)}")
+
+    intro_target = lesson.get("introTarget")
+    if intro_target and intro_target not in npc_ids and intro_target not in interact_ids:
+        _err("lesson.introTarget", f"apunta a '{intro_target}' inexistente.")
 
     # El cierre (último desafío) debe usar campamento si hay sendero que abrir
     ultimo = challenges[-1]
-    if ultimo["successAction"].get("kind") != "campamento" and zone.get("doors"):
+    progression_mode = lesson.get("progression", {}).get("mode", "sequential")
+    if progression_mode not in ("sequential", "free"):
+        _err("lesson.progression.mode", "debe ser 'sequential' o 'free'.")
+    if progression_mode == "free":
+        mission_nodes = [it.get("missionNode") for it in zone["interactables"] if it.get("missionNode")]
+        duplicates = sorted({node for node in mission_nodes if mission_nodes.count(node) > 1})
+        missing = sorted(ch_ids - set(mission_nodes))
+        extra = sorted(set(mission_nodes) - ch_ids)
+        if duplicates or missing or extra:
+            _err("zone.interactables.missionNode", f"progresión libre requiere cobertura 1:1; duplicados={duplicates}, faltantes={missing}, extra={extra}")
+    if progression_mode != "free" and ultimo["successAction"].get("kind") != "campamento" and zone.get("doors"):
         _err("lesson.challenges[último].successAction.kind",
              "el desafío final debe usar kind 'campamento' para abrir el sendero")
 
@@ -420,8 +499,9 @@ def main():
         sys.exit(1)
 
     data = json.loads(fuente.read_text(encoding="utf-8"))
+    manifest = json.loads(VISUAL_KIT.read_text(encoding="utf-8"))
     try:
-        data = validar_esquema(data, fuente)
+        data = validar_esquema(data, fuente, manifest)
     except SchemaError as e:
         print(f"ERROR de esquema en {fuente}: {e}", file=sys.stderr)
         sys.exit(1)
@@ -431,12 +511,12 @@ def main():
     book_pages = data.get("book_pages", [])
     chapter = data.get("chapter", "")
 
-    manifest = json.loads(VISUAL_KIT.read_text(encoding="utf-8"))
     assets_js = build_assets_js(manifest, chapter, zone)
+    renderer_js = ASSET_RENDERER.read_text(encoding="utf-8")
 
     template = TEMPLATE.read_text(encoding="utf-8")
     missing = [
-        p for p in ("/*__LESSONS_JS__*/", "/*__BOOK_JS__*/", "/*__ZONE_JS__*/", "/*__ASSETS_JS__*/")
+        p for p in ("/*__LESSONS_JS__*/", "/*__BOOK_JS__*/", "/*__ZONE_JS__*/", "/*__ASSETS_JS__*/", "/*__ASSET_RENDERER_JS__*/")
         if p not in template
     ]
     if missing:
@@ -453,6 +533,7 @@ def main():
         .replace("/*__BOOK_JS__*/", book_js)
         .replace("/*__ZONE_JS__*/", zone_js)
         .replace("/*__ASSETS_JS__*/", assets_js)
+        .replace("/*__ASSET_RENDERER_JS__*/", renderer_js)
     )
 
     cod = lesson["id"] or "juego"
