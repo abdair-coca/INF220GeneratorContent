@@ -45,6 +45,147 @@ def slug(s):
 
 
 # ---------------------------------------------------------------------------
+# Validación de esquema de guía — errores claros con contexto, advertencias
+# de calidad (placeholders, celdas sin salida, nums duplicados). Se ejecuta
+# antes de generar para que un JSON con bloques rotos falle con mensaje útil.
+# ---------------------------------------------------------------------------
+class SchemaError(ValueError):
+    """Error de esquema del JSON de guía, con el campo afectado."""
+
+
+TIPOS_VALIDOS = {
+    "texto", "competencia", "lista", "pasos", "definicion", "nota", "ejemplo",
+    "figura", "diagrama", "quiz", "simbolos", "sub", "celda",
+}
+PLACEHOLDERS = (
+    "título del", "titulo del", "objetivo del", "diálogo de", "dialogo de",
+    "línea de bienvenida", "linea de bienvenida", "pista 1", "pista 2",
+    "escribe aquí", "escribe aqui", "xxxx", "lorem",
+)
+
+
+def _err(campo, mensaje):
+    raise SchemaError(f"[{campo}] {mensaje}")
+
+
+def _warn(mensaje):
+    print(f"ADVERTENCIA: {mensaje}", file=sys.stderr)
+
+
+def _requiere(b, ruta, campo):
+    val = b.get(campo)
+    if val is None or (isinstance(val, str) and not val.strip()):
+        _err(f"{ruta}.{campo}", "campo requerido vacío")
+
+
+def _validar_bloques(bloques, ruta):
+    for i, b in enumerate(bloques):
+        br = f"{ruta}[{i}]"
+        tipo = b.get("tipo")
+        if tipo not in TIPOS_VALIDOS:
+            _err(br + ".tipo", f"tipo desconocido '{tipo}'. Válidos: {sorted(TIPOS_VALIDOS)}")
+        if tipo in ("texto", "competencia"):
+            _requiere(b, br, "texto")
+            _warn_placeholder(b["texto"], f"{br}.texto")
+        elif tipo == "lista":
+            items = b.get("items")
+            if not isinstance(items, list) or not items:
+                _err(br + ".items", "debe ser una lista no vacía de strings")
+            for j, it in enumerate(items):
+                if not isinstance(it, str) or not it.strip():
+                    _err(f"{br}.items[{j}]", "cada ítem debe ser un texto no vacío")
+        elif tipo == "pasos":
+            items = b.get("items")
+            if not isinstance(items, list) or not items:
+                _err(br + ".items", "debe ser una lista no vacía de pasos")
+            for j, p in enumerate(items):
+                if not isinstance(p, dict) or not (p.get("texto") or "").strip():
+                    _err(f"{br}.items[{j}]", "cada paso requiere 'texto'")
+        elif tipo == "definicion":
+            _requiere(b, br, "titulo")
+            _requiere(b, br, "texto")
+        elif tipo in ("nota", "ejemplo", "figura"):
+            _requiere(b, br, "texto")
+            _warn_placeholder(b["texto"], f"{br}.texto")
+        elif tipo == "diagrama":
+            _requiere(b, br, "code")
+        elif tipo == "quiz":
+            _requiere(b, br, "pregunta")
+            _warn_placeholder(b["pregunta"], f"{br}.pregunta")
+            opciones = b.get("opciones")
+            if not isinstance(opciones, list) or len(opciones) < 2:
+                _err(br + ".opciones", "debe tener al menos 2 opciones")
+            for j, o in enumerate(opciones):
+                texto_o = o.get("texto") if isinstance(o, dict) else o
+                if not isinstance(texto_o, str) or not texto_o.strip():
+                    _err(f"{br}.opciones[{j}]", "opción vacía")
+            correcta = b.get("correcta")
+            if not isinstance(correcta, int) or not (0 <= correcta < len(opciones)):
+                _err(br + ".correcta", f"debe ser un índice 0-based válido (0..{len(opciones) - 1})")
+        elif tipo == "sub":
+            _requiere(b, br, "titulo")
+            _validar_bloques(b.get("bloques", []), br + ".bloques")
+        elif tipo == "celda":
+            _requiere(b, br, "in")
+            if not (b.get("out") or "").strip():
+                _warn(f"{br}.out vacío — los estudiantes no verán el resultado esperado")
+
+
+def _warn_placeholder(texto, ruta):
+    t = texto.lower().strip()
+    if len(t) < 8 or any(p in t for p in PLACEHOLDERS):
+        _warn(f"{ruta} parece contenido placeholder o demasiado corto: '{texto[:60]}'")
+
+
+def validar_esquema(data, fuente):
+    """Valida la estructura del JSON de guía antes de generar."""
+    nombre = fuente.name
+    meta = data.get("meta", {})
+    for c in ("materia", "codigo", "titulo"):
+        if not (meta.get(c) or "").strip():
+            _err(f"meta.{c}", f"campo requerido vacío en {nombre}")
+
+    secciones = data.get("secciones")
+    if not isinstance(secciones, list) or not secciones:
+        _err("secciones", "la guía debe tener al menos una sección")
+    nums = set()
+    for i, s in enumerate(secciones):
+        num = s.get("num", "")
+        if not num:
+            _err(f"secciones[{i}].num", "sección sin número")
+        if num in nums:
+            _warn(f"secciones[{i}].num duplicado '{num}'")
+        nums.add(num)
+        if not (s.get("titulo") or "").strip():
+            _err(f"secciones[{i}].titulo", "sección sin título")
+        bloques = s.get("bloques")
+        rubrica = s.get("rubrica")
+        referencias = s.get("referencias")
+        if bloques is None and rubrica is None and referencias is None:
+            _err(f"secciones[{i}]", "debe llevar 'bloques', 'rubrica' o 'referencias'")
+        if bloques is not None:
+            if not isinstance(bloques, list):
+                _err(f"secciones[{i}].bloques", "debe ser una lista de bloques")
+            _validar_bloques(bloques, f"secciones[{i}].bloques")
+        if rubrica is not None:
+            if not isinstance(rubrica, list) or not rubrica:
+                _err(f"secciones[{i}].rubrica", "debe ser una lista de criterios")
+            for j, r in enumerate(rubrica):
+                for c in ("criterio", "descripcion"):
+                    if not (r.get(c) or "").strip():
+                        _err(f"secciones[{i}].rubrica[{j}].{c}", "campo requerido vacío")
+                if not isinstance(r.get("pts"), int) or r.get("pts") <= 0:
+                    _err(f"secciones[{i}].rubrica[{j}].pts", "debe ser un entero positivo")
+        if referencias is not None:
+            if not isinstance(referencias, list) or not referencias:
+                _err(f"secciones[{i}].referencias", "debe ser una lista de referencias")
+            for j, ref in enumerate(referencias):
+                if not isinstance(ref, str) or not ref.strip():
+                    _err(f"secciones[{i}].referencias[{j}]", "referencia vacía")
+    return data
+
+
+# ---------------------------------------------------------------------------
 # Tabla de símbolos de diagrama de flujo (SVG inline estilizado UX)
 # ---------------------------------------------------------------------------
 
@@ -201,18 +342,28 @@ def render_bloques(bloques, interactivo=False):
             opts_html = []
             for i, o in enumerate(b["opciones"]):
                 letra = chr(65 + i) if i < 26 else str(i)
+                if isinstance(o, dict):
+                    texto_o = o.get("texto", "")
+                    expl_o = o.get("explicacion", "")
+                else:
+                    texto_o = str(o)
+                    expl_o = ""
                 opts_html.append(
-                    f'<button class="option" data-ans="{i}" type="button">'
-                    f'<span class="letter">{letra}</span> {esc(o)}'
+                    f'<button class="option" data-ans="{i}"'
+                    f' data-expl="{esc(expl_o)}" type="button">'
+                    f'<span class="letter">{letra}</span> {esc(texto_o)}'
                     '</button>'
                 )
+            expl_q = b.get("explicacion", "")
             out.append(
-                f'<article class="quiz-card" data-q="{qn}" data-correct="{correcta_val}">'
+                f'<article class="quiz-card" data-q="{qn}" data-correct="{correcta_val}"'
+                f' data-expl="{esc(expl_q)}">'
                 f'<p class="question">{qn}. {esc(b["pregunta"])}</p>'
                 f'<div class="options" role="group" aria-label="Opciones Pregunta {qn}">'
                 f'{"".join(opts_html)}'
                 '</div>'
                 '<p class="feedback" aria-live="polite">Seleccioná una respuesta.</p>'
+                '<p class="quiz-expl hidden" aria-live="polite"></p>'
                 '</article>'
             )
         elif tipo == "simbolos":
@@ -822,6 +973,21 @@ h1 {
   color: var(--red);
 }
 
+.quiz-expl {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent, #5145cd);
+  background: rgba(81, 69, 205, 0.06);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-radius: 0 8px 8px 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
 /* Score Summary Box for Titi */
 .score-card {
   display: flex;
@@ -1367,6 +1533,17 @@ quizCards.forEach(card => {
 
       userAnswers[qId] = { selected: selectedAns, isCorrect };
 
+      const explEl = card.querySelector('.quiz-expl');
+      if (explEl) {
+        const expl = btn.dataset.expl || card.dataset.expl || '';
+        if (expl) {
+          explEl.textContent = expl;
+          explEl.classList.remove('hidden');
+        } else {
+          explEl.classList.add('hidden');
+        }
+      }
+
       options.forEach(o => {
         o.disabled = true;
         o.classList.remove('ok', 'bad');
@@ -1600,6 +1777,16 @@ quizCards.forEach(card => {
       const selected = btn.dataset.ans;
       const isCorrect = selected === correctAnswer;
       userAnswers[qId] = { selected, isCorrect };
+      const explEl = card.querySelector('.quiz-expl');
+      if (explEl) {
+        const expl = btn.dataset.expl || card.dataset.expl || '';
+        if (expl) {
+          explEl.textContent = expl;
+          explEl.classList.remove('hidden');
+        } else {
+          explEl.classList.add('hidden');
+        }
+      }
       options.forEach(o => { o.disabled = true; o.classList.remove('ok', 'bad'); });
       btn.classList.add(isCorrect ? 'ok' : 'bad');
       if (!isCorrect) {
@@ -1643,6 +1830,127 @@ if (window.mermaid) {
 }
 """
 
+GUIA_SKELETON = {
+    "meta": {
+        "materia": "INF-220 · Programación Orientada a Objetos",
+        "codigo": "GLXX",
+        "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+        "titulo": "Título de la Guía",
+        "subtitulo": "Práctica N.º X · Una frase que resuma qué logra el estudiante.",
+        "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+        "duracion": "3 h de laboratorio",
+        "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+    },
+    "convenciones": "Explica cómo se trabaja la guía (dónde se ejecuta el código, qué se entrega).",
+    "secciones": [
+        {
+            "num": "01",
+            "titulo": "Competencia y objetivos",
+            "bloques": [
+                {"tipo": "texto", "texto": "Competencia de la práctica"},
+                {"tipo": "competencia", "texto": "Redacta la competencia: qué habilidad construye el estudiante al terminar."},
+                {"tipo": "texto", "texto": "Objetivos específicos"},
+                {"tipo": "lista", "items": [
+                    "Comprender el concepto central de la práctica.",
+                    "Aplicar el concepto en ejercicios guiados.",
+                    "Resolver un ejercicio nuevo de forma autónoma."
+                ]}
+            ]
+        },
+        {
+            "num": "02",
+            "titulo": "Requisitos y preparación",
+            "bloques": [
+                {"tipo": "lista", "items": [
+                    "Navegador moderno (Chrome, Firefox, Edge o Safari).",
+                    "Lectura previa de la guía anterior."
+                ]},
+                {"tipo": "nota", "texto": "Podés ejecutar las celdas de Python en el navegador con ▶ ejecutar."}
+            ]
+        },
+        {
+            "num": "03",
+            "titulo": "Conceptos previos",
+            "bloques": [
+                {"tipo": "definicion", "titulo": "Concepto", "texto": "Definición precisa del concepto que se practica."},
+                {"tipo": "nota", "texto": "Ampliá con un detalle, trampa común o aclaración."}
+            ]
+        },
+        {
+            "num": "04",
+            "titulo": "Laboratorio Práctico interactivo",
+            "bloques": [
+                {"tipo": "celda", "in": "print('Hola, INF-220')", "out": "Hola, INF-220"}
+            ]
+        },
+        {
+            "num": "05",
+            "titulo": "Autoevaluación",
+            "bloques": [
+                {
+                    "tipo": "quiz",
+                    "pregunta": "Pregunta conceptual sobre la práctica",
+                    "opciones": [
+                        {"texto": "Opción incorrecta", "explicacion": "Por qué esta opción está mal."},
+                        {"texto": "Opción correcta", "explicacion": "Por qué esta es la correcta."},
+                        {"texto": "Otra opción incorrecta", "explicacion": "Por qué esta opción está mal."}
+                    ],
+                    "correcta": 1,
+                    "explicacion": "Explicación general opcional que se muestra al responder."
+                }
+            ]
+        },
+        {
+            "num": "06",
+            "titulo": "Práctica en clase",
+            "bloques": [
+                {"tipo": "lista", "items": ["Enunciado del ejercicio 1.", "Enunciado del ejercicio 2."]}
+            ]
+        },
+        {
+            "num": "07",
+            "titulo": "Entregable",
+            "bloques": [
+                {"tipo": "nota", "texto": "Formato de entrega y fecha límite."}
+            ]
+        },
+        {
+            "num": "08",
+            "titulo": "Rúbrica de evaluación",
+            "rubrica": [
+                {"criterio": "Criterio", "descripcion": "Descripción del criterio", "pts": 40},
+                {"criterio": "Criterio", "descripcion": "Descripción del criterio", "pts": 60}
+            ]
+        },
+        {
+            "num": "09",
+            "titulo": "Referencias",
+            "referencias": ["Referencia bibliográfica o documentación oficial."]
+        }
+    ]
+}
+
+
+def _nuevo_esqueleto():
+    """Crea un esqueleto de guía nuevo en public/clases_guia/ preguntando el tema."""
+    tema = input("Tema de la guía (ej. funciones): ").strip()
+    if not tema:
+        tema = "tema"
+    codigo = input("Código de la guía (ej. GL04): ").strip().upper() or "GLXX"
+    titulo = input("Título (ej. Estructuras de Control): ").strip()
+    destino = CLASES_DIR / f"guia_contenido_{slug(tema)}.json"
+    if destino.exists():
+        print(f"ERROR: ya existe {destino}", file=sys.stderr)
+        sys.exit(1)
+    skeleton = json.loads(json.dumps(GUIA_SKELETON))  # copia profunda
+    skeleton["meta"]["codigo"] = codigo
+    if titulo:
+        skeleton["meta"]["titulo"] = titulo
+    destino.write_text(json.dumps(skeleton, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"Esqueleto creado -> {destino}")
+    print("Edítalo y luego genera con: python tools/gl_generator.py " + str(destino))
+
+
 def main():
     args = sys.argv[1:]
     salida = None
@@ -1656,6 +1964,8 @@ def main():
         args.remove("--estatico")
     if "--nuevo" in args:
         args.remove("--nuevo")
+        _nuevo_esqueleto()
+        return
     i = 0
     while i < len(args):
         a = args[i]
@@ -1672,6 +1982,11 @@ def main():
         sys.exit(1)
 
     data = json.loads(fuente.read_text(encoding="utf-8"))
+    try:
+        data = validar_esquema(data, fuente)
+    except SchemaError as e:
+        print(f"ERROR de esquema en {fuente}: {e}", file=sys.stderr)
+        sys.exit(1)
     meta = data["meta"]
 
     global _cell_n, _quiz_n
