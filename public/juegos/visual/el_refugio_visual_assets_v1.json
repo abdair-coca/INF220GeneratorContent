@@ -7878,6 +7878,78 @@
         "Talking"
       ]
     },
+    "npc_alizon_storm": {
+      "id": "npc_alizon_storm",
+      "name": "Alizon bajo la tormenta",
+      "category": "characters",
+      "size": {"w": 56, "h": 64},
+      "anchor": {"x": 28, "y": 58},
+      "hitbox": {"x": 14, "y": 40, "w": 28, "h": 14},
+      "depth": {"mode": "y_sort", "footY": 58},
+      "states": {
+        "down": {"draw": [
+          {"type":"ellipse","x":28,"y":58,"rx":13,"ry":4,"color":"#2a241e","alpha":0.24},
+          {"type":"rect","x":16,"y":7,"w":22,"h":8,"color":"#103958","alpha":1},
+          {"type":"rect","x":14,"y":14,"w":26,"h":8,"color":"#17648b","alpha":1},
+          {"type":"rect","x":18,"y":16,"w":18,"h":13,"color":"#f4c884","alpha":1},
+          {"type":"rect","x":20,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},
+          {"type":"rect","x":32,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},
+          {"type":"polygon","points":[[17,29],[39,29],[42,46],[14,46]],"color":"#258fbd","alpha":1},
+          {"type":"line","x1":18,"y1":34,"x2":11,"y2":45,"color":"#103958","width":4},
+          {"type":"line","x1":38,"y1":34,"x2":45,"y2":45,"color":"#103958","width":4},
+          {"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},
+          {"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1}
+        ]},
+        "up": {"draw": [
+          {"type":"ellipse","x":28,"y":58,"rx":13,"ry":4,"color":"#2a241e","alpha":0.24},
+          {"type":"rect","x":15,"y":7,"w":26,"h":16,"color":"#103958","alpha":1},
+          {"type":"polygon","points":[[16,28],[40,28],[42,46],[14,46]],"color":"#258fbd","alpha":1},
+          {"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},
+          {"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},
+          {"type":"line","x1":18,"y1":34,"x2":11,"y2":44,"color":"#103958","width":4},
+          {"type":"line","x1":38,"y1":34,"x2":45,"y2":44,"color":"#103958","width":4}
+        ]},
+        "side": {"draw": [
+          {"type":"ellipse","x":28,"y":58,"rx":13,"ry":4,"color":"#2a241e","alpha":0.24},
+          {"type":"rect","x":18,"y":7,"w":18,"h":8,"color":"#103958","alpha":1},
+          {"type":"rect","x":16,"y":14,"w":23,"h":9,"color":"#17648b","alpha":1},
+          {"type":"rect","x":20,"y":16,"w":17,"h":13,"color":"#f4c884","alpha":1},
+          {"type":"rect","x":33,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},
+          {"type":"polygon","points":[[17,29],[39,29],[41,46],[15,46]],"color":"#258fbd","alpha":1},
+          {"type":"line","x1":18,"y1":34,"x2":10,"y2":44,"color":"#103958","width":4},
+          {"type":"line","x1":38,"y1":34,"x2":45,"y2":41,"color":"#103958","width":4},
+          {"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},
+          {"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1}
+        ]}
+      },
+      "stateLabels": {"worried":"Preocupada","working":"Trabajando","celebrating":"Celebrando","sheltering":"Resguardada"},
+      "extraStates": {
+        "worried": {"frames": [
+          {"draw":[
+            {"type":"ellipse","x":28,"y":58,"rx":13,"ry":4,"color":"#2a241e","alpha":0.24},{"type":"rect","x":16,"y":7,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":14,"w":26,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":18,"y":16,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":21,"y1":27,"x2":34,"y2":27,"color":"#d74a3a","width":2},{"type":"polygon","points":[[17,29],[39,29],[42,46],[14,46]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":34,"x2":9,"y2":46,"color":"#103958","width":4},{"type":"line","x1":38,"y1":34,"x2":47,"y2":46,"color":"#103958","width":4},{"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1}
+          ]},
+          {"draw":[
+            {"type":"ellipse","x":28,"y":57,"rx":13,"ry":4,"color":"#2a241e","alpha":0.2},{"type":"rect","x":16,"y":6,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":13,"w":26,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":18,"y":15,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":19,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":21,"y1":26,"x2":34,"y2":26,"color":"#d74a3a","width":2},{"type":"polygon","points":[[17,28],[39,28],[42,45],[14,45]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":33,"x2":9,"y2":45,"color":"#103958","width":4},{"type":"line","x1":38,"y1":33,"x2":47,"y2":45,"color":"#103958","width":4},{"type":"rect","x":18,"y":44,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":44,"w":8,"h":11,"color":"#5b351e","alpha":1}
+          ]}
+        ],"fps":3},
+        "working": {"frames": [
+          {"draw":[{"type":"ellipse","x":28,"y":58,"rx":13,"ry":4,"color":"#2a241e","alpha":0.24},{"type":"rect","x":16,"y":7,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":14,"w":26,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":18,"y":16,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[17,29],[39,29],[42,46],[14,46]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":34,"x2":7,"y2":29,"color":"#a36532","width":4},{"type":"line","x1":38,"y1":34,"x2":48,"y2":29,"color":"#a36532","width":4},{"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1}]},
+          {"draw":[{"type":"ellipse","x":28,"y":57,"rx":13,"ry":4,"color":"#2a241e","alpha":0.2},{"type":"rect","x":16,"y":6,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":13,"w":26,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":18,"y":15,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[17,28],[39,28],[42,45],[14,45]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":33,"x2":7,"y2":24,"color":"#a36532","width":4},{"type":"line","x1":38,"y1":33,"x2":48,"y2":24,"color":"#a36532","width":4},{"type":"rect","x":18,"y":44,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":44,"w":8,"h":11,"color":"#5b351e","alpha":1}]},
+          {"draw":[{"type":"ellipse","x":28,"y":58,"rx":13,"ry":4,"color":"#2a241e","alpha":0.24},{"type":"rect","x":16,"y":7,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":14,"w":26,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":18,"y":16,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[17,29],[39,29],[42,46],[14,46]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":34,"x2":7,"y2":29,"color":"#a36532","width":4},{"type":"line","x1":38,"y1":34,"x2":48,"y2":29,"color":"#a36532","width":4},{"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1}]},
+          {"draw":[{"type":"ellipse","x":28,"y":57,"rx":13,"ry":4,"color":"#2a241e","alpha":0.2},{"type":"rect","x":16,"y":6,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":13,"w":26,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":18,"y":15,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[17,28],[39,28],[42,45],[14,45]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":33,"x2":7,"y2":24,"color":"#a36532","width":4},{"type":"line","x1":38,"y1":33,"x2":48,"y2":24,"color":"#a36532","width":4},{"type":"rect","x":18,"y":44,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":44,"w":8,"h":11,"color":"#5b351e","alpha":1}]}
+        ],"fps":6},
+        "celebrating": {"frames": [
+          {"draw":[{"type":"ellipse","x":28,"y":58,"rx":14,"ry":4,"color":"#2a241e","alpha":0.2},{"type":"rect","x":16,"y":7,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":18,"y":16,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":22,"y1":27,"x2":33,"y2":27,"color":"#d74a3a","width":2},{"type":"polygon","points":[[17,29],[39,29],[42,46],[14,46]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":34,"x2":7,"y2":17,"color":"#103958","width":4},{"type":"line","x1":38,"y1":34,"x2":49,"y2":17,"color":"#103958","width":4},{"type":"rect","x":18,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":45,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":5,"y":13,"w":4,"h":4,"color":"#ffd35d","alpha":1},{"type":"rect","x":47,"y":11,"w":4,"h":4,"color":"#ffd35d","alpha":1}]},
+          {"draw":[{"type":"ellipse","x":28,"y":56,"rx":14,"ry":4,"color":"#2a241e","alpha":0.16},{"type":"rect","x":16,"y":5,"w":22,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":18,"y":14,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":19,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":19,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":22,"y1":25,"x2":33,"y2":25,"color":"#d74a3a","width":2},{"type":"polygon","points":[[17,27],[39,27],[42,44],[14,44]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":32,"x2":7,"y2":15,"color":"#103958","width":4},{"type":"line","x1":38,"y1":32,"x2":49,"y2":15,"color":"#103958","width":4},{"type":"rect","x":18,"y":43,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":43,"w":8,"h":11,"color":"#5b351e","alpha":1},{"type":"rect","x":5,"y":11,"w":4,"h":4,"color":"#ffd35d","alpha":1},{"type":"rect","x":47,"y":9,"w":4,"h":4,"color":"#ffd35d","alpha":1}]}
+        ],"fps":4},
+        "sheltering": {"frames": [
+          {"draw":[{"type":"ellipse","x":28,"y":58,"rx":14,"ry":4,"color":"#2a241e","alpha":0.28},{"type":"rect","x":18,"y":7,"w":20,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":18,"y":16,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":21,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[17,29],[39,29],[42,47],[14,47]],"color":"#258fbd","alpha":1},{"type":"polygon","points":[[7,27],[28,9],[49,27],[45,31],[11,31]],"color":"#17648b","alpha":1},{"type":"line","x1":28,"y1":9,"x2":28,"y2":47,"color":"#d5c8a7","width":2},{"type":"rect","x":18,"y":46,"w":8,"h":10,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":46,"w":8,"h":10,"color":"#5b351e","alpha":1}]},
+          {"draw":[{"type":"ellipse","x":28,"y":57,"rx":14,"ry":4,"color":"#2a241e","alpha":0.24},{"type":"rect","x":18,"y":6,"w":20,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":18,"y":15,"w":18,"h":13,"color":"#f4c884","alpha":1},{"type":"rect","x":20,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":32,"y":20,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[17,28],[39,28],[42,46],[14,46]],"color":"#258fbd","alpha":1},{"type":"polygon","points":[[7,26],[28,8],[49,26],[45,30],[11,30]],"color":"#17648b","alpha":1},{"type":"line","x1":28,"y1":8,"x2":28,"y2":46,"color":"#d5c8a7","width":2},{"type":"rect","x":18,"y":45,"w":8,"h":10,"color":"#5b351e","alpha":1},{"type":"rect","x":30,"y":45,"w":8,"h":10,"color":"#5b351e","alpha":1}]}
+        ],"fps":2}
+      },
+      "collision": true,
+      "interactable": true
+    },
     "station_signal_tower": {
       "id":"station_signal_tower","name":"Torre de señal","category":"stations","notes":"Torre arriostrada con antena parabólica direccional, pernos, caja transmisora y enlace estable.",
       "stateLabels":{"apagada":"Apagada","transmitting":"Transmitiendo","connected":"Conectada"},
@@ -8030,15 +8102,6 @@
     },
     "puddle": {
      "id":"puddle","name":"Charco","category":"environment","notes":"Reflejo de lluvia sobre suelo; sin colisión.","size":{"w":64,"h":24},"anchor":{"x":32,"y":20},"hitbox":null,"depth":{"mode":"y_sort","footY":20},"collision":false,"states":{"default":{"draw":[{"type":"ellipse","x":32,"y":17,"rx":27,"ry":7,"color":"#1f6f9a","alpha":0.65},{"type":"ellipse","x":29,"y":18,"rx":16,"ry":3,"color":"#67c7e8","alpha":0.5},{"type":"line","x1":12,"y1":21,"x2":22,"y2":19,"color":"#eaf7ff","width":1}]}}
-    },
-    "fallen_branch": {
-      "id":"fallen_branch","name":"Rama caída","category":"environment","notes":"Obstáculo decorativo de tormenta; colisión visual baja.","size":{"w":64,"h":32},"anchor":{"x":32,"y":28},"hitbox":{"x":16,"y":17,"w":32,"h":8},"depth":{"mode":"y_sort","footY":28},"collision":false,"states":{"default":{"draw":[{"type":"ellipse","x":32,"y":28,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"line","x1":11,"y1":22,"x2":52,"y2":12,"color":"#4f2d18","width":6},{"type":"line","x1":20,"y1":20,"x2":25,"y2":9,"color":"#75431f","width":3},{"type":"line","x1":39,"y1":15,"x2":48,"y2":6,"color":"#75431f","width":3}]}}
-    },
-    "lightning_scorch": {
-      "id":"lightning_scorch","name":"Marca de rayo","category":"environment","notes":"Cicatriz quemada para suelo de tormenta; sin colisión.","size":{"w":48,"h":32},"anchor":{"x":24,"y":25},"hitbox":null,"depth":{"mode":"y_sort","footY":25},"collision":false,"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":25,"rx":18,"ry":5,"color":"#17151d","alpha":0.5},{"type":"polygon","points":[[20,4],[28,4],[24,14],[31,14],[18,28],[21,18],[15,18]],"color":"#4f2d18","alpha":0.9},{"type":"line","x1":22,"y1":7,"x2":26,"y2":7,"color":"#d74a3a","width":2}]}}
-    },
-    "wind_debris": {
-      "id":"wind_debris","name":"Escombros del viento","category":"environment","notes":"Hojas y fragmentos desplazados por ráfagas, animados por frames.","size":{"w":64,"h":48},"anchor":{"x":32,"y":38},"hitbox":null,"depth":{"mode":"y_sort","footY":38},"collision":false,"states":{"default":{"frames":[{"draw":[{"type":"rect","x":12,"y":20,"w":5,"h":3,"color":"#c48747","alpha":1},{"type":"rect","x":38,"y":28,"w":4,"h":3,"color":"#39ad59","alpha":1},{"type":"line","x1":5,"y1":35,"x2":22,"y2":31,"color":"#b7c4cc","width":1}]},{"draw":[{"type":"rect","x":23,"y":14,"w":5,"h":3,"color":"#c48747","alpha":1},{"type":"rect","x":48,"y":20,"w":4,"h":3,"color":"#39ad59","alpha":1},{"type":"line","x1":12,"y1":30,"x2":31,"y2":26,"color":"#b7c4cc","width":1}]}],"fps":4}}
     },
     "marker_station_signal": {"id":"marker_station_signal","name":"Marcador de torre de señal","category":"markers","notes":"Icono HUD para torre de señal.","size":{"w":32,"h":32},"anchor":{"x":16,"y":29},"hitbox":null,"depth":{"mode":"y_sort","footY":29},"collision":false,"stateLabels":{"pending":"Pendiente","active":"Activa","completed":"Completada"},"states":{"pending":{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":11,"w":6,"h":15,"color":"#4d5964","alpha":1},{"type":"rect","x":14,"y":8,"w":4,"h":4,"color":"#7d8b96","alpha":1},{"type":"line","x1":16,"y1":8,"x2":16,"y2":4,"color":"#7d8b96","width":1}]},"active":{"frames":[{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":11,"w":6,"h":15,"color":"#17648b","alpha":1},{"type":"line","x1":16,"y1":11,"x2":16,"y2":4,"color":"#55b8d9","width":2},{"type":"line","x1":20,"y1":10,"x2":25,"y2":7,"color":"#55b8d9","width":1}]},{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":11,"w":6,"h":15,"color":"#17648b","alpha":1},{"type":"line","x1":16,"y1":11,"x2":16,"y2":4,"color":"#55b8d9","width":2},{"type":"line","x1":7,"y1":7,"x2":12,"y2":10,"color":"#55b8d9","width":1}]}],"fps":6},"completed":{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":12,"y":12,"w":8,"h":14,"color":"#2c8b4f","alpha":1},{"type":"line","x1":16,"y1":12,"x2":16,"y2":4,"color":"#57c86f","width":2},{"type":"line","x1":6,"y1":8,"x2":12,"y2":12,"color":"#ffe99b","width":2},{"type":"line","x1":26,"y1":8,"x2":20,"y2":12,"color":"#ffe99b","width":2},{"type":"line","x1":7,"y1":16,"x2":11,"y2":16,"color":"#ffe99b","width":1},{"type":"line","x1":21,"y1":16,"x2":25,"y2":16,"color":"#ffe99b","width":1}]}}},
     "marker_station_sensor": {"id":"marker_station_sensor","name":"Marcador de sensor","category":"markers","notes":"Icono HUD para pilar sensor.","size":{"w":32,"h":32},"anchor":{"x":16,"y":29},"hitbox":null,"depth":{"mode":"y_sort","footY":29},"collision":false,"stateLabels":{"pending":"Pendiente","active":"Activa","completed":"Completada"},"states":{"pending":{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":11,"y":11,"w":10,"h":15,"color":"#4d5964","alpha":1},{"type":"rect","x":13,"y":14,"w":6,"h":4,"color":"#7d8b96","alpha":1}]},"active":{"frames":[{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":11,"y":11,"w":10,"h":15,"color":"#17648b","alpha":1},{"type":"line","x1":7,"y1":20,"x2":25,"y2":20,"color":"#55b8d9","width":1}]},{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":11,"y":11,"w":10,"h":15,"color":"#17648b","alpha":1},{"type":"line","x1":9,"y1":17,"x2":23,"y2":17,"color":"#55b8d9","width":1}]}],"fps":6},"completed":{"draw":[{"type":"ellipse","x":16,"y":28,"rx":9,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":10,"y":11,"w":12,"h":15,"color":"#2c8b4f","alpha":1},{"type":"line","x1":6,"y1":18,"x2":10,"y2":18,"color":"#ffe99b","width":2},{"type":"line","x1":22,"y1":18,"x2":26,"y2":18,"color":"#ffe99b","width":2},{"type":"line","x1":16,"y1":8,"x2":16,"y2":26,"color":"#ffe99b","width":1},{"type":"line","x1":8,"y1":10,"x2":24,"y2":26,"color":"#ffe99b","width":1}]}}},
@@ -8680,13 +8743,9 @@
       "station_resource_depot",
       "station_reverse_beacon",
       "station_energy_console",
-      "station_stability_monitor",
-      "storm_core",
-      "storm_cloud",
-      "puddle",
-      "fallen_branch",
-      "lightning_scorch",
-      "wind_debris",
+       "station_stability_monitor",
+       "storm_core",
+       "puddle",
       "marker_station_signal",
       "marker_station_sensor",
       "marker_station_supply",
@@ -8696,8 +8755,9 @@
       "marker_station_reverse",
       "marker_station_energy",
       "marker_station_stability",
-      "marker_storm_core",
-      "npc_alizon"
+       "marker_storm_core",
+       "npc_alizon",
+       "npc_alizon_storm"
     ]
   }
 }
