@@ -200,6 +200,34 @@ Ejemplo de desafío con validador de estructura:
 }
 ```
 
+### Autocompletado pedagógico y auditoría de calidad
+
+El generador **deriva contenido explicativo del validador** cuando el autor lo
+omite, para que ningún desafío salga sin ejemplo o sin esqueleto:
+
+- `example` vacío → se arma `fn(args) -> resultado` con un caso normal y un
+  caso límite de `function_cases` (o `sampleArgs`/`expected` en `def_return`).
+- `starterCode` vacío → esqueleto `def fn(param): return None` por función.
+- `hints` con menos de 3 → se completan con pistas genéricas (firma exacta,
+  casos límite, usar `return` en vez de `print`).
+
+Los valores **explícitos del autor siempre ganan**: el autocompletado solo
+toca campos vacíos. Al generar se avisa por stderr qué campos se llenaron.
+
+Antes de publicar una lección nueva corré la auditoría:
+
+```
+python tools/game_generator.py public/juegos/juego_gl04_tema.json --audit
+```
+
+Reporta por desafío: longitud del `objective` (mín. 25), presencia de
+`example`/`starterCode`, cantidad de `hints` y nº de casos por función. Sale
+con código **1** si algún desafío incumple el mínimo (objetivo corto, sin
+ejemplo, sin esqueleto, <2 pistas, <2 casos), lo que corta CI/release.
+
+Regla práctica: si el `example` autogenerado no te aclara el ejercicio, el
+`objective` o los `cases` están mal planteados.
+
 ### Kit visual (data-driven)
 
 El motor renderiza TODO por assets del kit (`public/juegos/visual/el_refugio_visual_assets_v1.json`)
@@ -255,6 +283,8 @@ El backend de Titi además valida en el servidor (`validateHtmlLessonResource`):
 ## 9. Checklist final antes de entregar
 
 - [ ] Pasa `validate-titi-html.mjs --check-score` (salida OK).
+- [ ] Corrió `game_generator.py <json> --audit` y reportó 0 problemas.
+- [ ] Todo desafío tiene `objective` ≥25 chars y `example` ilustrativo.
 - [ ] CSP estricta presente.
 - [ ] Sin storage / sin navegación / sin fetch / sin `_blank`.
 - [ ] `TitiBridge.submitScore` envía `TITI_SCORE` con `__TITI_ATTEMPT_TOKEN`.

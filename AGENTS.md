@@ -61,7 +61,7 @@ se arma la plantilla perfecta que se replicará en los demás niveles/lecciones.
 ## Directory layout
 
 ```
-2026Semestre2/                      ← project root (NOT a git repo)
+2026Semestre2/                      ← project root — git repo de FUENTES (remote INF220GeneratorContent, rama main)
 ├── AGENTS.md                       ← this file
 ├── tools/                          ← generator scripts (Python 3.11, stdlib only)
 │   ├── game_generator.py           ←   generates games (El Refugio Lógico RPG)
@@ -79,7 +79,7 @@ se arma la plantilla perfecta que se replicará en los demás niveles/lecciones.
 │       ├── juego_gl01_oficial.json     ← GL01 CAP 1 OFICIAL (funciones+selectivas; GL01 diagramas = teoría)
 │       ├── juego_gl01_clases.json      ← GL01 Clases y Objetos (práctica extra)
 │       └── juego_gl02_funciones.json   ← GL02 Funciones (práctica extra)
-├── inf-220-g2/                     ← the ONLY git repo (user inits it)
+├── inf-220-g2/                     ← subrepo de ARTEFACTOS generados (user inits it, rama inf-220-g2-artifacts)
 │   ├── clases/                     ← generated HTML (guia_gl0x.html, Juego_*.html)
 │   ├── practicas/                  ← user drops practice docs here (user fills, we don't)
 │   └── README.md
@@ -117,6 +117,16 @@ python tools/gl_generator.py --nuevo                        # create a new guide
 
 - Output defaults to `inf-220-g2/clases/guia_<slug(codigo)>.html`.
 - Use `-o <path>` to override (e.g. into `resueltos/`).
+- **Valida el esquema** antes de generar (tipos de bloque, quizzes con
+  `correcta` 0-based válido, celdas con `in`, placeholders, secciones con
+  `bloques`/`rubrica`/`referencias`) y falla con mensaje claro si algo no cumple.
+- `--nuevo` crea un esqueleto de guía en `public/clases_guia/` (pregunta tema,
+  código y título). El esqueleto ya incluye quiz con `explicacion` y celdas con
+  `out`.
+- **Quizzes**: cada opción puede ser un string o `{"texto", "explicacion"}`;
+  la pregunta puede llevar `"explicacion"`. Al responder se muestra la
+  explicación (la de la opción elegida, o la de la pregunta como fallback)
+  para que el estudiante aprenda por qué.
 
 ## game_generator.py
 
@@ -136,19 +146,65 @@ python tools/game_generator.py public/juegos/juego_gl01_oficial.json -o inf-220-
 python tools/game_generator.py public/juegos/juego_gl01_clases.json                                            # práctica (Clases)
 python tools/game_generator.py public/juegos/juego_gl02_funciones.json -o inf-220-g2/clases/Juego_funciones_01.html
 python tools/game_generator.py --nuevo                    # esqueleto JSON de lección nueva
+python tools/game_generator.py public/juegos/juego_gl04_tema.json --audit   # auditoría de calidad (no genera)
 ```
 
 Output defaults to `inf-220-g2/clases/Juego_<lesson_id>.html`. El generador
 **valida el esquema** del JSON antes de generar (longitud del `map`, ids
-únicos, `target` existente, `validator.kind`/`successAction.kind` válidos) y
-falla con mensaje claro si algo no cumple.
+únicos, `target` existente, `validator.kind`/`successAction.kind` válidos,
+objetivo de cada desafío con ≥25 chars) y falla con mensaje claro si algo no
+cumple.
+
+### Autocompletado pedagógico (los ejercicios se explican solos)
+
+Si el autor omite `example`, `starterCode` o deja menos de 3 `hints`, el
+generador los **deriva del validador** (no toca valores explícitos):
+
+- `example` → se construye `fn(args) -> resultado` tomando un caso normal y un
+  caso límite de `validator.function_cases` (o `sampleArgs`/`expected`).
+- `starterCode` → esqueleto `def fn(param): return None` para cada función pedida.
+- `hints` → se completan hasta 3 con pistas genéricas (firma exacta, casos
+  límite, usar `return` en vez de `print`).
+
+Al generar se avisa por stderr qué campos se autocompletaron.
+
+### `--audit` (calidad pedagógica)
+
+Reporta por desafío: longitud de `objective`, si tiene `example`/`starterCode`,
+cantidad de `hints` y nº de casos de prueba. Sale con código **1** si algún
+desafío no cumple los estándares mínimos (objetivo corto, sin ejemplo en
+`function_cases`/`def_return`, sin `starterCode`, <2 pistas, <2 casos).
+Usalo antes de entregar una lección nueva.
 
 ### Validadores y acciones (data-driven)
 
 - `validator.kind`: `structure` (POO: classes/attrs/methods/instantiate/calls),
-  `def_return`, `def_exists`, `print_call` (funciones).
-- `successAction.kind` (tema Refugio): `fogata`, `tienda`, `campamento`.
+  `def_return`, `def_exists`, `print_call` (funciones), `function_cases`
+  (multi-función con casos `args[]`/`expected`; el más expresivo y el que
+  permite el autocompletado pedagógico).
+- `successAction.kind` (tema Refugio): `fogata`, `tienda`, `campamento`,
+  `station_transition`.
   `campamento` abre el sendero y debe ser el desafío final.
+
+### Cómo escribir un buen desafío (juego)
+
+El generador autocompleta `example`/`starterCode`/`hints`, pero la **calidad
+pedagógica la pone el autor** en 3 campos:
+
+1. **`objective` (≥25 chars, siempre)**: explica el contrato completo — qué
+   función/es definir, qué reciben, qué calculan y qué devuelven en los casos
+   límite (cero, negativos, vacíos). No asumas que el título alcanza.
+2. **`validator` con casos de prueba**: usá `function_cases` y pensá los casos
+   **límite** además del caso feliz (negativos, cero, listas vacías, `None`).
+   Con ≥3 casos por función el ejercicio es robusto y el `example` autogenerado
+   queda ilustrativo. Menos de 2 casos hace que una solución "a medida" pase.
+3. **`hints` (opcional)**: guiá el razonamiento (qué descomponer, qué límites
+   validar), no pegues el código de la solución. El generador completa hasta 3
+   si dejás menos.
+
+Regla práctica: si el `example` autogenerado no te aclara el ejercicio, el
+`objective` o los `cases` están mal planteados. Corré
+`python tools/game_generator.py <json> --audit` antes de entregar.
 
 > **Cap 1 oficial (`juego_gl01_oficial.json`)** = funciones + selectivas
 > (GL02/GL03). Los diagramas de flujo (GL01) se enseñan como teoría en el
@@ -207,7 +263,7 @@ renderiza con `JuegoArtAssetRenderer`. El asset `npc_guardabosques` se deriva de
 | `ejemplo` | `texto` | example box |
 | `figura` | `texto` | figure placeholder |
 | `diagrama` | `titulo`, `code` | Mermaid flowchart (interactive, zoom/pan) |
-| `quiz` | `pregunta`, `opciones[]`, `correcta` | self-check; `correcta` = **0-based index** of the right option |
+| `quiz` | `pregunta`, `opciones[]`, `correcta`, `explicacion?` | self-check; `correcta` = **0-based index**; cada opción puede ser string o `{"texto","explicacion"}` y la pregunta puede llevar `explicacion` (se muestra al responder) |
 | `simbolos` | — | table of flowchart symbols (inline SVG) |
 | `sub` | `titulo`, `bloques[]` | subsection heading + nested blocks |
 | `celda` | `in`, `out?` | runnable Python cell (Pyodide) `In[n]/Out[n]` |
