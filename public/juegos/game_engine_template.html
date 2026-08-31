@@ -709,16 +709,97 @@ class ParticleSystem {
   }
 }
 
+/* -------------------------------------------------------------------------
+   WeatherSystem — lluvia estable, reutilizable y controlada por zone.weather
+   ------------------------------------------------------------------------- */
+class WeatherSystem {
+  constructor(config) {
+    this.config = Object.assign({
+      mode: "none", density: 1, dropCount: 180, dropLength: 16,
+      dropSpeed: 500, wind: 0.22, gust: 0.06, gustPeriod: 5, alpha: 0.5,
+      color: "#b9dbe9"
+    }, config || {});
+    this.drops = [];
+    this.width = 0; this.height = 0; this.elapsed = 0; this.poolSize = -1;
+  }
+  _isRain() { return this.config.mode === "rain"; }
+  _targetSize() {
+    if (!this._isRain()) return 0;
+    return Math.max(1, Math.round(this.config.dropCount * this.config.density));
+  }
+  _reset(drop, fromTop) {
+    const length = this.config.dropLength;
+    drop.length = length * (0.82 + Math.random() * 0.36);
+    drop.speed = this.config.dropSpeed * (0.88 + Math.random() * 0.24);
+    drop.alpha = this.config.alpha * (0.72 + Math.random() * 0.28);
+    drop.x = Math.random() * Math.max(1, this.width);
+    drop.y = fromTop ? -drop.length * (0.25 + Math.random() * 0.75) : Math.random() * Math.max(1, this.height);
+  }
+  _wrap(value, extent) {
+    const wrapped = value % extent;
+    return wrapped < 0 ? wrapped + extent : wrapped;
+  }
+  resize(width, height) {
+    const oldWidth = this.width, oldHeight = this.height;
+    this.width = Math.max(1, width); this.height = Math.max(1, height);
+    const target = this._targetSize();
+    const preserved = oldWidth > 0 && oldHeight > 0 ? Math.min(this.drops.length, target) : 0;
+    for (let i = 0; i < preserved; i++) {
+      const drop = this.drops[i];
+      drop.x = this._wrap(drop.x / oldWidth * this.width, this.width);
+      drop.y = this._wrap(drop.y / oldHeight * this.height, this.height);
+    }
+    if (target !== this.poolSize) {
+      this.drops.length = target;
+      for (let i = preserved; i < target; i++) {
+        if (!this.drops[i]) this.drops[i] = {};
+        this._reset(this.drops[i], false);
+      }
+      this.poolSize = target;
+    }
+  }
+  update(dt) {
+    this.elapsed += dt;
+    if (!this._isRain()) return;
+    const gustPeriod = Math.max(0.1, this.config.gustPeriod);
+    const slope = this.config.wind + this.config.gust * Math.sin(this.elapsed * Math.PI * 2 / gustPeriod);
+    for (const drop of this.drops) {
+      drop.x += drop.speed * slope * dt;
+      drop.x = this._wrap(drop.x, this.width);
+      drop.y += drop.speed * dt;
+      if (drop.y > this.height + drop.length || drop.y < -drop.length) this._reset(drop, true);
+    }
+  }
+  render(ctx, width, height) {
+    if (!this._isRain()) return;
+    const gustPeriod = Math.max(0.1, this.config.gustPeriod);
+    const slope = this.config.wind + this.config.gust * Math.sin(this.elapsed * Math.PI * 2 / gustPeriod);
+    ctx.save();
+    ctx.strokeStyle = this.config.color;
+    ctx.lineWidth = 1;
+    ctx.lineCap = "square";
+    for (const drop of this.drops) {
+      if (drop.x < -60 || drop.x > width + 60 || drop.y < -60 || drop.y > height + 60) continue;
+      ctx.globalAlpha = drop.alpha;
+      ctx.beginPath();
+      ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
+      ctx.lineTo(Math.round(drop.x + slope * drop.length), Math.round(drop.y + drop.length));
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
 window.__JuegoArt = window.__JuegoArt || {};
 Object.assign(window.__JuegoArt, {
   TILE, MAX_EXECUTION_STEPS, GameState, InputManager, Camera, PALETTE, drawSprite,
-  AudioManager, ParticleSystem, GAME_CONFIG
+  AudioManager, ParticleSystem, WeatherSystem, GAME_CONFIG
 });
 })();
 (function () {
 "use strict";
 const NS = window.__JuegoArt;
-const { TILE, drawSprite, PALETTE, GAME_CONFIG } = NS;
+const { TILE, drawSprite, PALETTE, GAME_CONFIG, WeatherSystem } = NS;
 
 /*__ASSET_RENDERER_JS__*/
 
@@ -912,7 +993,10 @@ class Player {
 }
 
 class Renderer {
-  constructor(ctx, particles) { this.ctx = ctx; this.particles = particles || null; }
+  constructor(ctx, particles, weather) {
+    this.ctx = ctx; this.particles = particles || null;
+    this.weather = weather || new WeatherSystem(ZONE.weather || {});
+  }
 
   _stateFor(it, challengeSystem) {
     if (it.stateMap && challengeSystem) return it.stateMap[challengeSystem.status(it.missionNode)] || it.stateMap.pending;
@@ -964,14 +1048,14 @@ class Renderer {
        else if (d.asset) ASSET_RENDERER.drawAsset(ctx, d.asset, d.state || "default", d.x + d.w / 2, d.y + d.h, camera, now);
      }
      if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
-     if (challengeSystem && challengeSystem.lesson.storm) {
+      if (ZONE.weather && ZONE.weather.mode === "storm" && challengeSystem && challengeSystem.lesson.storm) {
        const phase = challengeSystem.stormPhase();
        const alpha = { solved_0_2:.22, solved_3_5:.16, solved_6_8:.10, solved_9:.04, solved_10:0 }[phase] || 0;
        if (alpha) { ctx.save(); ctx.globalAlpha = alpha; rect(ctx, 0, 0, canvasW, canvasH, "#24154b"); ctx.restore(); }
      }
   }
 
-   renderDepthScene(world, player, camera, challengeSystem) {
+  renderDepthScene(world, player, camera, challengeSystem) {
     const ctx = this.ctx, now = performance.now(), items = [];
     for (const d of world.decor) if (d.kind === "bush") items.push({ type: "decor", ref: d, y: d.y + d.h, asset: d.asset || "bush_flowers" });
     for (const n of world.npcs) items.push({ type: "npc", ref: n, y: n.y + n.h, asset: n.asset || "npc_alizon" });
@@ -996,9 +1080,13 @@ class Renderer {
          ASSET_RENDERER.drawAsset(ctx, item.asset, n.visualState || "down", n.x + n.w / 2, n.y + n.h + bob, camera, now);
         continue;
       }
-      const it = item.ref, age = it.changedAt ? Math.min(1, (now - it.changedAt) / 430) : 1;
-      const pop = (it.changedAt && age < 1) ? .72 + age * .28 : 1;
-       ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it, challengeSystem), it.x + (it.w || 32) / 2, it.y + (it.h || 32), camera, now, { alpha: pop });
+       const it = item.ref, age = it.changedAt ? Math.min(1, (now - it.changedAt) / 430) : 1;
+       const pop = (it.changedAt && age < 1) ? .72 + age * .28 : 1;
+        const status = challengeSystem && it.missionNode ? challengeSystem.status(it.missionNode) : null;
+        ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it, challengeSystem), it.x + (it.w || 32) / 2, it.y + (it.h || 32), camera, now, { alpha: pop });
+        if (status === "pending" && challengeSystem.lesson.progression && challengeSystem.lesson.progression.strict) {
+          this._drawBlockedIndicator(ctx, it.x + (it.w || 32) / 2 - camera.x, it.y + 10 - camera.y);
+        }
       const meta = ASSET_RENDERER.asset(item.asset);
       if (meta.light && it.type === "fogata" && it.lit) {
         ctx.save(); ctx.globalAlpha = (meta.light.alpha || .16) * pop; ctx.fillStyle = meta.light.color || "#ffd35d";
@@ -1009,6 +1097,17 @@ class Renderer {
         if (Math.random() < 0.07) this._emitFromEffect("sparks", it.x + 16, it.y - 4);
       }
     }
+  }
+
+  _drawBlockedIndicator(ctx, x, y) {
+    x = Math.round(x); y = Math.round(y);
+    ctx.save();
+    rect(ctx, x - 10, y - 7, 20, 19, C.ink);
+    ctx.strokeStyle = C.gold1; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y - 1, 5, Math.PI, 0); ctx.stroke();
+    rect(ctx, x - 7, y, 14, 9, C.gold1);
+    rect(ctx, x - 1, y + 3, 2, 4, C.ink);
+    ctx.restore();
   }
 
   renderEntities(world, camera) {}
@@ -1270,7 +1369,7 @@ class PythonEngine {
     return parsed.nodes;
   }
   _safeTick() { this.steps++; if (this.steps > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "El código superó el límite seguro de 1000 pasos.", hint: "Revisa la condición de tu bucle y asegúrate de que avance." }; }
-  _safeLookup(name, env) { if (Object.prototype.hasOwnProperty.call(env, name)) return env[name]; if (Object.prototype.hasOwnProperty.call(this.globals || {}, name)) return this.globals[name]; if (["True", "False", "None"].includes(name)) return name === "True" ? true : name === "False" ? false : null; if (this.functions[name] || ["print", "len", "range"].includes(name)) return { __callable: name }; throw { type: "NameError", message: "Variable '" + name + "' no existe." }; }
+  _safeLookup(name, env) { if (Object.prototype.hasOwnProperty.call(env, name)) return env[name]; if (Object.prototype.hasOwnProperty.call(this.globals || {}, name)) return this.globals[name]; if (["True", "False", "None"].includes(name)) return name === "True" ? true : name === "False" ? false : null; if (this.functions[name] || ["print", "len", "range", "int", "float", "str", "abs", "max", "min", "sum", "round", "divmod", "bool", "list", "sorted"].includes(name)) return { __callable: name }; throw { type: "NameError", message: "Variable '" + name + "' no existe." }; }
   _safeAssign(target, value, env) { const simple = target.match(/^([A-Za-z_]\w*)$/); if (simple) { env[simple[1]] = value; return; } const indexed = target.match(/^([A-Za-z_]\w*)\[(.+)\]$/); if (!indexed) throw { type: "SyntaxError", message: "Destino de asignación inválido." }; const list = this._safeLookup(indexed[1], env), index = this._safeExpr(indexed[2], env); if (!Array.isArray(list) || !Number.isInteger(index)) throw { type: "TypeError", message: "Solo se puede asignar a un índice de lista." }; list[index] = value; }
    _safeExecBlock(nodes, env, inFunction, inLoop) { for (const node of nodes) { if (node.type === "def") continue; const flow = this._safeExecNode(node, env, inFunction, inLoop); if (flow) return flow; } return null; }
    _safeExecNode(node, env, inFunction, inLoop) {
@@ -1292,6 +1391,17 @@ class PythonEngine {
     if (name === "print") { this.output.push(args.map(v => this._display(v)).join(" ")); this.calls.push({ name, args }); return null; }
     if (name === "len") { if (args.length !== 1 || (typeof args[0] !== "string" && !Array.isArray(args[0]))) throw { type: "TypeError", message: "len() recibe una lista o texto." }; return args[0].length; }
     if (name === "range") { if (args.length < 1 || args.length > 3) throw { type: "TypeError", message: "range() recibe entre 1 y 3 argumentos." }; const start = args.length === 1 ? 0 : args[0], end = args.length === 1 ? args[0] : args[1], step = args.length === 3 ? args[2] : 1; if (![start, end, step].every(Number.isFinite) || step === 0) throw { type: "ValueError", message: "range() necesita números y paso distinto de cero." }; const out = []; for (let n = start; step > 0 ? n < end : n > end; n += step) { out.push(n); if (out.length > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "range() supera el límite seguro de 1000 pasos." }; } return out; }
+    if (name === "int") { const v = args[0]; if (typeof v === "string") { const n = Number(v.trim()); if (Number.isNaN(n)) throw { type: "ValueError", message: "int() no puede convertir el texto a entero." }; return Math.trunc(n); } if (typeof v === "boolean") return v ? 1 : 0; if (typeof v === "number") return Math.trunc(v); throw { type: "TypeError", message: "int() recibe un número o texto." }; }
+    if (name === "float") { const v = args[0]; if (typeof v === "number") return v; if (typeof v === "string") { const n = Number(v.trim()); if (Number.isNaN(n)) throw { type: "ValueError", message: "float() no puede convertir el texto a número." }; return n; } throw { type: "TypeError", message: "float() recibe un número o texto." }; }
+    if (name === "str") { return this._display(args[0]); }
+    if (name === "abs") { if (args.length !== 1 || typeof args[0] !== "number") throw { type: "TypeError", message: "abs() recibe un número." }; return Math.abs(args[0]); }
+    if (name === "max" || name === "min") { const nums = args.length === 1 && Array.isArray(args[0]) ? args[0] : args; if (!nums.length || nums.some(n => typeof n !== "number")) throw { type: "TypeError", message: name + "() recibe números." }; return name === "max" ? Math.max(...nums) : Math.min(...nums); }
+    if (name === "sum") { if (args.length !== 1 || !Array.isArray(args[0])) throw { type: "TypeError", message: "sum() recibe una lista de números." }; return args[0].reduce((a, b) => a + b, 0); }
+    if (name === "round") { if (args.length !== 1 || typeof args[0] !== "number") throw { type: "TypeError", message: "round() recibe un número." }; return Math.round(args[0]); }
+    if (name === "divmod") { if (args.length !== 2 || typeof args[0] !== "number" || typeof args[1] !== "number") throw { type: "TypeError", message: "divmod() recibe dos números." }; if (args[1] === 0) throw { type: "ZeroDivisionError", message: "No se puede dividir entre cero." }; return [Math.floor(args[0] / args[1]), args[0] % args[1]]; }
+    if (name === "bool") { return this._safeTruthy(args[0]); }
+    if (name === "list") { const v = args[0]; if (Array.isArray(v)) return v.slice(); if (typeof v === "string") return v.split(""); throw { type: "TypeError", message: "list() recibe una lista o texto." }; }
+    if (name === "sorted") { if (args.length !== 1 || !Array.isArray(args[0])) throw { type: "TypeError", message: "sorted() recibe una lista." }; return args[0].slice().sort((a, b) => a - b); }
     const tokens = this._safeTokens, index = this._safeIndex;
     const result = this._execFunctionWithArgs(name, args);
     this._safeTokens = tokens; this._safeIndex = index;
@@ -1522,7 +1632,7 @@ const VALIDATORS = {
       for (let i = 0; i < fnSpec.cases.length; i++) {
         const test = fnSpec.cases[i], result = engine._execFunctionWithArgs(fnSpec.defName, test.args);
         if (result.error) return { valid: false, error: result.error };
-        if (!engine._deepEqual(result.value, test.expected)) return { valid: false, error: { type: "LogicError", message: "La función no supera uno de los casos de prueba.", hint: "Compara límites, acumuladores y valor de retorno sin asumir un único caso." } };
+        if (!engine._deepEqual(result.value, test.expected)) { const argsTxt = (test.args || []).map(a => engine._display(a)).join(", "); return { valid: false, error: { type: "LogicError", message: "'" + fnSpec.defName + "(" + argsTxt + ")' devolvió " + engine._display(result.value) + ", se esperaba " + engine._display(test.expected) + ".", hint: "Revisa límites, acumuladores y el tipo de valor que retornás." } }; }
       }
     }
     return { valid: true };
@@ -1591,10 +1701,12 @@ class ChallengeSystem {
   }
   current() { return this.selectedId ? this.lesson.challenges.find(c => c.id === this.selectedId) : null; }
   currentRecord() { return this.selectedId ? this.records.get(this.selectedId) : null; }
+  isStrictSequential() { return !!(this.lesson.progression && this.lesson.progression.mode === "sequential" && this.lesson.progression.strict); }
+  nextPending() { return this.lesson.challenges.find(c => !this.records.get(c.id).solved) || null; }
   status(id) { const record = this.records.get(id); if (record && record.solved) return "completed"; return id === this.selectedId ? "active" : "pending"; }
   get completedCount() { return Array.from(this.records.values()).filter(r => r.solved).length; }
    stormPhase() { const count = this.completedCount, thresholds = (((this.lesson || {}).storm || {}).thresholds || []).slice().sort((a, b) => a.maxSolved - b.maxSolved); const match = thresholds.find(t => count <= t.maxSolved); return match ? match.phase : (count === this.lesson.challenges.length ? "solved_10" : "solved_0_2"); }
-  select(id) { const record = this.records.get(id); if (!record || record.solved) return null; this.selectedId = id; this.index = this.lesson.challenges.findIndex(c => c.id === id); this.start(); return this.current(); }
+  select(id) { const record = this.records.get(id); if (!record || record.solved) return null; if (this.isStrictSequential()) { const next = this.nextPending(); if (!next || id !== next.id) return null; } this.selectedId = id; this.index = this.lesson.challenges.findIndex(c => c.id === id); this.start(); return this.current(); }
   isLast() { return this.completedCount === this.lesson.challenges.length - 1; }
   start() { if (this.currentRecord()) this.currentRecord().startedAt = performance.now(); this.hintLevel = 0; }
   requestHint() { const ch = this.current(); if (!ch) return null; if (this.hintLevel < ch.hints.length) { const hint = ch.hints[this.hintLevel]; this.hintLevel++; this.currentRecord().hintsUsed++; return hint; } return null; }
@@ -1604,7 +1716,7 @@ class ChallengeSystem {
     if (!result.valid) { rec.errors++; return { success: false, error: result.error }; }
     rec.timeMs = performance.now() - rec.startedAt; rec.solved = true; ch.onSuccess(worldActions, world); return { success: true, concepts: ch.concepts };
   }
-  advance() { const next = this.lesson.challenges.find(c => !this.records.get(c.id).solved); if (next) this.select(next.id); }
+  advance() { const next = this.nextPending(); if (next) this.select(next.id); }
 }
 
 class StatisticsSystem {
@@ -1742,7 +1854,8 @@ Object.assign(NS, { UIManager, highlightPython });
 "use strict";
 const NS = window.__JuegoArt;
 const {
-  TILE, GameState, InputManager, Camera, AudioManager, ParticleSystem,
+   TILE, GameState, InputManager, Camera, AudioManager, ParticleSystem,
+  WeatherSystem,
   World, Player, Renderer, PythonEngine, WorldActions, DialogueSystem,
   InteractionSystem, LESSONS, BookSystem, ChallengeSystem, StatisticsSystem,
   SaveSystem, TitiBridge, UIManager
@@ -1825,19 +1938,20 @@ class Game {
       if (this.dialogue.active && this.input.wantsInteract()) this.dialogue.advance();
       if (this.input.wantsClose()) this._closeTopModal();
     }
-    this.camera.update(dt); this.particles.update(dt); this.input.update();
+     this.camera.update(dt); this.renderer.weather.update(dt); this.particles.update(dt); this.input.update();
   }
 
   render() {
      this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height, this.challengeSystem);
      this.renderer.renderDepthScene(this.world, this.player, this.camera, this.challengeSystem);
-    this.renderer.renderCanopy(this.world, this.camera);
+      this.renderer.renderCanopy(this.world, this.camera);
 
     // Renderizado del Sistema de Guía
-    const targetId = this._getActiveTargetId();
-    this.renderer.renderGuide(this.ctx, this.world, this.camera, targetId, this.canvas.width, this.canvas.height);
+      const targetId = this._getActiveTargetId();
+      this.renderer.renderGuide(this.ctx, this.world, this.camera, targetId, this.canvas.width, this.canvas.height);
 
-     this.particles.render(this.ctx, this.camera);
+      this.renderer.weather.render(this.ctx, this.canvas.width, this.canvas.height);
+      this.particles.render(this.ctx, this.camera);
      const radar = document.getElementById("radarCanvas"); if (radar && this.challengeSystem) this.renderer.renderRadar(radar.getContext("2d"), this.world, this.challengeSystem);
     if (this.nearby && !this._isModalOpen()) {
       const r = this.nearby.ref;
@@ -1859,7 +1973,7 @@ class Game {
          const record = this.challengeSystem.records.get(it.missionNode);
          if (record && record.solved) { this.ui.toast("Esta estación ya está completada."); return; }
          const ch = free ? this.challengeSystem.select(it.missionNode) : this.challengeSystem.current(); if (!ch) return;
-         if (!free && it.id !== ch.target) { this.ui.toast("Sigue la estación indicada."); return; }
+          if (!free && it.id !== ch.target) { this.ui.toast("Estación bloqueada. Sigue el orden indicado."); return; }
          this._syncWorldState(); this.ui.setObjective(this.lesson.objectives[ch.id] || ch.objective); this.ui.showEditor(ch, (this.lesson.ui && this.lesson.ui.editorLabel) || "CONSOLA DE CAMPO");
        }
     }
@@ -1903,8 +2017,8 @@ class Game {
   }
 
   _bindResize() {
-    const resize = () => { const wrap = document.getElementById("canvasWrap"); const w = wrap.clientWidth, h = wrap.clientHeight; this.canvas.width = w; this.canvas.height = h; this.camera.resize(w, h); };
-    window.addEventListener("resize", resize); resize();
+     const resize = () => { const wrap = document.getElementById("canvasWrap"); const w = wrap.clientWidth, h = wrap.clientHeight; this.canvas.width = w; this.canvas.height = h; this.camera.resize(w, h); this.renderer.weather.resize(w, h); };
+     window.addEventListener("resize", resize); resize();
   }
 }
 
