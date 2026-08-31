@@ -17,6 +17,7 @@ TITI_SCORE (window.__TITI_ATTEMPT_TOKEN).
 """
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -179,7 +180,7 @@ def build_assets_js(manifest, chapter, zone):
         "grass_tufts",
     }
     all_assets = manifest.get("assets", {})
-    assets = {aid: all_assets[aid] for aid in ids if aid in all_assets}
+    assets = {aid: all_assets[aid] for aid in sorted(ids) if aid in all_assets}
     out = {
         "kit": manifest.get("kit", {}),
         "palette": manifest.get("palette", {}),
@@ -230,6 +231,34 @@ def validar_esquema(data, fuente, manifest=None):
     for i, fila in enumerate(mapa):
         if len(fila) != ancho:
             _err("zone.map", f"fila {i} tiene {len(fila)} chars, se esperaba {ancho}")
+
+    weather = zone.get("weather")
+    if weather is not None:
+        if not isinstance(weather, dict):
+            _err("zone.weather", "debe ser un objeto de configuración.")
+        mode = weather.get("mode", "none")
+        if not isinstance(mode, str) or mode not in {"none", "rain", "storm"}:
+            _err("zone.weather.mode", "debe ser 'none', 'rain' o 'storm'.")
+        numeric_limits = {
+            "density": (0, 1),
+            "dropCount": (0, 600),
+            "dropLength": (0, 80),
+            "dropSpeed": (0, 1500),
+            "wind": (0, 1.5),
+            "gust": (0, 0.75),
+            "gustPeriod": (0, 30),
+            "alpha": (0, 1),
+        }
+        for field, (minimum, maximum) in numeric_limits.items():
+            if field not in weather:
+                continue
+            value = weather[field]
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                _err(f"zone.weather.{field}", "debe ser un número finito.")
+            if value <= minimum or value > maximum:
+                _err(f"zone.weather.{field}", f"debe ser > {minimum} y <= {maximum}.")
+        if "dropCount" in weather and not isinstance(weather["dropCount"], int):
+            _err("zone.weather.dropCount", "debe ser un entero positivo.")
 
     def _ids_unicos(items, seccion, campo_id="id", requerido=True):
         vistos = set()
