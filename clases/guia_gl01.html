@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'self' 'unsafe-inline' data: blob: https:; script-src 'unsafe-inline' 'unsafe-eval' https:; style-src 'unsafe-inline' https:; img-src data: blob: https:; font-src data: https:; connect-src https:;"><title>Diagramas de Flujo — Estructuras de Control Básicas · GL01</title><style>
+<!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='Content-Security-Policy' content="default-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'; frame-src 'none'; img-src data:; media-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline';"><title>Diagramas de Flujo — Estructuras de Control Básicas · GL01</title><style>
 :root {
   --ink: #172033;
   --muted: #647083;
@@ -441,6 +441,7 @@ h1 {
   display: flex;
   justify-content: center;
   overflow: auto;
+  padding: 6px;
 }
 
 .diagrama .mermaid svg {
@@ -532,6 +533,21 @@ h1 {
 
 .feedback.bad {
   color: var(--red);
+}
+
+.quiz-expl {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent, #5145cd);
+  background: rgba(81, 69, 205, 0.06);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-radius: 0 8px 8px 0;
+}
+
+.hidden {
+  display: none !important;
 }
 
 /* Score Summary Box for Titi */
@@ -829,7 +845,7 @@ footer {
     C -- &quot;Sí&quot; --&gt; D[&quot;Acción&quot;]
     D --&gt; E[&quot;i ← i + 1&quot;]
     E --&gt; C
-    C -- &quot;No&quot; --&gt; F([&quot;Fin&quot;])</pre></figure></section><section class="section" id="sec-05"><div class="head"><div><span class="num">SECCIÓN 05</span><h2>Autoevaluación</h2></div></div><p class="muted">Comprueba tus conocimientos teóricos respondiendo las siguientes preguntas interactivas:</p><article class="quiz-card" data-q="1" data-correct="1"><p class="question">1. Un rombo de decisión recibe una entrada y produce:</p><div class="options" role="group" aria-label="Opciones Pregunta 1"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Una sola salida (el flujo continúa en línea recta)</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Dos salidas rotuladas Sí y No</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Ninguna salida: solo procesa datos</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Tantas salidas como condiciones existan</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><article class="quiz-card" data-q="2" data-correct="2"><p class="question">2. En la estructura mientras, la condición se evalúa:</p><div class="options" role="group" aria-label="Opciones Pregunta 2"><button class="option" data-ans="0" type="button"><span class="letter">A</span> Después de cada iteración</button><button class="option" data-ans="1" type="button"><span class="letter">B</span> Solo una vez al inicio</button><button class="option" data-ans="2" type="button"><span class="letter">C</span> Antes de cada iteración; si es falsa al inicio, no se ejecuta ninguna</button><button class="option" data-ans="3" type="button"><span class="letter">D</span> Al final del algoritmo</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p></article><div class="score-card" id="titi-score-card"><div class="score-info"><b>Estado de Autoevaluación Titi</b><span id="score-text">Respondidas: 0 / 2</span><div class="titi-status" id="titi-status">Sincronización activa con entorno Titi</div></div><div class="score-badge"><div class="score-val" id="score-val">0%</div></div></div></section><section class="section" id="sec-06"><div class="head"><div><span class="num">SECCIÓN 06</span><h2>Práctica en clase</h2></div></div><p class="muted">Resuelve ahora los 10 ejercicios de la Práctica N.º 1. Identifica primero la estructura que necesita cada uno y luego dibuja el diagrama completo, desde Inicio hasta Fin.</p><ul class="list-custom"><li>Lectura y visualización de un número: lee un número entero y muéstralo en pantalla.</li><li>Suma de dos números: lee dos números y muestra su suma.</li><li>Promedio de tres números: lee tres números y calcula su promedio.</li><li>Área y perímetro de un círculo: lee el radio y calcula área y perímetro (π = 3.1416).</li><li>Conversión de bolivianos a dólares: lee bolivianos y conviértelos (1 USD = 6.96 Bs).</li><li>Número par o impar: lee un entero y determina si es par o impar.</li><li>El mayor de dos números: lee dos números distintos y muestra cuál es mayor.</li><li>Calificación según la nota: nota entre 0 y 100 → Reprobado (&lt; 51), Aprobado (51–79) o Excelente (80–100).</li><li>Números del 1 al 10: muestra los números del 1 al 10.</li><li>Suma de 5 números: lee 5 números y calcula su suma total.</li><li>Conteo de números hasta ingresar 0: lee números hasta que se ingrese 0 y muestra cuántos se ingresaron (sin contar el 0).</li></ul><div class="box-info highlight"><b>EJEMPLO</b><p>Retos extra (para practicar más): promedio de N números; tabla de multiplicar de un número N; verificar si un número es positivo, negativo o cero. La misma lógica de las soluciones 5.8 y 5.10 te sirve.</p></div></section><section class="section" id="sec-07"><div class="head"><div><span class="num">SECCIÓN 07</span><h2>Entregable</h2></div></div><p class="muted">Entrega la Práctica N.º 1 resuelta antes de la fecha indicada. Recuerda: únicamente diagramas de flujo, sin código ni pseudocódigo.</p><div class="box-info highlight"><b>EJEMPLO</b><p>Archivo: Practica_1_Apellido_Nombre — diagramas dibujados a mano (foto o escaneo claro) o digitales (draw.io exportado a PDF). Fecha de entrega: 18/08/2026.</p></div><ul class="list-custom"><li>Cada diagrama debe empezar con Inicio y terminar con Fin.</li><li>Símbolos correctos: terminal, proceso, entrada/salida y decisión.</li><li>Toda decisión con sus dos salidas rotuladas Sí y No.</li><li>Flechas claras, sin cortes ni cruces innecesarios.</li><li>El diagrama debe correr mentalmente de punta a punta sin trabas (verifica con un caso de ejemplo).</li></ul></section><section class="section" id="sec-08"><div class="head"><div><span class="num">SECCIÓN 08</span><h2>Rúbrica de evaluación</h2></div></div><div class="table-container"><table class="styled-table"><thead><tr><th>Criterio</th><th>Descripción</th><th style="width:100px;">Puntaje</th></tr></thead><tbody><tr><td><b>Simbología</b></td><td>Uso correcto de terminales, procesos, entradas/salidas y decisiones.</td><td class="pts">20 pts</td></tr><tr><td><b>Flujo y trazado</b></td><td>Flechas direccionales claras, sin cortes ni cruces innecesarios.</td><td class="pts">20 pts</td></tr><tr><td><b>Estructuras de control</b></td><td>Selección y repetición modeladas correctamente según el problema.</td><td class="pts">30 pts</td></tr><tr><td><b>Solución lógica</b></td><td>El algoritmo resuelve el problema para cualquier entrada válida.</td><td class="pts">20 pts</td></tr><tr><td><b>Presentación</b></td><td>Diagramas limpios, legibles y completos (Inicio a Fin).</td><td class="pts">10 pts</td></tr></tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td class="pts">100 Pts</td></tr></tfoot></table></div></section><section class="section" id="sec-09"><div class="head"><div><span class="num">SECCIÓN 09</span><h2>Referencias</h2></div></div><ul class="list-custom"><li>Joyanes Aguilar, L. — Fundamentos de programación: algoritmos, estructura de datos y objetos (McGraw-Hill).</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li><li>Documentación de draw.io / diagrams.net: https://app.diagrams.net</li><li>Wikipedia — Diagrama de flujo: https://es.wikipedia.org/wiki/Diagrama_de_flujo</li><li>Práctica N.º 1 · Diagramas de Flujo — Estructuras de Control Básicas (INF-220, Gestión 2026-02).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato UX · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script>
+    C -- &quot;No&quot; --&gt; F([&quot;Fin&quot;])</pre></figure></section><section class="section" id="sec-05"><div class="head"><div><span class="num">SECCIÓN 05</span><h2>Autoevaluación</h2></div></div><p class="muted">Comprueba tus conocimientos teóricos respondiendo las siguientes preguntas interactivas:</p><article class="quiz-card" data-q="1" data-correct="1" data-expl=""><p class="question">1. Un rombo de decisión recibe una entrada y produce:</p><div class="options" role="group" aria-label="Opciones Pregunta 1"><button class="option" data-ans="0" data-expl="" type="button"><span class="letter">A</span> Una sola salida (el flujo continúa en línea recta)</button><button class="option" data-ans="1" data-expl="" type="button"><span class="letter">B</span> Dos salidas rotuladas Sí y No</button><button class="option" data-ans="2" data-expl="" type="button"><span class="letter">C</span> Ninguna salida: solo procesa datos</button><button class="option" data-ans="3" data-expl="" type="button"><span class="letter">D</span> Tantas salidas como condiciones existan</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p><p class="quiz-expl hidden" aria-live="polite"></p></article><article class="quiz-card" data-q="2" data-correct="2" data-expl=""><p class="question">2. En la estructura mientras, la condición se evalúa:</p><div class="options" role="group" aria-label="Opciones Pregunta 2"><button class="option" data-ans="0" data-expl="" type="button"><span class="letter">A</span> Después de cada iteración</button><button class="option" data-ans="1" data-expl="" type="button"><span class="letter">B</span> Solo una vez al inicio</button><button class="option" data-ans="2" data-expl="" type="button"><span class="letter">C</span> Antes de cada iteración; si es falsa al inicio, no se ejecuta ninguna</button><button class="option" data-ans="3" data-expl="" type="button"><span class="letter">D</span> Al final del algoritmo</button></div><p class="feedback" aria-live="polite">Seleccioná una respuesta.</p><p class="quiz-expl hidden" aria-live="polite"></p></article><div class="score-card" id="titi-score-card"><div class="score-info"><b>Estado de Autoevaluación Titi</b><span id="score-text">Respondidas: 0 / 2</span><div class="titi-status" id="titi-status">Sincronización activa con entorno Titi</div></div><div class="score-badge"><div class="score-val" id="score-val">0%</div></div></div></section><section class="section" id="sec-06"><div class="head"><div><span class="num">SECCIÓN 06</span><h2>Práctica en clase</h2></div></div><p class="muted">Resuelve ahora los 10 ejercicios de la Práctica N.º 1. Identifica primero la estructura que necesita cada uno y luego dibuja el diagrama completo, desde Inicio hasta Fin.</p><ul class="list-custom"><li>Lectura y visualización de un número: lee un número entero y muéstralo en pantalla.</li><li>Suma de dos números: lee dos números y muestra su suma.</li><li>Promedio de tres números: lee tres números y calcula su promedio.</li><li>Área y perímetro de un círculo: lee el radio y calcula área y perímetro (π = 3.1416).</li><li>Conversión de bolivianos a dólares: lee bolivianos y conviértelos (1 USD = 6.96 Bs).</li><li>Número par o impar: lee un entero y determina si es par o impar.</li><li>El mayor de dos números: lee dos números distintos y muestra cuál es mayor.</li><li>Calificación según la nota: nota entre 0 y 100 → Reprobado (&lt; 51), Aprobado (51–79) o Excelente (80–100).</li><li>Números del 1 al 10: muestra los números del 1 al 10.</li><li>Suma de 5 números: lee 5 números y calcula su suma total.</li><li>Conteo de números hasta ingresar 0: lee números hasta que se ingrese 0 y muestra cuántos se ingresaron (sin contar el 0).</li></ul><div class="box-info highlight"><b>EJEMPLO</b><p>Retos extra (para practicar más): promedio de N números; tabla de multiplicar de un número N; verificar si un número es positivo, negativo o cero. La misma lógica de las soluciones 5.8 y 5.10 te sirve.</p></div></section><section class="section" id="sec-07"><div class="head"><div><span class="num">SECCIÓN 07</span><h2>Entregable</h2></div></div><p class="muted">Entrega la Práctica N.º 1 resuelta antes de la fecha indicada. Recuerda: únicamente diagramas de flujo, sin código ni pseudocódigo.</p><div class="box-info highlight"><b>EJEMPLO</b><p>Archivo: Practica_1_Apellido_Nombre — diagramas dibujados a mano (foto o escaneo claro) o digitales (draw.io exportado a PDF). Fecha de entrega: 18/08/2026.</p></div><ul class="list-custom"><li>Cada diagrama debe empezar con Inicio y terminar con Fin.</li><li>Símbolos correctos: terminal, proceso, entrada/salida y decisión.</li><li>Toda decisión con sus dos salidas rotuladas Sí y No.</li><li>Flechas claras, sin cortes ni cruces innecesarios.</li><li>El diagrama debe correr mentalmente de punta a punta sin trabas (verifica con un caso de ejemplo).</li></ul></section><section class="section" id="sec-08"><div class="head"><div><span class="num">SECCIÓN 08</span><h2>Rúbrica de evaluación</h2></div></div><div class="table-container"><table class="styled-table"><thead><tr><th>Criterio</th><th>Descripción</th><th style="width:100px;">Puntaje</th></tr></thead><tbody><tr><td><b>Simbología</b></td><td>Uso correcto de terminales, procesos, entradas/salidas y decisiones.</td><td class="pts">20 pts</td></tr><tr><td><b>Flujo y trazado</b></td><td>Flechas direccionales claras, sin cortes ni cruces innecesarios.</td><td class="pts">20 pts</td></tr><tr><td><b>Estructuras de control</b></td><td>Selección y repetición modeladas correctamente según el problema.</td><td class="pts">30 pts</td></tr><tr><td><b>Solución lógica</b></td><td>El algoritmo resuelve el problema para cualquier entrada válida.</td><td class="pts">20 pts</td></tr><tr><td><b>Presentación</b></td><td>Diagramas limpios, legibles y completos (Inicio a Fin).</td><td class="pts">10 pts</td></tr></tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td class="pts">100 Pts</td></tr></tfoot></table></div></section><section class="section" id="sec-09"><div class="head"><div><span class="num">SECCIÓN 09</span><h2>Referencias</h2></div></div><ul class="list-custom"><li>Joyanes Aguilar, L. — Fundamentos de programación: algoritmos, estructura de datos y objetos (McGraw-Hill).</li><li>Cairó, O. — Metodología de la programación: algoritmos, diagramas de flujo y programas (Alfaomega).</li><li>Documentación de draw.io / diagrams.net: https://app.diagrams.net</li><li>Wikipedia — Diagrama de flujo: https://es.wikipedia.org/wiki/Diagrama_de_flujo</li><li>Práctica N.º 1 · Diagramas de Flujo — Estructuras de Control Básicas (INF-220, Gestión 2026-02).</li></ul></section></main></div><footer>Generado con gl_generator.py · formato UX · UATF · Facultad de Ciencias Puras · Ing. Informática</footer><div id="cargando-bar"></div><script>
 // ---------- Barra de progreso de lectura ----------
 const progressBar = document.getElementById('bar');
 window.addEventListener('scroll', () => {
@@ -847,61 +863,44 @@ const scoreValEl = document.getElementById('score-val');
 const scoreTextEl = document.getElementById('score-text');
 const titiStatusEl = document.getElementById('titi-status');
 
-let currentScore = 0;
 const userAnswers = {};
 
-function reportarScoreTiti(score, detail) {
-  currentScore = score;
+function reportarScoreTiti(score) {
+  const finalScore = Math.max(0, Math.min(100, Math.round(Number(score) || 0)));
   try {
     window.parent.postMessage({
       source: 'titi-html',
       type: 'TITI_SCORE',
-      score: score,
-      detail: detail || {},
+      score: finalScore,
       attemptToken: window.__TITI_ATTEMPT_TOKEN,
     }, '*');
-  } catch (err) {
-    // Ejecución en ventana independiente
-  }
+  } catch (e) { /* ejecución standalone */ }
 }
 
 function actualizarCalculoScore() {
-  const totalQuizzes = quizCards.length;
-  if (!totalQuizzes) return;
-
-  let answeredCount = 0;
-  let correctCount = 0;
-
+  const total = quizCards.length;
+  if (!total) return;
+  let answered = 0, correct = 0;
   quizCards.forEach(card => {
     const qId = card.dataset.q;
     if (userAnswers[qId] !== undefined) {
-      answeredCount++;
-      if (userAnswers[qId].isCorrect) {
-        correctCount++;
-      }
+      answered++;
+      if (userAnswers[qId].isCorrect) correct++;
     }
   });
-
-  const scorePercent = Math.round((correctCount / totalQuizzes) * 100);
-  
-  if (scoreValEl) scoreValEl.textContent = scorePercent + '%';
-  if (scoreTextEl) scoreTextEl.textContent = `Respondidas: ${answeredCount} / ${totalQuizzes} (${correctCount} correctas)`;
+  const pct = Math.round((correct / total) * 100);
+  if (scoreValEl) scoreValEl.textContent = pct + '%';
+  if (scoreTextEl) scoreTextEl.textContent = 'Respondidas: ' + answered + ' / ' + total + ' (' + correct + ' correctas)';
   if (titiStatusEl) {
-    titiStatusEl.textContent = answeredCount === totalQuizzes
-      ? '✓ Evaluación completada y enviada a Titi'
-      : 'Sincronización activa con entorno Titi';
+    titiStatusEl.textContent = answered === total
+      ? '\u2713 Evaluaci\u00f3n completada y enviada a Titi'
+      : 'Sincronizaci\u00f3n activa con entorno Titi';
   }
-
-  // Solo enviamos el score definitivo a Titi cuando la evaluación está completa.
-  // Enviarlo en cada respuesta haría que Titi registre el score parcial de la
-  // primera pregunta como si fuera la nota final.
-  if (answeredCount === totalQuizzes) {
-    reportarScoreTiti(scorePercent, {
-      total: totalQuizzes,
-      correct: correctCount,
-      answered: answeredCount
-    });
-    mostrarOverlayNota(scorePercent);
+  // Solo reportamos el score final cuando la evaluación está completa, para
+  // evitar que Titi registre el score parcial de la primera pregunta.
+  if (answered === total) {
+    reportarScoreTiti(pct);
+    mostrarOverlayNota(pct);
   }
 }
 
@@ -945,33 +944,33 @@ quizCards.forEach(card => {
   const correctAnswer = card.dataset.correct;
   const options = card.querySelectorAll('.option');
   const feedbackEl = card.querySelector('.feedback');
-
   options.forEach(btn => {
     btn.addEventListener('click', () => {
-      const selectedAns = btn.dataset.ans;
-      const isCorrect = selectedAns === correctAnswer;
-
-      userAnswers[qId] = { selected: selectedAns, isCorrect };
-
-      options.forEach(o => {
-        o.disabled = true;
-        o.classList.remove('ok', 'bad');
-      });
-
-      btn.classList.add(isCorrect ? 'ok' : 'bad');
-
-      if (!isCorrect) {
-        const correctBtn = card.querySelector(`.option[data-ans="${correctAnswer}"]`);
-        if (correctBtn) correctBtn.classList.add('ok');
+      const selected = btn.dataset.ans;
+      const isCorrect = selected === correctAnswer;
+      userAnswers[qId] = { selected, isCorrect };
+      const explEl = card.querySelector('.quiz-expl');
+      if (explEl) {
+        const expl = btn.dataset.expl || card.dataset.expl || '';
+        if (expl) {
+          explEl.textContent = expl;
+          explEl.classList.remove('hidden');
+        } else {
+          explEl.classList.add('hidden');
+        }
       }
-
+      options.forEach(o => { o.disabled = true; o.classList.remove('ok', 'bad'); });
+      btn.classList.add(isCorrect ? 'ok' : 'bad');
+      if (!isCorrect) {
+        const right = card.querySelector('.option[data-ans="' + correctAnswer + '"]');
+        if (right) right.classList.add('ok');
+      }
       if (feedbackEl) {
         feedbackEl.className = 'feedback ' + (isCorrect ? 'ok' : 'bad');
         feedbackEl.textContent = isCorrect
-          ? '✓ ¡Excelente! Respuesta correcta.'
-          : '✗ Incorrecto. Revisa la teoría y vuelve a intentarlo.';
+          ? '\u2713 \u00a1Excelente! Respuesta correcta.'
+          : '\u2717 Incorrecto. Revisa la teor\u00eda y vuelve a intentarlo.';
       }
-
       actualizarCalculoScore();
     });
   });
@@ -982,113 +981,4 @@ window.addEventListener('message', (ev) => {
     actualizarCalculoScore();
   }
 });
-
-// ---------- carga de Pyodide (Python en el navegador) ----------
-let _pyodide = null;
-
-async function cargarPython() {
-  if (_pyodide) return _pyodide;
-  const bar = document.getElementById('cargando-bar');
-  if (bar) {
-    bar.style.display = 'block';
-    bar.textContent = 'Cargando entorno Python (primera vez tarda unos segundos)…';
-  }
-  _pyodide = await loadPyodide();
-  await _pyodide.loadPackage(['numpy', 'pandas', 'matplotlib', 'seaborn']);
-  await _pyodide.runPythonAsync(PRELUDE);
-  if (bar) {
-    bar.textContent = 'Entorno Python listo. Las celdas ▶ ejecutan de verdad.';
-    setTimeout(() => { bar.style.display = 'none'; }, 2500);
-  }
-  return _pyodide;
-}
-
-const PRELUDE = `
-import numpy as np
-import pandas as pd
-import matplotlib
-matplotlib.use('module://matplotlib_pyodide.html5_canvas_backend')
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-def load_iris():
-    try:
-        from sklearn.datasets import load_iris as _li
-        return _li()
-    except Exception:
-        rng = np.random.default_rng(42)
-        data = np.round(np.column_stack([
-            rng.normal(5.01, 0.35, 150), rng.normal(3.43, 0.38, 150),
-            rng.normal(3.76, 1.77, 150), rng.normal(1.20, 0.76, 150)]), 1)
-        iris = type('Iris', (), {})()
-        iris.data = data
-        iris.target = np.repeat([0, 1, 2], 50)
-        iris.target_names = np.array(['setosa', 'versicolor', 'virginica'])
-        return iris
-`;
-
-async function ejecutar(n, codigo) {
-  const cell = document.getElementById('cell-' + n);
-  if (!cell) return;
-  const outPre = cell.querySelector('.out-pre');
-  const btn = cell.querySelector('.btn-run');
-  btn.disabled = true;
-  btn.textContent = '⏳ …';
-  outPre.textContent = 'ejecutando…';
-  const canvasAntes = new Set([...document.querySelectorAll('canvas')]);
-  try {
-    const p = await cargarPython();
-    let prints = '';
-    p.setStdout({ batched: (s) => { prints += s + '\n'; } });
-    const val = await p.runPythonAsync(codigo);
-    p.globals.set('_last', val);
-    const reprTxt = await p.runPythonAsync('repr(_last)');
-    let texto = prints;
-    if (reprTxt && String(reprTxt) !== 'None' && String(reprTxt) !== '') {
-      texto += String(reprTxt);
-    }
-    outPre.textContent = texto || '(sin salida de texto — ver figura abajo)';
-    const nuevos = [...document.querySelectorAll('canvas')].filter(c => !canvasAntes.has(c));
-    for (const c of nuevos) {
-      c.classList.add('plot-canvas');
-      cell.querySelector('.cell-out').appendChild(c);
-    }
-  } catch (e) {
-    outPre.textContent = String(e.message || e);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '▶ ejecutar';
-  }
-}
-
-document.addEventListener('click', (ev) => {
-  const b = ev.target.closest('.btn-copy');
-  if (b) {
-    navigator.clipboard.writeText(b.dataset.codigo)
-      .then(() => { b.textContent = '✓ copiado'; setTimeout(() => { b.textContent = '⧉ copiar'; }, 1500); });
-  }
-});
-
-document.addEventListener('click', (ev) => {
-  const b = ev.target.closest('.btn-run');
-  if (b) ejecutar(Number(b.dataset.n), b.dataset.codigo);
-});
-
-// ---------- diagramas mermaid ----------
-if (window.mermaid) {
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'loose',
-    theme: 'base',
-    themeVariables: {
-      primaryColor: '#eeecff',
-      primaryBorderColor: '#5145cd',
-      primaryTextColor: '#172033',
-      lineColor: '#5145cd',
-      fontFamily: 'Segoe UI, sans-serif'
-    },
-    flowchart: { curve: 'basis', padding: 10, nodeSpacing: 32, rankSpacing: 40 }
-  });
-  mermaid.run({ nodes: document.querySelectorAll('.mermaid') });
-}
 </script><div id="titi-nota-overlay"><div class="nota-box" id="titi-nota-box"><div class="nota-spinner"></div><p class="nota-title" id="nota-title">Subiendo nota a Titi…</p><p class="nota-text" id="nota-text">Guardando tu resultado, espera un momento.</p><div class="nota-score hidden" id="nota-score"></div><button class="nota-btn hidden" id="nota-btn" type="button">Continuar</button></div></div></body></html>
