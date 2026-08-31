@@ -187,22 +187,13 @@ def render_bloques(bloques, interactivo=False):
                 f'<p>{esc(b["texto"])}</p></div>'
             )
         elif tipo == "diagrama":
-            if interactivo:
-                out.append(
-                    '<figure class="diagrama">'
-                    f'<figcaption>{esc(b.get("titulo", ""))}</figcaption>'
-                    f'<pre class="mermaid">{esc(b["code"])}</pre>'
-                    '</figure>'
-                )
-            else:
-                # Documento puro (Titi): sin librería mermaid -> mostrar el
-                # código del diagrama como bloque de texto plano.
-                out.append(
-                    '<figure class="diagrama">'
-                    f'<figcaption>{esc(b.get("titulo", ""))}</figcaption>'
-                    f'<pre class="mermaid-code">{esc(b["code"])}</pre>'
-                    '</figure>'
-                )
+            # Titi interpreta estos bloques con su runtime Mermaid interno.
+            out.append(
+                '<figure class="diagrama">'
+                f'<figcaption>{esc(b.get("titulo", ""))}</figcaption>'
+                f'<pre class="mermaid">{esc(b["code"])}</pre>'
+                '</figure>'
+            )
         elif tipo == "quiz":
             _quiz_n += 1
             qn = _quiz_n
@@ -737,6 +728,7 @@ h1 {
   display: flex;
   justify-content: center;
   overflow: auto;
+  padding: 6px;
 }
 
 .diagrama .mermaid svg {
@@ -1033,8 +1025,223 @@ footer {
 """
 
 # ---------------------------------------------------------------------------
-# Plantilla JS UX
+# Renderizador flowchart propio (autocontenido, sin CDN). Dibuja los
+# diagramas de flujo (graph TD) como SVG inline. Funciona en Titi y standalone.
 # ---------------------------------------------------------------------------
+FLOW_RENDERER_JS = r"""
+// ---------- Renderizador de diagramas de flujo (SVG, sin librerías) ----------
+(function () {
+  function parseFlow(code) {
+    const lines = code.split('\n').map(l => l.trim()).filter(l => l && !/^(graph|flowchart)\s/i.test(l));
+    const nodes = {};
+    const edges = [];
+    function cleanText(text) {
+      text = text.trim();
+      if ((text.startsWith('"') && text.endsWith('"')) ||
+          (text.startsWith("'") && text.endsWith("'"))) {
+        return text.slice(1, -1);
+      }
+      return text;
+    }
+    function parseNodeSegment(segment) {
+      const idMatch = segment.match(/^\s*([A-Za-z0-9_]+)/);
+      if (!idMatch) return null;
+      const id = idMatch[1], rest = segment.slice(idMatch[0].length).trim();
+      let m;
+      m = rest.match(/^\(\s*\[([^]*?)\]\s*\)/);
+      if (m) return { id, text: cleanText(m[1]), shape: 'terminal' };
+      m = rest.match(/^\[\/\s*([^]*?)\s*\/\]/);
+      if (m) return { id, text: cleanText(m[1]), shape: 'parallelogram' };
+      m = rest.match(/^\{\s*([^]*?)\s*\}/);
+      if (m) return { id, text: cleanText(m[1]), shape: 'diamond' };
+      m = rest.match(/^\[\s*([^]*?)\s*\]/);
+      if (m) return { id, text: cleanText(m[1]), shape: 'process' };
+      m = rest.match(/^\(\s*([^]*?)\s*\)/);
+      if (m) return { id, text: cleanText(m[1]), shape: 'process' };
+      return { id, text: id, shape: 'rect' };
+    }
+    function setNode(node) {
+      if (!nodes[node.id] || nodes[node.id].text === node.id) nodes[node.id] = node;
+    }
+    for (const line of lines) {
+      const arrowAt = line.indexOf('-->');
+      if (arrowAt !== -1) {
+        const left = line.slice(0, arrowAt).trim();
+        const right = line.slice(arrowAt + 3).trim();
+        const labelMatch = left.match(/^([^]*?)\s*--\s*([^]*)$/);
+        const fromNode = parseNodeSegment(labelMatch ? labelMatch[1].trim() : left);
+        const toNode = parseNodeSegment(right);
+        if (fromNode && toNode) {
+          edges.push({ from: fromNode.id, to: toNode.id,
+            label: labelMatch ? cleanText(labelMatch[2]) : '' });
+          setNode(fromNode);
+          setNode(toNode);
+        }
+      } else {
+        const node = parseNodeSegment(line);
+        if (node) setNode(node);
+      }
+    }
+    return { nodes, edges };
+  }
+
+  function layout(g) {
+    const ids = Object.keys(g.nodes);
+    // Asignar capas siguiendo flujo, sin recursión: los ciclos vuelven a una
+    // capa ya visitada y conservan dirección visual de arriba hacia abajo.
+    const layer = {};
+    const outgoing = {};
+    const incoming = {};
+    ids.forEach(id => { outgoing[id] = []; incoming[id] = 0; });
+    g.edges.forEach(e => {
+      outgoing[e.from].push(e.to);
+      incoming[e.to]++;
+    });
+    const queue = ids.filter(id => incoming[id] === 0);
+    if (!queue.length && ids.length) queue.push(ids[0]);
+    queue.forEach(id => { layer[id] = 0; });
+    for (let i = 0; i < queue.length; i++) {
+      const from = queue[i];
+      outgoing[from].forEach(to => {
+        if (layer[to] === undefined) {
+          layer[to] = layer[from] + 1;
+          queue.push(to);
+        }
+      });
+    }
+    ids.forEach(id => { if (layer[id] === undefined) layer[id] = 0; });
+    const maxLayer = Math.max(0, ...ids.map(id => layer[id]));
+    // orden dentro de capa (orden de aparición)
+    const byLayer = {};
+    ids.forEach(id => { (byLayer[layer[id]] = byLayer[layer[id]] || []).push(id); });
+    Object.keys(byLayer).forEach(k => byLayer[k].sort());
+    return { layer, byLayer, maxLayer };
+  }
+
+  function measure(text, fontSize) {
+    return Math.max(40, text.length * fontSize * 0.62 + 22);
+  }
+
+  function renderFlow(container) {
+    const code = container.getAttribute('data-flow');
+    if (!code) return;
+    const g = parseFlow(code);
+    const { layer, byLayer, maxLayer } = layout(g);
+    const fontSize = 13, nodeH = 44, vGap = 46, hGap = 24;
+    const pad = 20;
+    const nw = {};
+    Object.keys(g.nodes).forEach(id => nw[id] = measure(g.nodes[id].text, fontSize));
+    const pos = {};
+    const layerWidths = {};
+    Object.keys(byLayer).forEach(k => {
+      let x = 0;
+      byLayer[k].forEach(id => {
+        pos[id] = { x: x + nw[id] / 2, y: pad + Number(k) * (nodeH + vGap) + nodeH / 2 };
+        x += nw[id] + hGap;
+      });
+      layerWidths[k] = Math.max(0, x - hGap);
+    });
+    // ancho/alto total
+    const maxLayerWidth = Math.max(0, ...Object.values(layerWidths));
+    let W = maxLayerWidth + pad * 2, H = pad * 2 + maxLayer * (nodeH + vGap) + nodeH;
+    Object.keys(pos).forEach(id => { pos[id].x += pad; });
+    H = Math.max(H, ...Object.keys(pos).map(id => pos[id].y + nodeH / 2 + pad));
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('width', String(W));
+    svg.setAttribute('role', 'img');
+    svg.style.width = 'min(100%, ' + W + 'px)';
+    svg.style.maxWidth = '100%';
+    svg.style.height = 'auto';
+    // edges
+    for (const e of g.edges) {
+      const a = pos[e.from], b = pos[e.to];
+      const x1 = a.x, y1 = a.y + nodeH / 2;
+      const x2 = b.x, y2 = b.y - nodeH / 2;
+      const path = document.createElementNS(svgNS, 'path');
+      const mx = (x1 + x2) / 2;
+      const backward = b.y <= a.y;
+      const routeX = Math.max(8, Math.min(x1, x2) - 28);
+      const pathData = backward
+        ? 'M ' + x1 + ' ' + y1 + ' C ' + routeX + ' ' + y1 + ', ' + routeX + ' ' + y2 + ', ' + x2 + ' ' + y2
+        : 'M ' + x1 + ' ' + y1 + ' C ' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2;
+      path.setAttribute('d', pathData);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#5145cd');
+      path.setAttribute('stroke-width', '1.6');
+      svg.appendChild(path);
+      // flecha
+      const ang = Math.atan2(y2 - y1, x2 - x1);
+      const aSize = 8;
+      const ax = x2, ay = y2;
+      const arrow = document.createElementNS(svgNS, 'path');
+      arrow.setAttribute('d', 'M ' + ax + ' ' + ay + ' L ' + (ax - aSize * Math.cos(ang - 0.4)) + ' ' + (ay - aSize * Math.sin(ang - 0.4)) + ' M ' + ax + ' ' + ay + ' L ' + (ax - aSize * Math.cos(ang + 0.4)) + ' ' + (ay - aSize * Math.sin(ang + 0.4)));
+      arrow.setAttribute('stroke', '#5145cd');
+      arrow.setAttribute('stroke-width', '1.6');
+      arrow.setAttribute('fill', 'none');
+      svg.appendChild(arrow);
+      // label
+      if (e.label) {
+        const txt = document.createElementNS(svgNS, 'text');
+        txt.setAttribute('x', backward ? routeX : mx);
+        txt.setAttribute('y', (y1 + y2) / 2 - 4);
+        txt.setAttribute('text-anchor', 'middle');
+        txt.setAttribute('font-size', '12');
+        txt.setAttribute('fill', '#172033');
+        txt.setAttribute('font-weight', '600');
+        txt.textContent = e.label;
+        svg.appendChild(txt);
+      }
+    }
+    // nodos
+    for (const id of Object.keys(g.nodes)) {
+      const n = g.nodes[id], p = pos[id];
+      const w = nw[id], h = nodeH, cx = p.x, cy = p.y;
+      let shape;
+      if (n.shape === 'terminal') {
+        shape = '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + (w / 2 + 10) + '" ry="' + (h / 2 + 6) + '" fill="#eeecff" stroke="#5145cd" stroke-width="1.8"/>';
+      } else if (n.shape === 'diamond') {
+        shape = '<polygon points="' + (cx - w / 2) + ',' + cy + ' ' + cx + ',' + (cy - h / 2 - 6) + ' ' + (cx + w / 2) + ',' + cy + ' ' + cx + ',' + (cy + h / 2 + 6) + '" fill="#eeecff" stroke="#5145cd" stroke-width="1.8"/>';
+      } else if (n.shape === 'parallelogram') {
+        const skew = 14;
+        shape = '<polygon points="' + (cx - w / 2 + skew) + ',' + (cy - h / 2) + ' ' + (cx + w / 2) + ',' + (cy - h / 2) + ' ' + (cx + w / 2 - skew) + ',' + (cy + h / 2) + ' ' + (cx - w / 2) + ',' + (cy + h / 2) + '" fill="#fff" stroke="#5145cd" stroke-width="1.8"/>';
+      } else {
+        shape = '<rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h + '" rx="6" fill="#fff" stroke="#5145cd" stroke-width="1.8"/>';
+      }
+      const gEl = document.createElementNS(svgNS, 'g');
+      gEl.innerHTML = shape;
+      const text = document.createElementNS(svgNS, 'text');
+      text.setAttribute('x', cx);
+      text.setAttribute('y', cy + fontSize * 0.35);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-size', fontSize);
+      text.setAttribute('fill', '#172033');
+      text.setAttribute('font-family', 'Segoe UI, sans-serif');
+      const words = n.text.split(/\s+/);
+      const lines = [];
+      let cur = '';
+      for (const wd of words) { const t = cur ? cur + ' ' + wd : wd; if (t.length * fontSize * 0.62 > w - 12 && cur) { lines.push(cur); cur = wd; } else { cur = t; } }
+      lines.push(cur);
+      const lineH = fontSize + 3;
+      const startY = cy - (lines.length - 1) * lineH / 2 + fontSize * 0.35;
+      lines.forEach((ln, i) => {
+        const ts = document.createElementNS(svgNS, 'tspan');
+        ts.setAttribute('x', cx);
+        ts.setAttribute('y', startY + i * lineH);
+        ts.textContent = ln;
+        text.appendChild(ts);
+      });
+      gEl.appendChild(text);
+      svg.appendChild(gEl);
+    }
+    container.innerHTML = '';
+    container.appendChild(svg);
+  }
+
+  document.querySelectorAll('.flowchart').forEach(renderFlow);
+})();
+"""
 
 JS = """
 // ---------- Barra de progreso de lectura ----------
@@ -1281,29 +1488,12 @@ document.addEventListener('click', (ev) => {
   if (b) ejecutar(Number(b.dataset.n), b.dataset.codigo);
 });
 
-// ---------- diagramas mermaid ----------
-if (window.mermaid) {
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'loose',
-    theme: 'base',
-    themeVariables: {
-      primaryColor: '#eeecff',
-      primaryBorderColor: '#5145cd',
-      primaryTextColor: '#172033',
-      lineColor: '#5145cd',
-      fontFamily: 'Segoe UI, sans-serif'
-    },
-    flowchart: { curve: 'basis', padding: 10, nodeSpacing: 32, rankSpacing: 40 }
-  });
-  mermaid.run({ nodes: document.querySelectorAll('.mermaid') });
-}
 """
 
 # ---------------------------------------------------------------------------
 # Plantilla JS para documento puro (modo no interactivo / Titi).
-# Sin Pyodide ni Mermaid: solo menú, modo clase, scrollspy, quiz + score Titi
-# y botón de imprimir. Celdas y diagramas se muestran como texto estático.
+# Sin Pyodide ni CDN: solo menú, modo clase, scrollspy, quiz + score Titi.
+# Titi renderiza Mermaid antes de cargar el documento en su iframe.
 # ---------------------------------------------------------------------------
 
 JS_STATIC = """
@@ -1434,14 +1624,32 @@ window.addEventListener('message', (ev) => {
 });
 """
 
+MERMAID_STANDALONE_JS = """
+if (window.mermaid) {
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'strict',
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#eeecff',
+      primaryBorderColor: '#5145cd',
+      primaryTextColor: '#172033',
+      lineColor: '#5145cd',
+      fontFamily: 'Segoe UI, sans-serif'
+    },
+    flowchart: { curve: 'basis', padding: 10, nodeSpacing: 32, rankSpacing: 40, htmlLabels: false }
+  });
+  mermaid.run({ nodes: document.querySelectorAll('.mermaid') });
+}
+"""
 
 def main():
     args = sys.argv[1:]
     salida = None
     fuente = DEFAULT_JSON
-    # Modo interactivo (celdas Pyodide + Mermaid con CDN). NO compatible con el
-    # sandbox de Titi; úsalo solo para abrir el HTML standalone fuera de Titi.
-    interactivo = "--estatico" not in args
+    # Modo Titi por defecto: sin CDN, con renderer SVG inline. El modo
+    # interactivo se solicita explícitamente para abrir el HTML standalone.
+    interactivo = "--interactivo" in args
     if "--interactivo" in args:
         args.remove("--interactivo")
     if "--estatico" in args:
@@ -1542,10 +1750,10 @@ def main():
 
     scripts = ""
     if interactivo:
-        if usa_diagramas:
-            scripts += "<script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script>"
         if usa_celdas:
             scripts += "<script src='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js'></script>"
+        if usa_diagramas:
+            scripts += "<script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script>"
 
     codigo_mark = esc(meta.get("codigo", "GL"))
 
@@ -1586,7 +1794,7 @@ def main():
         f'<main>{hero}{conv}{secciones_html}</main></div>'
         f'<footer>Generado con gl_generator.py · formato UX · {esc(meta.get("facultad", ""))}</footer>'
         f'<div id="cargando-bar"></div>{scripts}'
-        f'<script>{JS if interactivo else JS_STATIC}</script>'
+        f'<script>{(JS if interactivo else JS_STATIC) + (MERMAID_STANDALONE_JS if interactivo and usa_diagramas else "")}</script>'
         f'{nota_overlay}'
         "</body></html>"
     )
