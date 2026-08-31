@@ -70,6 +70,22 @@ def js_dict(d):
     return "{ " + ", ".join(parts) + " }"
 
 
+def py_repr(x):
+    """Repr estilo Python para mostrar valores en ejemplos generados:
+    str con comillas dobles, listas con corchetes, True/False/None, números."""
+    if isinstance(x, bool):
+        return "True" if x else "False"
+    if x is None:
+        return "None"
+    if isinstance(x, str):
+        return '"' + x.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    if isinstance(x, list):
+        return "[" + ", ".join(py_repr(v) for v in x) + "]"
+    if isinstance(x, dict):
+        return "{ " + ", ".join(f'"{k}": {py_repr(v)}' for k, v in x.items()) + " }"
+    return repr(x)
+
+
 def build_lessons_js(lesson):
     """Convierte la misión del JSON a la const LESSONS de JS, generando
     validate()/onSuccess() desde los registros VALIDATORS/ACTIONS."""
@@ -294,6 +310,10 @@ def validar_esquema(data, fuente, manifest=None):
     npc_ids = {n["id"] for n in zone["npcs"]}
     for ch in challenges:
         cid = ch["id"]
+        obj = (ch.get("objective") or "").strip()
+        if len(obj) < 25:
+            _err(f"lesson.challenges[{cid}].objective",
+                 f"objetivo muy corto ({len(obj)} chars). Explica qué funciones definir y qué debe retornar cada una (mín. 25 chars).")
         target = ch.get("target")
         if not target:
             _err(f"lesson.challenges[{cid}].target", "campo requerido vacío.")
@@ -384,6 +404,157 @@ def validar_esquema(data, fuente, manifest=None):
 
 
 # ---------------------------------------------------------------------------
+# Autocompletado pedagógico: example/starterCode/hints derivados del validador.
+# Hace que un desafío quede bien explicado aunque el autor omita esos campos:
+# los casos de prueba definen qué mostrar como ejemplo y qué firmas pedir.
+# ---------------------------------------------------------------------------
+def _firmas_validator(v):
+    """Devuelve [(defName, params)] pedidas por el validador del desafío."""
+    if v.get("kind") == "function_cases":
+        return [(f["defName"], list(f.get("params", []))) for f in (v.get("functions") or [])]
+    if v.get("kind") in ("def_return", "def_exists"):
+        return [(v["defName"], list(v.get("params", [])))]
+    return []
+
+
+def _casos_validator(v):
+    """Devuelve [(defName, params, caso)] con args/expected para derivar ejemplos."""
+    casos = []
+    if v.get("kind") == "function_cases":
+        for f in (v.get("functions") or []):
+            for c in f.get("cases", []):
+                casos.append((f["defName"], f.get("params", []), c))
+    elif v.get("kind") == "def_return":
+        casos.append((v["defName"], v.get("params", []),
+                      {"args": v.get("sampleArgs", []), "expected": v.get("expected")}))
+    return casos
+
+
+def _caso_borde(caso):
+    """True si el caso toca límites (cero, negativos, vacíos, None, False)."""
+    exp = caso.get("expected")
+    if exp is None or exp == [] or exp == 0 or exp is False or exp == "":
+        return True
+    args = caso.get("args", [])
+    return (any(isinstance(a, (int, float)) and a < 0 for a in args)
+            or any(a == [] for a in args))
+
+
+def _autoejemplo(v):
+    """Deriva un ejemplo 'fn(args) -> resultado' de los casos de prueba:
+    un caso normal y un caso límite, para que el alumno vea el contrato."""
+    casos = _casos_validator(v)
+    if not casos:
+        return ""
+    normales = [c for c in casos if not _caso_borde(c[2])]
+    elegidos = []
+    if normales:
+        elegidos.append(normales[0])
+    bordes = [c for c in casos if _caso_borde(c[2])]
+    if bordes:
+        elegidos.append(bordes[0])
+    lineas = []
+    for n, (fn, _params, caso) in enumerate(elegidos[:2], 1):
+        args = ", ".join(py_repr(a) for a in caso.get("args", []))
+        lineas.append(f"Ejemplo {n}\n{fn}({args}) -> {py_repr(caso.get('expected'))}")
+    return "\n\n".join(lineas)
+
+
+def _autostarter(v):
+    """Deriva el esqueleto 'def fn(...): return None' de cada función pedida."""
+    firmas = _firmas_validator(v)
+    if not firmas:
+        return ""
+    bloques = []
+    for nombre, params in firmas:
+        bloques.append(f"def {nombre}({', '.join(params)}):\n    return None")
+    return "\n\n".join(bloques)
+
+
+def _autohints(v, hints):
+    """Garantiza al menos 3 pistas. Respeta las del autor y completa con
+    pistas genéricas útiles (firma, casos límite, return) cuando faltan."""
+    auto = []
+    firmas = _firmas_validator(v)
+    if firmas:
+        nombres = ", ".join(n for n, _ in firmas)
+        auto.append(f"Definí las funciones pedidas con la firma exacta: {nombres}.")
+    if any(p for _n, p in firmas):
+        auto.append("Validá los casos límite (cero, negativos, listas vacías) antes de calcular.")
+    auto.append("Cada función debe devolver su resultado con return, sin usar print.")
+    resultado = list(hints)
+    for h in auto:
+        if len(resultado) >= 3:
+            break
+        if h not in resultado:
+            resultado.append(h)
+    return resultado
+
+
+def autocompletar_leccion(lesson):
+    """Completa example/starterCode/hints de cada desafío desde su validador
+    cuando el autor los dejó vacíos. No toca valores explícitos.
+    Devuelve [(challenge_id, [campos_autocompletados])]."""
+    autollenos = []
+    for ch in lesson["challenges"]:
+        v = ch.get("validator", {})
+        relleno = set()
+        if not ch.get("example"):
+            ej = _autoejemplo(v)
+            if ej:
+                ch["example"] = ej
+                relleno.add("example")
+        if not ch.get("starterCode"):
+            st = _autostarter(v)
+            if st:
+                ch["starterCode"] = st
+                relleno.add("starterCode")
+        antes = len(ch.get("hints", []))
+        ch["hints"] = _autohints(v, ch.get("hints", []))
+        if len(ch["hints"]) > antes:
+            relleno.add("hints")
+        if relleno:
+            autollenos.append((ch["id"], sorted(relleno)))
+    return autollenos
+
+
+def auditar_calidad(lesson):
+    """Reporte de calidad pedagógica por desafío (objetivo claro, casos
+    suficientes, ejemplo y esqueleto presentes). Devuelve cantidad de problemas."""
+    problemas = 0
+    for ch in lesson["challenges"]:
+        cid = ch["id"]
+        v = ch.get("validator", {})
+        flags = []
+        if len((ch.get("objective") or "").strip()) < 25:
+            flags.append("objetivo corto (<25 chars)")
+            problemas += 1
+        if not ch.get("example") and v.get("kind") in ("function_cases", "def_return"):
+            flags.append("sin ejemplo")
+            problemas += 1
+        if not ch.get("starterCode"):
+            flags.append("sin starterCode")
+            problemas += 1
+        if len(ch.get("hints", [])) < 2:
+            flags.append("pocas pistas (<2)")
+            problemas += 1
+        if v.get("kind") == "function_cases":
+            for f in (v.get("functions") or []):
+                if len(f.get("cases", [])) < 2:
+                    flags.append(f"{f['defName']}: <2 casos de prueba")
+                    problemas += 1
+        estado = (f"objective={len((ch.get('objective') or '').strip())}c "
+                  f"example={'sí' if ch.get('example') else 'no'} "
+                  f"starterCode={'sí' if ch.get('starterCode') else 'no'} "
+                  f"hints={len(ch.get('hints', []))}")
+        print(f"  [{cid}] {ch['title']}")
+        print(f"      {estado}")
+        for flag in flags:
+            print(f"      ! {flag}")
+    return problemas
+
+
+# ---------------------------------------------------------------------------
 # Esqueleto de lección nueva (--nuevo)
 # ---------------------------------------------------------------------------
 SKELETON = {
@@ -459,10 +630,14 @@ SKELETON = {
                 "id": "challenge1",
                 "title": "Título del Desafío",
                 "target": "fogata01",
-                "objective": "Objetivo del desafío.",
+                "objective": "Define la función mi_funcion(x) que retorna <resultado>. Explica el contrato: qué recibe, qué calcula y qué devuelve en los casos límite (cero, negativos, vacíos).",
                 "example": "",
                 "starterCode": "",
-                "hints": ["Pista 1.", "Pista 2."],
+                "hints": [
+                    "Usa return para devolver el resultado, no print.",
+                    "Validá primero los casos límite (cero, negativos, vacíos).",
+                    "Probá tu función con los valores del ejemplo antes de ejecutar."
+                ],
                 "validator": {
                     "kind": "def_return",
                     "defName": "mi_funcion",
@@ -504,6 +679,9 @@ def main():
     salida = None
     fuente = None
     nuevo = False
+    audit = "--audit" in args
+    if audit:
+        args.remove("--audit")
     i = 0
     while i < len(args):
         a = args[i]
@@ -537,6 +715,20 @@ def main():
     meta = data["meta"]
     zone = data["zone"]
     lesson = data["lesson"]
+
+    # Modo auditoría: reporta la calidad pedagógica de cada desafío y sale
+    # con código distinto de cero si alguno no cumple los estándares mínimos.
+    if audit:
+        print("AUDITORÍA de calidad de desafíos:", fuente.name)
+        problemas = auditar_calidad(lesson)
+        print(f"Problemas detectados: {problemas}")
+        sys.exit(1 if problemas else 0)
+
+    autollenos = autocompletar_leccion(lesson)
+    if autollenos:
+        resumen = ", ".join(f"{cid}({','.join(campos)})" for cid, campos in autollenos)
+        print(f"Auto-completado (autor omitió estos campos): {resumen}", file=sys.stderr)
+
     book_pages = data.get("book_pages", [])
     chapter = data.get("chapter", "")
 
