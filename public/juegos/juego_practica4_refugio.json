@@ -11,6 +11,18 @@
   },
   "chapter": "practica_4_estaciones",
   "zone": {
+    "weather": {
+      "mode": "rain",
+      "density": 1.0,
+      "dropCount": 260,
+      "dropLength": 17,
+      "dropSpeed": 560,
+      "wind": 0.28,
+      "gust": 0.08,
+      "gustPeriod": 4.5,
+      "alpha": 0.58,
+      "color": "#b9dbe9"
+    },
     "rows": 18,
     "cols": 24,
     "map": [
@@ -48,35 +60,30 @@
         "y": 256,
         "w": 26,
         "h": 28,
-        "asset": "npc_alizon",
+        "asset": "npc_alizon_storm",
         "name": "Alizon",
         "dialogue": [
           "La tormenta no avanza por el reloj, sino por lo que todavía no entendemos.",
-          "Las diez estaciones están disponibles desde este hub. Elegí cualquier ruta y dejá que cada función pruebe sus propios límites.",
+          "Las diez estaciones permanecen visibles, pero el protocolo exige seguir el orden indicado.",
           "Yo vigilaré los instrumentos mientras vos escribís la lógica. Cuando una estación responda, su señal quedará conectada."
         ]
       }
     ],
     "interactables": [
-      {"id":"station_signal_tower","type":"station","asset":"station_signal_tower","markerAsset":"marker_station_signal","x":64,"y":58,"w":64,"h":96,"missionNode":"signal","stateMap":{"pending":"apagada","active":"transmitting","completed":"connected"},"solid":{"x":18,"y":74,"w":28,"h":14},"sortOffset":88},
-      {"id":"station_sensor_pillar","type":"station","asset":"station_sensor_pillar","markerAsset":"marker_station_sensor","x":272,"y":58,"w":48,"h":80,"missionNode":"sensor","stateMap":{"pending":"inactive","active":"scanning","completed":"diagnosed"},"solid":{"x":13,"y":59,"w":22,"h":13},"sortOffset":72},
-      {"id":"station_supply_sorter","type":"station","asset":"station_supply_sorter","markerAsset":"marker_station_supply","x":480,"y":58,"w":80,"h":64,"missionNode":"supply","stateMap":{"pending":"messy","active":"sorting","completed":"organized"},"solid":{"x":8,"y":43,"w":64,"h":13},"sortOffset":56},
-      {"id":"station_ration_board","type":"station","asset":"station_ration_board","markerAsset":"marker_station_ration","x":656,"y":58,"w":80,"h":72,"missionNode":"ration","stateMap":{"pending":"empty","active":"calculating","completed":"stocked"},"solid":{"x":8,"y":49,"w":64,"h":15},"sortOffset":64},
-      {"id":"station_frequency_beacon","type":"station","asset":"station_frequency_beacon","markerAsset":"marker_station_frequency","x":64,"y":218,"w":56,"h":88,"missionNode":"frequency","stateMap":{"pending":"off","active":"searching","completed":"active"},"solid":{"x":13,"y":68,"w":30,"h":12},"sortOffset":80},
-      {"id":"station_resource_depot","type":"station","asset":"station_resource_depot","markerAsset":"marker_station_resource","x":240,"y":218,"w":96,"h":72,"missionNode":"resource","stateMap":{"pending":"mixed","active":"separating","completed":"classified"},"solid":{"x":8,"y":48,"w":80,"h":16},"sortOffset":64},
-      {"id":"station_reverse_beacon","type":"station","asset":"station_reverse_beacon","markerAsset":"marker_station_reverse","x":480,"y":218,"w":64,"h":88,"missionNode":"reverse","stateMap":{"pending":"locked","active":"decoding","completed":"decoded"},"solid":{"x":14,"y":67,"w":36,"h":13},"sortOffset":80},
-      {"id":"station_energy_console","type":"station","asset":"station_energy_console","markerAsset":"marker_station_energy","x":656,"y":218,"w":72,"h":64,"missionNode":"energy","stateMap":{"pending":"broken","active":"repairing","completed":"online"},"solid":{"x":9,"y":43,"w":54,"h":13},"sortOffset":56},
-      {"id":"station_stability_monitor","type":"station","asset":"station_stability_monitor","markerAsset":"marker_station_stability","x":240,"y":402,"w":80,"h":72,"missionNode":"stability","stateMap":{"pending":"alert","active":"analyzing","completed":"stable"},"solid":{"x":8,"y":49,"w":64,"h":15},"sortOffset":64},
-      {"id":"storm_core","type":"station","asset":"storm_core","markerAsset":"marker_storm_core","x":480,"y":402,"w":80,"h":80,"missionNode":"core","stateMap":{"pending":"sealed","active":"unstable","completed":"activated"},"solid":{"x":15,"y":58,"w":50,"h":14},"sortOffset":72}
+      {"id":"station_signal_tower","type":"station","asset":"station_signal_tower","markerAsset":"marker_station_signal","x":64,"y":58,"w":64,"h":96,"missionNode":"signal","stateMap":{"pending":"apagada","active":"apagada","completed":"transmitting"},"solid":{"x":18,"y":74,"w":28,"h":14},"sortOffset":88},
+      {"id":"station_sensor_pillar","type":"station","asset":"station_sensor_pillar","markerAsset":"marker_station_sensor","x":272,"y":58,"w":48,"h":80,"missionNode":"sensor","stateMap":{"pending":"inactive","active":"inactive","completed":"scanning"},"solid":{"x":13,"y":59,"w":22,"h":13},"sortOffset":72},
+      {"id":"station_supply_sorter","type":"station","asset":"station_supply_sorter","markerAsset":"marker_station_supply","x":480,"y":58,"w":80,"h":64,"missionNode":"supply","stateMap":{"pending":"messy","active":"messy","completed":"sorting"},"solid":{"x":8,"y":43,"w":64,"h":13},"sortOffset":56},
+      {"id":"station_ration_board","type":"station","asset":"station_ration_board","markerAsset":"marker_station_ration","x":656,"y":58,"w":80,"h":72,"missionNode":"ration","stateMap":{"pending":"empty","active":"empty","completed":"calculating"},"solid":{"x":8,"y":49,"w":64,"h":15},"sortOffset":64},
+      {"id":"station_frequency_beacon","type":"station","asset":"station_frequency_beacon","markerAsset":"marker_station_frequency","x":64,"y":218,"w":56,"h":88,"missionNode":"frequency","stateMap":{"pending":"off","active":"off","completed":"searching"},"solid":{"x":13,"y":68,"w":30,"h":12},"sortOffset":80},
+      {"id":"station_resource_depot","type":"station","asset":"station_resource_depot","markerAsset":"marker_station_resource","x":240,"y":218,"w":96,"h":72,"missionNode":"resource","stateMap":{"pending":"mixed","active":"mixed","completed":"separating"},"solid":{"x":8,"y":48,"w":80,"h":16},"sortOffset":64},
+      {"id":"station_reverse_beacon","type":"station","asset":"station_reverse_beacon","markerAsset":"marker_station_reverse","x":480,"y":218,"w":64,"h":88,"missionNode":"reverse","stateMap":{"pending":"locked","active":"locked","completed":"decoding"},"solid":{"x":14,"y":67,"w":36,"h":13},"sortOffset":80},
+      {"id":"station_energy_console","type":"station","asset":"station_energy_console","markerAsset":"marker_station_energy","x":656,"y":218,"w":72,"h":64,"missionNode":"energy","stateMap":{"pending":"broken","active":"broken","completed":"repairing"},"solid":{"x":9,"y":43,"w":54,"h":13},"sortOffset":56},
+      {"id":"station_stability_monitor","type":"station","asset":"station_stability_monitor","markerAsset":"marker_station_stability","x":240,"y":402,"w":80,"h":72,"missionNode":"stability","stateMap":{"pending":"alert","active":"alert","completed":"analyzing"},"solid":{"x":8,"y":49,"w":64,"h":15},"sortOffset":64},
+      {"id":"storm_core","type":"station","asset":"storm_core","markerAsset":"marker_storm_core","x":480,"y":402,"w":80,"h":80,"missionNode":"core","stateMap":{"pending":"sealed","active":"sealed","completed":"activated"},"solid":{"x":15,"y":58,"w":50,"h":14},"sortOffset":72}
     ],
     "decor": [
-      {"kind":"storm","asset":"storm_cloud","x":142,"y":12,"w":96,"h":48},
-      {"kind":"storm","asset":"storm_cloud","x":530,"y":10,"w":96,"h":48},
       {"kind":"storm","asset":"puddle","x":150,"y":174,"w":64,"h":24},
-      {"kind":"storm","asset":"puddle","x":540,"y":350,"w":64,"h":24},
-      {"kind":"storm","asset":"fallen_branch","x":360,"y":116,"w":64,"h":32},
-      {"kind":"storm","asset":"lightning_scorch","x":92,"y":356,"w":48,"h":32},
-      {"kind":"storm","asset":"wind_debris","x":352,"y":78,"w":64,"h":48}
+      {"kind":"storm","asset":"puddle","x":540,"y":350,"w":64,"h":24}
     ],
     "doors": []
   },
@@ -90,9 +97,9 @@
       "El Gran Backend entra en fase de tormenta. Diez estaciones antiguas sostienen el refugio y cada una espera una función que traduzca señales en decisiones.",
       "La tormenta solo cambia cuando una estación queda resuelta. No hay reloj ni castigo por explorar: el protocolo se completa al estabilizar las diez señales."
     ],
-    "introDialogue": {"speaker":"Alizon","lines":["El protocolo está abierto. Las diez estaciones esperan desde el inicio.","Elegí cualquier marcador del radar. Una respuesta correcta estabiliza esa estación; tus intentos y pistas no reducen la nota."]},
+    "introDialogue": {"speaker":"Alizon","lines":["El protocolo está abierto. Las diez estaciones permanecen visibles.","Comenzá por el primer marcador del radar y seguí el orden. Una respuesta correcta estabiliza esa estación; tus intentos y pistas no reducen la nota."]},
     "objectives": {
-      "intro": "Habla con Alizon y elegí cualquier estación del radar.",
+      "intro": "Habla con Alizon y seguí la estación indicada por el radar.",
       "signal": "Transmite saludo según franja horaria. Retorna: Buenos días (0–11), Buenas tardes (12–18) o Buenas noches (19–23), siempre con nombre.",
       "sensor": "Diagnostica signo y paridad. Retorna lista [signo, paridad], con cero clasificado como cero y par.",
       "supply": "Calcula factorial de cantidad_cajas mediante un bucle. Retorna 1 para cero y None para cantidades negativas.",
@@ -104,58 +111,58 @@
       "stability": "Calcula promedio con un bucle y clasifica estable si promedio >= 51. Sin lecturas retorna [0, sin lecturas].",
       "core": "Suma dígitos y reduce repetidamente hasta raíz digital. Retorna None para códigos negativos y 0 para cero."
     },
-    "progression": {"mode":"free"},
+    "progression": {"mode":"sequential","strict":true},
     "completion": {"score":100},
     "ui": {"bookTitle":"Bitácora de Emergencia","editorLabel":"PROTOCOLO · CONSOLA DE ESTACIÓN","showDuration":false},
     "storm": {"thresholds":[{"maxSolved":2,"phase":"solved_0_2"},{"maxSolved":5,"phase":"solved_3_5"},{"maxSolved":8,"phase":"solved_6_8"},{"maxSolved":9,"phase":"solved_9"},{"maxSolved":10,"phase":"solved_10"}]},
     "challenges": [
       {
-        "id":"signal","title":"Torre de señal · Saludo por franjas","target":"station_signal_tower","objective":"Define transmitir_saludo(nombre, hora). Debe incluir nombre y devolver exactamente Buenos días, Buenas tardes o Buenas noches según 0–11, 12–18 y 19–23.","starterCode":"","hints":["Separá tres franjas con comparaciones ordenadas.","Los límites 11, 12, 18 y 19 cambian de franja.","El resultado debe conservar nombre dentro del saludo, no imprimirlo."],
+        "id":"signal","title":"Torre de señal · Saludo por franjas","target":"station_signal_tower","objective":"Define transmitir_saludo(nombre, hora). Debe incluir nombre y devolver exactamente Buenos días, Buenas tardes o Buenas noches según 0–11, 12–18 y 19–23.","example":"Entrada\nnombre = \"Luz\"\nhora = 12\n\nSalida\nBuenas tardes, Luz","starterCode":"","hints":["Separá tres franjas con comparaciones ordenadas.","Los límites 11, 12, 18 y 19 cambian de franja.","El resultado debe conservar nombre dentro del saludo, no imprimirlo."],
         "validator":{"kind":"function_cases","functions":[{"defName":"transmitir_saludo","params":["nombre","hora"],"cases":[{"args":["Luz",0],"expected":"Buenos días, Luz"},{"args":["Luz",11],"expected":"Buenos días, Luz"},{"args":["Luz",12],"expected":"Buenas tardes, Luz"},{"args":["Luz",18],"expected":"Buenas tardes, Luz"},{"args":["Luz",19],"expected":"Buenas noches, Luz"},{"args":["Luz",23],"expected":"Buenas noches, Luz"}]}]},
         "successAction":{"kind":"station_transition","id":"station_signal_tower"},"successDialogue":["La torre transmite una secuencia limpia. La señal del refugio vuelve a tener voz."],"concepts":["funciones","if","elif","else"]
       },
       {
-        "id":"sensor","title":"Pilar sensor · Diagnóstico dual","target":"station_sensor_pillar","objective":"Define diagnosticar_senal(valor). Retorna [signo, paridad]: positivo/negativo/cero y par/impar.","starterCode":"","hints":["Primero resolvé signo con tres ramas.","Después usá módulo 2 para paridad; funciona también con negativos.","Empaquetá ambos textos en una lista en el return."],
+        "id":"sensor","title":"Pilar sensor · Diagnóstico dual","target":"station_sensor_pillar","objective":"Define diagnosticar_senal(valor). Retorna [signo, paridad]: positivo/negativo/cero y par/impar.","example":"Entrada\nvalor = -4\n\nSalida\n[negativo, par]","starterCode":"","hints":["Primero resolvé signo con tres ramas.","Después usá módulo 2 para paridad; funciona también con negativos.","Empaquetá ambos textos en una lista en el return."],
         "validator":{"kind":"function_cases","functions":[{"defName":"diagnosticar_senal","params":["valor"],"cases":[{"args":[0],"expected":["cero","par"]},{"args":[7],"expected":["positivo","impar"]},{"args":[-4],"expected":["negativo","par"]},{"args":[-3],"expected":["negativo","impar"]}]}]},
         "successAction":{"kind":"station_transition","id":"station_sensor_pillar"},"successDialogue":["El pilar separa signo y paridad sin perder el cero. Diagnóstico confirmado."],"concepts":["condiciones","módulo","listas"]
       },
       {
-        "id":"supply","title":"Clasificador · Factorial de cajas","target":"station_supply_sorter","objective":"Define ordenar_provisiones(cantidad_cajas). Para cantidades no negativas retorna factorial mediante un bucle; para negativas retorna None.","starterCode":"","hints":["Un acumulador factorial comienza en 1.","Iterá desde 1 hasta cantidad_cajas inclusive.","Validá negativo antes del bucle y conservá caso cero."],
+        "id":"supply","title":"Clasificador · Factorial de cajas","target":"station_supply_sorter","objective":"Define ordenar_provisiones(cantidad_cajas). Para cantidades no negativas retorna factorial mediante un bucle; para negativas retorna None.","example":"Entrada\ncantidad_cajas = 5\n\nSalida\n120","starterCode":"","hints":["Un acumulador factorial comienza en 1.","Iterá desde 1 hasta cantidad_cajas inclusive.","Validá negativo antes del bucle y conservá caso cero."],
         "validator":{"kind":"function_cases","functions":[{"defName":"ordenar_provisiones","params":["cantidad_cajas"],"cases":[{"args":[-1],"expected":null},{"args":[0],"expected":1},{"args":[1],"expected":1},{"args":[5],"expected":120},{"args":[7],"expected":5040}]}]},
         "successAction":{"kind":"station_transition","id":"station_supply_sorter"},"successDialogue":["Las cajas pasan por la tolva en orden. El acumulador resistió incluso el caso cero."],"concepts":["for","range","acumulador"]
       },
       {
-        "id":"ration","title":"Tablero de raciones · Diez días","target":"station_ration_board","objective":"Define planificar_raciones(racion_diaria). Retorna una lista con racion_diaria multiplicada por cada día del 1 al 10.","starterCode":"","hints":["Comenzá con una lista vacía.","El rango debe visitar diez posiciones y el producto usa el índice del día.","Agregá cada producto con append y devolvé la lista."],
+        "id":"ration","title":"Tablero de raciones · Diez días","target":"station_ration_board","objective":"Define planificar_raciones(racion_diaria). Retorna una lista con racion_diaria multiplicada por cada día del 1 al 10.","example":"Entrada\nracion_diaria = 2\n\nSalida\n[2, 4, 6, 8, 10, 12, 14, 16, 18, 20]","starterCode":"","hints":["Comenzá con una lista vacía.","El rango debe visitar diez posiciones y el producto usa el índice del día.","Agregá cada producto con append y devolvé la lista."],
         "validator":{"kind":"function_cases","functions":[{"defName":"planificar_raciones","params":["racion_diaria"],"cases":[{"args":[0],"expected":[0,0,0,0,0,0,0,0,0,0]},{"args":[2],"expected":[2,4,6,8,10,12,14,16,18,20]},{"args":[-1],"expected":[-1,-2,-3,-4,-5,-6,-7,-8,-9,-10]}]}]},
         "successAction":{"kind":"station_transition","id":"station_ration_board"},"successDialogue":["El tablero muestra diez raciones alineadas. Alizon guarda la lista para la expedición."],"concepts":["listas","for","append"]
       },
       {
-        "id":"frequency","title":"Baliza de frecuencia · Primos seguros","target":"station_frequency_beacon","objective":"Define es_frecuencia_segura(numero) y buscar_frecuencias_seguras(limite). Un primo es mayor que 1 y solo divisible por 1 y por sí mismo; la búsqueda incluye límite.","starterCode":"","hints":["Para probar divisores, recorré desde 2 hasta el número anterior.","Un número menor que 2 no es primo.","La búsqueda puede reutilizar tu función de prueba y agregar cada primo."],
+        "id":"frequency","title":"Baliza de frecuencia · Primos seguros","target":"station_frequency_beacon","objective":"Define es_frecuencia_segura(numero) y buscar_frecuencias_seguras(limite). Un primo es mayor que 1 y solo divisible por 1 y por sí mismo; la búsqueda incluye límite.","example":"Entrada\nlimite = 10\n\nSalida\n[2, 3, 5, 7]","starterCode":"","hints":["Para probar divisores, recorré desde 2 hasta el número anterior.","Un número menor que 2 no es primo.","La búsqueda puede reutilizar tu función de prueba y agregar cada primo."],
         "validator":{"kind":"function_cases","functions":[{"defName":"es_frecuencia_segura","params":["numero"],"cases":[{"args":[-3],"expected":false},{"args":[0],"expected":false},{"args":[1],"expected":false},{"args":[2],"expected":true},{"args":[9],"expected":false},{"args":[13],"expected":true}]},{"defName":"buscar_frecuencias_seguras","params":["limite"],"cases":[{"args":[0],"expected":[]},{"args":[2],"expected":[2]},{"args":[10],"expected":[2,3,5,7]},{"args":[-2],"expected":[]}]}]},
         "successAction":{"kind":"station_transition","id":"station_frequency_beacon"},"successDialogue":["La baliza encuentra frecuencias primas y descarta ruido compuesto. El canal queda activo."],"concepts":["funciones","for","módulo","booleanos"]
       },
       {
-        "id":"resource","title":"Depósito · Conteo inclusivo","target":"station_resource_depot","objective":"Define separar_recursos(inicio, fin). Retorna [cantidad_pares, cantidad_impares] contando ambos extremos; intervalo invertido retorna [0, 0].","starterCode":"","hints":["El intervalo incluye fin, por eso el rango necesita ajustar su límite.","Mantené dos contadores separados.","Decidí qué hacer si inicio es mayor que fin antes de iterar."],
+        "id":"resource","title":"Depósito · Conteo inclusivo","target":"station_resource_depot","objective":"Define separar_recursos(inicio, fin). Retorna [cantidad_pares, cantidad_impares] contando ambos extremos; intervalo invertido retorna [0, 0].","example":"Entrada\ninicio = 1\nfin = 4\n\nSalida\n[2, 2]","starterCode":"","hints":["El intervalo incluye fin, por eso el rango necesita ajustar su límite.","Mantené dos contadores separados.","Decidí qué hacer si inicio es mayor que fin antes de iterar."],
         "validator":{"kind":"function_cases","functions":[{"defName":"separar_recursos","params":["inicio","fin"],"cases":[{"args":[1,1],"expected":[0,1]},{"args":[1,4],"expected":[2,2]},{"args":[-2,2],"expected":[3,2]},{"args":[5,3],"expected":[0,0]}]}]},
         "successAction":{"kind":"station_transition","id":"station_resource_depot"},"successDialogue":["Madera, metal y piedra quedan contados en compartimentos pares e impares."],"concepts":["intervalos","for","módulo","contadores"]
       },
       {
-        "id":"reverse","title":"Baliza inversa · Código aritmético","target":"station_reverse_beacon","objective":"Define descifrar_codigo(codigo). Invierte un entero positivo usando división entera y módulo, sin texto ni slicing; negativo retorna None.","starterCode":"","hints":["El último dígito sale con módulo 10.","Desplazá dígitos con división entera entre 10.","Acumulá resultado multiplicando por 10 antes de sumar cada dígito."],
+        "id":"reverse","title":"Baliza inversa · Código aritmético","target":"station_reverse_beacon","objective":"Define descifrar_codigo(codigo). Invierte un entero positivo usando división entera y módulo, sin texto ni slicing; negativo retorna None.","example":"Entrada\ncodigo = 12030\n\nSalida\n3021","starterCode":"","hints":["El último dígito sale con módulo 10.","Desplazá dígitos con división entera entre 10.","Acumulá resultado multiplicando por 10 antes de sumar cada dígito."],
         "validator":{"kind":"function_cases","functions":[{"defName":"descifrar_codigo","params":["codigo"],"cases":[{"args":[-12],"expected":null},{"args":[0],"expected":0},{"args":[7],"expected":7},{"args":[12030],"expected":3021},{"args":[987654],"expected":456789}]}]},
         "successAction":{"kind":"station_transition","id":"station_reverse_beacon"},"successDialogue":["Los anillos invierten el código sin convertirlo en texto. La baliza reconoce la secuencia."],"concepts":["while","módulo","división entera"]
       },
       {
-        "id":"energy","title":"Consola de energía · Despacho","target":"station_energy_console","objective":"Define cargar_energia, gastar_energia, multiplicar_materiales, repartir_raciones y operar_consola. Cargar suma 10; gastar nunca baja de cero; repartir devuelve [cociente, resto] o [] con divisor cero.","starterCode":"","hints":["Cada operación debe vivir en una función propia.","Para gastar, compará antes de restar y devolvé cero si gasto supera energía.","operar_consola debe seleccionar por opción y delegar, no repetir cálculos."],
+        "id":"energy","title":"Consola de energía · Despacho","target":"station_energy_console","objective":"Define 5 funciones que retornan valores (sin print): cargar_energia(cantidad) retorna cantidad + 10; gastar_energia(energia, gasto) retorna energia - gasto sin bajar de 0; multiplicar_materiales(a, b) retorna a * b; repartir_raciones(total, personas) retorna [cociente, resto] o [] si personas es 0; operar_consola(opcion, a, b) delega según la opción y retorna None si la opción no existe.","example":"Ejemplos\noperar_consola(\"cargar\", 5, 0) -> 15\noperar_consola(\"gastar\", 5, 2) -> 3\noperar_consola(\"gastar\", 3, 10) -> 0\noperar_consola(\"repartir\", 10, 3) -> [3, 1]\noperar_consola(\"otra\", 1, 2) -> None","starterCode":"def cargar_energia(cantidad):\n    return cantidad + 10\n\ndef gastar_energia(energia, gasto):\n    return None\n\ndef multiplicar_materiales(a, b):\n    return None\n\ndef repartir_raciones(total, personas):\n    return None\n\ndef operar_consola(opcion, a, b):\n    return None","hints":["cargar_energia ya está resuelta en el código inicial: es return cantidad + 10.","gastar_energia: si gasto > energia retorná 0; si no, retorná energia - gasto.","multiplicar_materiales: retorná a * b.","repartir_raciones: si personas es 0 retorná []; si no, retorná [total // personas, total % personas].","operar_consola: encadená if/elif por opción y delegá: cargar_energia(a), gastar_energia(a, b), multiplicar_materiales(a, b), repartir_raciones(a, b). Si ninguna opción coincide, retorná None.","El sandbox soporta // y %; usá solo return dentro de las funciones, no print."],
         "validator":{"kind":"function_cases","functions":[{"defName":"cargar_energia","params":["cantidad"],"cases":[{"args":[0],"expected":10},{"args":[7],"expected":17},{"args":[-2],"expected":8}]},{"defName":"gastar_energia","params":["energia","gasto"],"cases":[{"args":[10,3],"expected":7},{"args":[3,10],"expected":0},{"args":[0,0],"expected":0}]},{"defName":"multiplicar_materiales","params":["a","b"],"cases":[{"args":[0,8],"expected":0},{"args":[-2,4],"expected":-8}]},{"defName":"repartir_raciones","params":["total","personas"],"cases":[{"args":[10,3],"expected":[3,1]},{"args":[10,0],"expected":[]},{"args":[0,4],"expected":[0,0]}]},{"defName":"operar_consola","params":["opcion","a","b"],"cases":[{"args":["cargar",5,0],"expected":15},{"args":["gastar",5,2],"expected":3},{"args":["multiplicar",3,4],"expected":12},{"args":["repartir",10,3],"expected":[3,1]},{"args":["otra",1,2],"expected":null}]}]},
         "successAction":{"kind":"station_transition","id":"station_energy_console"},"successDialogue":["La consola vuelve a línea. Cada operación delega su responsabilidad en una función clara."],"concepts":["funciones","despacho","división entera","cero"]
       },
       {
-        "id":"stability","title":"Monitor · Promedio de estabilidad","target":"station_stability_monitor","objective":"Define evaluar_estabilidad(lecturas). Calcula promedio con un bucle; retorna [promedio, estable] si promedio >= 51, o [promedio, inestable]. Lista vacía retorna [0, sin lecturas].","starterCode":"","hints":["No uses sum automática: acumulá lecturas dentro de un bucle.","Separá caso de lista vacía antes de dividir.","El umbral estable incluye exactamente 51."],
+        "id":"stability","title":"Monitor · Promedio de estabilidad","target":"station_stability_monitor","objective":"Define evaluar_estabilidad(lecturas). Calcula promedio con un bucle; retorna [promedio, estable] si promedio >= 51, o [promedio, inestable]. Lista vacía retorna [0, sin lecturas].","example":"Entrada\nlecturas = [50, 51, 52]\n\nSalida\n[51, estable]","starterCode":"","hints":["No uses sum automática: acumulá lecturas dentro de un bucle.","Separá caso de lista vacía antes de dividir.","El umbral estable incluye exactamente 51."],
         "validator":{"kind":"function_cases","functions":[{"defName":"evaluar_estabilidad","params":["lecturas"],"cases":[{"args":[[]],"expected":[0,"sin lecturas"]},{"args":[[50]],"expected":[50,"inestable"]},{"args":[[50,51,52]],"expected":[51,"estable"]},{"args":[[100,0]],"expected":[50,"inestable"]},{"args":[[-2,4]],"expected":[1,"inestable"]}]}]},
         "successAction":{"kind":"station_transition","id":"station_stability_monitor"},"successDialogue":["El monitor deja de alarmar. El promedio alcanza el umbral y la estructura se mantiene estable."],"concepts":["listas","len","for","promedios"]
       },
       {
-        "id":"core","title":"Núcleo de tormenta · Raíz digital","target":"storm_core","objective":"Define sumar_digitos_frecuencia(codigo) y reducir_frecuencia(codigo). Sumá dígitos con operaciones aritméticas y repetí hasta obtener un solo dígito; negativos retornan None.","starterCode":"","hints":["Módulo 10 obtiene último dígito y división entera lo elimina.","La reducción necesita repetir mientras el valor tenga dos o más dígitos.","Podés llamar sumar_digitos_frecuencia desde reducir_frecuencia."],
+        "id":"core","title":"Núcleo de tormenta · Raíz digital","target":"storm_core","objective":"Define sumar_digitos_frecuencia(codigo) y reducir_frecuencia(codigo). Sumá dígitos con operaciones aritméticas y repetí hasta obtener un solo dígito; negativos retornan None.","example":"Entrada\ncodigo = 407\n\nSalida\n2","starterCode":"","hints":["Módulo 10 obtiene último dígito y división entera lo elimina.","La reducción necesita repetir mientras el valor tenga dos o más dígitos.","Podés llamar sumar_digitos_frecuencia desde reducir_frecuencia."],
         "validator":{"kind":"function_cases","functions":[{"defName":"sumar_digitos_frecuencia","params":["codigo"],"cases":[{"args":[-8],"expected":null},{"args":[0],"expected":0},{"args":[407],"expected":11},{"args":[9999],"expected":36}]},{"defName":"reducir_frecuencia","params":["codigo"],"cases":[{"args":[-8],"expected":null},{"args":[0],"expected":0},{"args":[407],"expected":2},{"args":[987],"expected":6},{"args":[9999],"expected":9}]}]},
         "successAction":{"kind":"station_transition","id":"storm_core"},"successDialogue":["El núcleo se activa cuando la raíz digital converge. Alizon cierra el protocolo desde el refugio."],"concepts":["while","funciones","módulo","raíz digital"]
       }
