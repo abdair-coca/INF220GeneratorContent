@@ -722,9 +722,11 @@ class WeatherSystem {
     this.drops = [];
     this.width = 0; this.height = 0; this.elapsed = 0; this.poolSize = -1;
   }
+  _active() { return this.config.mode === "rain" || this.config.mode === "frost"; }
   _isRain() { return this.config.mode === "rain"; }
+  _isFrost() { return this.config.mode === "frost"; }
   _targetSize() {
-    if (!this._isRain()) return 0;
+    if (!this._active()) return 0;
     return Math.max(1, Math.round(this.config.dropCount * this.config.density));
   }
   _reset(drop, fromTop) {
@@ -760,30 +762,40 @@ class WeatherSystem {
   }
   update(dt) {
     this.elapsed += dt;
-    if (!this._isRain()) return;
+    if (!this._active()) return;
     const gustPeriod = Math.max(0.1, this.config.gustPeriod);
     const slope = this.config.wind + this.config.gust * Math.sin(this.elapsed * Math.PI * 2 / gustPeriod);
     for (const drop of this.drops) {
-      drop.x += drop.speed * slope * dt;
+      if (this._isFrost()) {
+        drop.x += (Math.random() - 0.5) * drop.speed * 0.4 * dt;
+        drop.y += drop.speed * dt * 0.5;
+      } else {
+        drop.x += drop.speed * slope * dt;
+        drop.y += drop.speed * dt;
+      }
       drop.x = this._wrap(drop.x, this.width);
-      drop.y += drop.speed * dt;
       if (drop.y > this.height + drop.length || drop.y < -drop.length) this._reset(drop, true);
     }
   }
   render(ctx, width, height) {
-    if (!this._isRain()) return;
+    if (!this._active()) return;
     const gustPeriod = Math.max(0.1, this.config.gustPeriod);
     const slope = this.config.wind + this.config.gust * Math.sin(this.elapsed * Math.PI * 2 / gustPeriod);
     ctx.save();
     ctx.strokeStyle = this.config.color;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = this._isFrost() ? 2 : 1;
     ctx.lineCap = "square";
     for (const drop of this.drops) {
       if (drop.x < -60 || drop.x > width + 60 || drop.y < -60 || drop.y > height + 60) continue;
       ctx.globalAlpha = drop.alpha;
       ctx.beginPath();
-      ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
-      ctx.lineTo(Math.round(drop.x + slope * drop.length), Math.round(drop.y + drop.length));
+      if (this._isFrost()) {
+        ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
+        ctx.lineTo(Math.round(drop.x + 2), Math.round(drop.y + 2));
+      } else {
+        ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
+        ctx.lineTo(Math.round(drop.x + slope * drop.length), Math.round(drop.y + drop.length));
+      }
       ctx.stroke();
     }
     ctx.restore();
@@ -943,15 +955,34 @@ function drawPerson(ctx,entity,cam,style,dir="down",frame=0,isPlayer=false) {
 const TILE_DEF = {
   G: { walkable: true, base: C.grass }, g: { walkable: true, base: C.grassDark },
   P: { walkable: true, base: C.sand }, H: { walkable: true, base: C.path },
-  T: { walkable: false, base: C.grassDark }, D: { walkable: false, base: C.sand }
+  T: { walkable: false, base: C.grassDark }, D: { walkable: false, base: C.sand },
+  W: { walkable: false, base: "#7a5230" }, F: { walkable: true, base: "#b78a5a" }, C: { walkable: false, base: "#9c6b3f" }
 };
 
 const ZONE = /*__ZONE_JS__*/;
+const ZONES = (typeof /*__ZONES_JS__*/ !== "undefined") ? /*__ZONES_JS__*/ : { exterior: ZONE };
 class World {
-  constructor() {
-    this.rows=ZONE.rows; this.cols=ZONE.cols; this.tiles=ZONE.map.map(r=>r.split("")); this.flags={...ZONE.flags};
-     this.npcs=ZONE.npcs.map(n=>({...n,dialogue:n.dialogue.slice(),visualState:n.initialState||"down"})); this.interactables=ZONE.interactables.map(i=>({...i,solid:{...i.solid},stateMap:i.stateMap?{...i.stateMap}:null}));
-    this.decor=ZONE.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null})); this.doors=ZONE.doors.map(d=>({...d}));
+  constructor(zoneId) {
+    this.zoneId = zoneId || "exterior";
+    this.load(ZONES[this.zoneId] || ZONE);
+  }
+  load(zoneData) {
+    const data = zoneData || ZONE;
+    this.rows=data.rows; this.cols=data.cols; this.tiles=data.map.map(r=>r.split("")); this.flags={...data.flags};
+    this.npcs=data.npcs.map(n=>({...n,dialogue:n.dialogue.slice(),visualState:n.initialState||"down"})); this.interactables=data.interactables.map(i=>({...i,solid:{...i.solid},stateMap:i.stateMap?{...i.stateMap}:null}));
+    this.decor=data.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null})); this.doors=data.doors.map(d=>({...d}));
+    this.weather = data.weather || null;
+    return this;
+  }
+  findPortal(zoneId) {
+    return this.interactables.find(i => i.type === "portal" && i.toZone === zoneId) || null;
+  }
+  static zoneForMission(missionNodeId) {
+    for (const zid of Object.keys(ZONES)) {
+      const z = ZONES[zid];
+      if (z && (z.interactables || []).some(i => i.missionNode === missionNodeId)) return zid;
+    }
+    return "exterior";
   }
   tileAt(col,row){ if(row<0||row>=this.rows||col<0||col>=this.cols)return "T"; return this.tiles[row][col]; }
   _pointInSolid(px,py,o){ if(!o.solid)return false; const r=o.solid; return px>=o.x+r.x&&px<o.x+r.x+r.w&&py>=o.y+r.y&&py<o.y+r.y+r.h; }
@@ -998,6 +1029,11 @@ class Renderer {
     this.weather = weather || new WeatherSystem(ZONE.weather || {});
   }
 
+  setWeather(config) {
+    this.weather = new WeatherSystem(config || {});
+    this.weather.resize(this.ctx.canvas.width || 0, this.ctx.canvas.height || 0);
+  }
+
   _stateFor(it, challengeSystem) {
     if (it.stateMap && challengeSystem) return it.stateMap[challengeSystem.status(it.missionNode)] || it.stateMap.pending;
     if (it.type === "fogata") return it.lit ? "on" : "off";
@@ -1039,6 +1075,12 @@ class Renderer {
         else rect(ctx, sx + 6 + (seed % 5) * 4, sy + 8 + (seed % 2) * 12, 2, 4, C.grassLight);
       } else if (t === "T") {
         ASSET_RENDERER.drawAsset(ctx, "tree_oak", "default", col * TILE + 32, row * TILE + 32, camera, now, { clipY: 45, clipH: 19 });
+      } else if (t === "W") {
+        rect(ctx, sx, sy, TILE, TILE, "#6b4626"); rect(ctx, sx, sy + 26, TILE, 6, "#5c3a21");
+      } else if (t === "C") {
+        rect(ctx, sx + 3, sy + 8, TILE - 6, TILE - 8, "#8a5a33"); rect(ctx, sx + 3, sy + 8, TILE - 6, 5, "#a06b3d");
+      } else if (t === "F") {
+        if (seed % 4 === 0) rect(ctx, sx + 5 + (seed % 3) * 8, sy + 6 + (seed % 2) * 12, 4, 2, "#a97c4e");
       }
       if (t === "D" && !world.flags.senderoAbierto) drawDoor(ctx, sx, sy, false);
     }
@@ -1047,12 +1089,13 @@ class Renderer {
        else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
        else if (d.asset) ASSET_RENDERER.drawAsset(ctx, d.asset, d.state || "default", d.x + d.w / 2, d.y + d.h, camera, now);
      }
-     if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
-      if (ZONE.weather && ZONE.weather.mode === "storm" && challengeSystem && challengeSystem.lesson.storm) {
+if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
+      if (world.weather && (world.weather.mode === "storm" || world.weather.mode === "frost") && challengeSystem && challengeSystem.lesson.storm) {
        const phase = challengeSystem.stormPhase();
        const alpha = { solved_0_2:.22, solved_3_5:.16, solved_6_8:.10, solved_9:.04, solved_10:0 }[phase] || 0;
-       if (alpha) { ctx.save(); ctx.globalAlpha = alpha; rect(ctx, 0, 0, canvasW, canvasH, "#24154b"); ctx.restore(); }
-     }
+       const tint = world.weather.overlayColor || (world.weather.mode === "frost" ? "#8fb8c9" : "#24154b");
+       if (alpha) { ctx.save(); ctx.globalAlpha = alpha; rect(ctx, 0, 0, canvasW, canvasH, tint); ctx.restore(); }
+      }
   }
 
   renderDepthScene(world, player, camera, challengeSystem) {
@@ -1132,7 +1175,16 @@ class Renderer {
   }
 
   renderGuide(ctx, world, camera, activeTargetId, canvasW, canvasH) {
-    if (!activeTargetId) return; let target = world.interactables.find(i => i.id === activeTargetId) || world.npcs.find(n => n.id === activeTargetId); if (!target) return;
+    if (!activeTargetId) return;
+    let target = world.interactables.find(i => i.id === activeTargetId) || world.npcs.find(n => n.id === activeTargetId);
+    if (!target) {
+      const zoneId = World.zoneForMission(activeTargetId);
+      if (zoneId && zoneId !== world.zoneId) {
+        const portal = world.findPortal(zoneId);
+        if (portal) target = portal;
+      }
+      if (!target) return;
+    }
     const tx = (target.x + (target.w || 32) / 2) - camera.x, ty = (target.y - 8) - camera.y, time = performance.now() / 1000;
     if (tx >= 12 && tx <= canvasW - 12 && ty >= 12 && ty <= canvasH - 12) {
       const b = Math.round(Math.sin(time * 6) * 3); ctx.save(); rect(ctx, tx - 4, ty - 18 + b, 8, 8, C.gold0); rect(ctx, tx - 3, ty - 17 + b, 6, 6, C.gold1); rect(ctx, tx - 2, ty - 14 + b, 4, 8, C.gold1); ctx.restore();
@@ -1148,7 +1200,13 @@ class Renderer {
     ctx.fillStyle = "rgba(17,21,29,.92)"; ctx.fillRect(0, 0, w, h);
     ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 4; ctx.strokeRect(2, 2, w - 4, h - 4);
     ctx.fillStyle = "#fff4d8"; ctx.font = "bold 16px monospace"; ctx.fillText("RADAR · ESTACIONES", 14, 22);
-    const items = world.interactables.filter(it => it.missionNode && it.markerAsset);
+    const items = [];
+    for (const zid of Object.keys(ZONES)) {
+      const z = ZONES[zid];
+      for (const it of (z && z.interactables) || []) {
+        if (it.missionNode && it.markerAsset) items.push({ ...it, _zone: zid });
+      }
+    }
     items.forEach((it, index) => {
       const col = index % 5, row = Math.floor(index / 5), x = 38 + col * 84, y = 58 + row * 76;
       const status = challengeSystem ? challengeSystem.status(it.missionNode) : "pending";
@@ -1889,7 +1947,9 @@ class Game {
 
   startLesson(lessonId) {
     this.lesson = LESSONS[lessonId] || LESSONS[Object.keys(LESSONS)[0]];
-    this.world = new World(); this.player = new Player(); this.camera.x = this.camera.y = 0;
+    this._spawnZone = this.lesson.zone || "exterior";
+    this.world = new World(this._spawnZone); this.player = new Player(); this.camera.x = this.camera.y = 0;
+    this._applyZoneWeather(this.world);
     this.worldActions = new WorldActions(this.world, this.particles, this.audio); this.interaction = new InteractionSystem(this.world);
     this.engine = new PythonEngine(); this.challengeSystem = new ChallengeSystem(this.lesson, this.engine); this.statistics = new StatisticsSystem(this.lesson, this.challengeSystem);
     this.challengeSystem.start(); GameState.lesson = this.lesson;
@@ -1897,6 +1957,22 @@ class Game {
      this.introDone = false; this.missionComplete = false; this._syncWorldState();
     if (!this._loopStarted) { this._loopStarted = true; requestAnimationFrame((ts) => this._loop(ts)); }
      setTimeout(() => { this.dialogue.start(this.lesson.introDialogue.speaker, this.lesson.introDialogue.lines, () => { this.introDone = true; this._syncWorldState(); const current = this.challengeSystem.current(); this.ui.setObjective(current ? (this.lesson.objectives[current.id] || current.objective) : "Elegí cualquier estación pendiente en el radar."); }); }, 400);
+  }
+
+  _applyZoneWeather(world) {
+    if (this.renderer) this.renderer.setWeather(world.weather || {});
+  }
+
+  enterZone(zoneId, spawnX, spawnY) {
+    if (!ZONES[zoneId]) return;
+    this.world.load(ZONES[zoneId]);
+    this.world.zoneId = zoneId;
+    if (spawnX != null && spawnY != null) { this.player.x = spawnX; this.player.y = spawnY; }
+    this.camera.x = this.camera.y = 0;
+    this.worldActions = new WorldActions(this.world, this.particles, this.audio);
+    this.interaction = new InteractionSystem(this.world);
+    this._applyZoneWeather(this.world);
+    this._syncWorldState();
   }
 
    _getActiveTargetId() {
@@ -1967,6 +2043,11 @@ class Game {
     if (this.nearby.kind === "door") { this.ui.toast("El sendero está bloqueado."); return; }
     if (this.nearby.kind === "interactable") {
       const it = this.nearby.ref;
+       if (it.type === "portal") {
+         if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
+         if (it.toZone) { this.enterZone(it.toZone, it.spawnX, it.spawnY); this.audio.play("open"); }
+         return;
+       }
        if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
        const free = this.lesson.progression && this.lesson.progression.mode === "free";
        if (it.missionNode) {
