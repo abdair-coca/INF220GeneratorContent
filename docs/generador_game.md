@@ -121,13 +121,15 @@ python tools/game_generator.py --nuevo                                          
   `missionNode`/`target` que no existe, `validator.kind`/`successAction.kind`
   desconocidos, etc.).
 
-El script inyecta 5 placeholders en el template:
+El script inyecta 6 placeholders en el template:
 
-- `/*__ZONE_JS__*/` → el mapa, NPCs, interactuables y decoración de la zona.
-- `/*__LESSONS_JS__*/` → la misión (`challenges` con `validate`/`onSuccess`).
-- `/*__BOOK_JS__*/` → las páginas del Libro desbloqueables.
-- `/*__ASSETS_JS__*/` → subset del kit visual recortado por capítulo.
-- `/*__ASSET_RENDERER_JS__*/` → renderer canónico inline leído desde
+- `/*__ZONE_JS__*/` — el mapa, NPCs, interactuables y decoración de la zona exterior.
+- `/*__ZONES_JS__*/` — el registro completo de zonas (`{ exterior, posada, ... }`)
+  para juegos multi-escenario; en juegos sin `zones` se deriva solo `exterior`.
+- `/*__LESSONS_JS__*/` — la misión (`challenges` con `validate`/`onSuccess`).
+- `/*__BOOK_JS__*/` — las páginas del Libro desbloqueables.
+- `/*__ASSETS_JS__*/` — subset del kit visual recortado por capítulo.
+- `/*__ASSET_RENDERER_JS__*/` — renderer canónico inline leído desde
   `public/juegos/visual/el_refugio_asset_renderer.js`; el template instancia
   `window.JuegoArtAssetRenderer` sin mantener una copia paralela.
 
@@ -140,6 +142,17 @@ El script inyecta 5 placeholders en el template:
 - `zone`: `rows`, `cols`, `map` (filas de igual longitud), `flags`, `npcs`
   (con `asset`), `interactables` (con `type`, `asset`, `missionNode`, `solid`,
   `sortOffset`), `decor` (con `kind` + `asset`), `doors`.
+- `zones` (opcional): registro `{ zoneId: {...zona} }` de **interiores** para
+  juegos multi-escenario. La zona exterior del `zone` se registra como
+  `exterior`. Cada zona puede tener su propio `map`, `npcs`, `interactables`,
+  `decor`, `doors` y `weather`. Para entrar/salir se usan interactables con
+  `"type": "portal"` y campos `toZone` (zona destino), `spawnX`/`spawnY`
+  (posición de aparición en la zona destino). El motor cambia de zona con
+  `Game.enterZone()`; la guía dorada apunta al portal correcto si el reto
+  activo vive en otra zona, y el radar lista los retos de todas las zonas.
+  - **Tiles de interior**: `W` (pared, no caminable), `F` (piso, caminable),
+    `C` (mueble, no caminable) además de los tiles exteriores (`G`, `g`, `P`,
+    `H`, `T`, `D`).
 - `lesson`: `id`, `title`, `concept`, `zone`, `story`, `introDialogue`,
   `objectives`, `challenges[]`.
 - `book_pages`: páginas del Libro (`unlockedBy` para desbloqueo).
@@ -151,9 +164,19 @@ motor (`VALIDATORS` / `ACTIONS`) por `kind`. Así el generador emite código
 consistente y el motor mantiene los errores educativos.
 
 - `validator.kind`:
-  - `structure` — POO: valida `classes` (nombre, `attrs` con `self.x`,
+  - `structure` — POO estático: valida `classes` (nombre, `attrs` con `self.x`,
     `methods` con `self`, `returnText`), `instantiate` (crear objetos) y
     `calls` (llamar métodos). El spec se pasa por `requirements` del desafío.
+    No ejecuta el código: verifica la forma, no el comportamiento.
+  - `class_cases` — POO **ejecutable**: el motor interpreta `class`, `self`,
+    instancias, `@classmethod`, name mangling de privados (`_Clase__atributo`),
+    composición y `__str__`. El spec (`requirements.classes[]`) define por
+    clase: `initArgs` (argumentos de `__init__`), `instances` (cuántos objetos
+    crear; default 1), `methods[]` con `cases[]` (`args`/`expected`),
+    `classMethods[]` (deben llevar `@classmethod`), y `privateAttrs[]` (deben
+    declararse con `self.__atributo` y no accederse directamente desde fuera).
+    Compara retornos con igualdad profunda (números, booleanos, strings,
+    listas). Ver ejemplo abajo.
   - `def_return` — funciones: `defName`, `params`, `sampleArgs` y `expected`
     (o `contains` para texto). Soporta booleanos (`True`/`False`).
   - `def_exists` — solo existe la función con la firma pedida.
@@ -200,6 +223,52 @@ Ejemplo de desafío con validador de estructura:
 }
 ```
 
+Ejemplo de desafío con validador **ejecutable** `class_cases` (verifica el
+comportamiento, no solo la forma):
+
+```json
+{
+  "id": "ej2_medida",
+  "title": "La Medida del Claro",
+  "target": "altar_medida",
+  "objective": "Define la clase Rectangulo con __init__(base, altura), calcular_area() que retorne base * altura, calcular_perimetro() que retorne 2 * (base + altura) y es_cuadrado() que retorne True si base y altura son iguales.",
+  "validator": { "kind": "class_cases" },
+  "requirements": {
+    "classes": [
+      {
+        "name": "Rectangulo",
+        "initArgs": [5, 10],
+        "methods": [
+          { "name": "calcular_area", "cases": [ { "args": [], "expected": 50 } ] },
+          { "name": "calcular_perimetro", "cases": [ { "args": [], "expected": 30 } ] },
+          { "name": "es_cuadrado", "cases": [ { "args": [], "expected": false } ] }
+        ]
+      }
+    ]
+  },
+  "successAction": { "kind": "station_transition", "id": "altar_medida" },
+  "successDialogue": ["El marco mide el claro sin dudar."],
+  "concepts": ["clases", "metodos", "atributos"]
+}
+```
+
+> `class_cases` admite además `instances` (crear N objetos antes de probar,
+> útil para `@classmethod` contadores), `classMethods: [{"name": "..."}]`
+> (exige `@classmethod`), y `privateAttrs: ["__salario"]` (exige declararlo
+> privado y acceder solo por métodos). El motor interpreta el subconjunto POO:
+> clases, `__init__`, `self`, atributos, métodos, `@classmethod`, atributos de
+> clase, name mangling y composición.
+
+### Clima (`zone.weather` / `zones.<id>.weather`)
+
+Cada zona puede llevar su propio clima. Modos válidos: `none`, `rain`
+(lluvia), `storm` (tormenta, requiere `lesson.storm.thresholds` para las
+fases) y `frost` (escarcha/nieve fina). La escarcha usa el mismo sistema de
+fases que la tormenta pero con overlay azul-blanca (`overlayColor` opcional en
+la config de la zona). Campos numéricos: `density`, `dropCount`, `dropLength`,
+`dropSpeed`, `wind`, `gust`, `gustPeriod`, `alpha`, `color`. Los interiores
+suelen usar `mode: "none"`.
+
 ### Autocompletado pedagógico y auditoría de calidad
 
 El generador **deriva contenido explicativo del validador** cuando el autor lo
@@ -207,7 +276,9 @@ omite, para que ningún desafío salga sin ejemplo o sin esqueleto:
 
 - `example` vacío → se arma `fn(args) -> resultado` con un caso normal y un
   caso límite de `function_cases` (o `sampleArgs`/`expected` en `def_return`).
-- `starterCode` vacío → esqueleto `def fn(param): return None` por función.
+  En `class_cases` se deriva `Clase(initArgs)` + `Clase.metodo(args) -> valor`.
+- `starterCode` vacío → esqueleto `def fn(param): return None` por función; en
+  `class_cases` se deriva `class X:` con `__init__` y `return None` por método.
 - `hints` con menos de 3 → se completan con pistas genéricas (firma exacta,
   casos límite, usar `return` en vez de `print`).
 
@@ -221,7 +292,8 @@ python tools/game_generator.py public/juegos/juego_gl04_tema.json --audit
 ```
 
 Reporta por desafío: longitud del `objective` (mín. 25), presencia de
-`example`/`starterCode`, cantidad de `hints` y nº de casos por función. Sale
+`example`/`starterCode`, cantidad de `hints` y nº de casos por función (o por
+método en `class_cases`). Sale
 con código **1** si algún desafío incumple el mínimo (objetivo corto, sin
 ejemplo, sin esqueleto, <2 pistas, <2 casos), lo que corta CI/release.
 
