@@ -2139,11 +2139,32 @@ class Game {
     if (this.renderer) this.renderer.setWeather(world.weather || {});
   }
 
+  _findWalkableSpawn(world, px, py) {
+    const cx = Math.floor(px / TILE), cy = Math.floor(py / TILE);
+    if (world.isWalkable(px, py) && world.isWalkable(px + this.player.w - 4, py + this.player.h - 2)) return { x: px, y: py };
+    for (let radius = 1; radius <= 8; radius++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) continue;
+          const col = cx + dx, row = cy + dy;
+          const sx = col * TILE + 3, sy = row * TILE + 4;
+          if (world.isWalkable(sx, sy) && world.isWalkable(sx + this.player.w - 4, sy + this.player.h - 2)) return { x: sx, y: sy };
+        }
+      }
+    }
+    return { x: px, y: py };
+  }
   enterZone(zoneId, spawnX, spawnY) {
     if (!ZONES[zoneId]) return;
     this.world.load(ZONES[zoneId]);
     this.world.zoneId = zoneId;
-    if (spawnX != null && spawnY != null) { this.player.x = spawnX; this.player.y = spawnY; }
+    if (spawnX != null && spawnY != null) {
+      const safe = this._findWalkableSpawn(this.world, spawnX, spawnY);
+      this.player.x = safe.x; this.player.y = safe.y;
+    } else {
+      const safe = this._findWalkableSpawn(this.world, this.player.x, this.player.y);
+      this.player.x = safe.x; this.player.y = safe.y;
+    }
     this.camera.x = this.camera.y = 0;
     this.worldActions = new WorldActions(this.world, this.particles, this.audio);
     this.interaction = new InteractionSystem(this.world);
