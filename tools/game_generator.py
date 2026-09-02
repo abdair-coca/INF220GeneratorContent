@@ -626,12 +626,30 @@ def _autoejemplo_class(reqs):
 
 
 def _autostarter_class(reqs):
-    """Deriva un esqueleto de clase: class + __init__ con self.attr."""
+    """Deriva un esqueleto de clase: class + __init__ con self.attr.
+    Deduplica clases repetidas (varias specs prueban instancias distintas)
+    fusionando los métodos únicos por nombre."""
     clases = (reqs.get("classes") or [])
     if not clases:
         return ""
-    bloques = []
+    # Fusionar specs de la misma clase: usar initArgs de la primera y
+    # conservar métodos únicos (primera aparición por nombre).
+    unidas = {}
     for cs in clases:
+        nombre = cs.get("name")
+        if not nombre:
+            continue
+        if nombre not in unidas:
+            unidas[nombre] = {
+                "name": nombre,
+                "initArgs": cs.get("initArgs"),
+                "initParams": cs.get("initParams"),
+                "methods": {},
+            }
+        for m in (cs.get("methods") or []):
+            unidas[nombre]["methods"].setdefault(m.get("name"), m)
+    bloques = []
+    for cs in unidas.values():
         params = (cs.get("initParams") or [])
         if not params and cs.get("initArgs"):
             params = [f"param{i}" for i in range(len(cs["initArgs"]))]
@@ -643,7 +661,7 @@ def _autostarter_class(reqs):
                     continue
                 lineas.append(f"        self.{p} = {p}")
             lineas.append("")
-        for m in (cs.get("methods") or []):
+        for m in cs["methods"].values():
             if m.get("name") == "__init__":
                 continue
             cargs = ((m.get("cases") or [{}])[0].get("args") or []) if (m.get("cases") or []) else []
