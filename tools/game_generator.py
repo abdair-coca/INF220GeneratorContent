@@ -30,7 +30,7 @@ VISUAL_KIT = JUEGOS_DIR / "visual" / "el_refugio_visual_assets_v1.json"
 ASSET_RENDERER = JUEGOS_DIR / "visual" / "el_refugio_asset_renderer.js"
 
 VALIDATORS_REGISTRY = {  # kinds soportados (ver template -> VALIDATORS)
-    "print_call", "def_exists", "def_return", "function_cases", "structure",
+    "print_call", "def_exists", "def_return", "function_cases", "structure", "class_cases",
 }
 ACTIONS_REGISTRY = {  # kinds soportados (ver template -> ACTIONS)
     "fogata", "tienda", "campamento", "station_transition",
@@ -97,9 +97,9 @@ def build_lessons_js(lesson):
         a = c["successAction"]
         if a["kind"] not in ACTIONS_REGISTRY:
             raise ValueError(f"acción desconocida: {a['kind']}")
-        if v["kind"] == "structure":
+        if v["kind"] in ("structure", "class_cases"):
             req_js = js_dict(c.get("requirements", {}))
-            validate_js = "function(engine, code){ return VALIDATORS.structure(engine, code, this.requirements); }"
+            validate_js = "function(engine, code){ return VALIDATORS.%s(engine, code, this.requirements); }" % v["kind"]
         else:
             validator_spec = {kk: vv for kk, vv in v.items() if kk != "kind"}
             validate_js = (
@@ -119,7 +119,7 @@ def build_lessons_js(lesson):
             "starterCode: " + js_str(c.get("starterCode", "")),
             "hints: " + js_list(c["hints"]),
         ]
-        if v["kind"] == "structure":
+        if v["kind"] in ("structure", "class_cases"):
             parts.append("requirements: " + req_js)
         parts.append("validate: " + validate_js)
         parts.append("onSuccess: " + on_success_js)
@@ -168,6 +168,23 @@ def build_zone_js(zone):
     return js_dict(zone)
 
 
+def build_zones_js(zones):
+    """Serializa el registro completo de zonas (exterior + interiores)."""
+    items = ",\n  ".join(f"{js_str(zid)}: {js_dict(z)}" for zid, z in zones.items())
+    return "{\n  " + items + "\n}"
+
+
+def _all_zones(data):
+    """Devuelve {zoneId: zoneData} con la zona exterior como 'exterior'."""
+    zones = dict(data.get("zones") or {})
+    exterior = data.get("zone")
+    if exterior:
+        zones["exterior"] = exterior
+    if not zones:
+        zones["exterior"] = {}
+    return zones
+
+
 def _zone_asset_ids(zone):
     ids = set()
     for n in zone.get("npcs", []):
@@ -184,12 +201,14 @@ def _zone_asset_ids(zone):
     return ids
 
 
-def build_assets_js(manifest, chapter, zone):
+def build_assets_js(manifest, chapter, zone, zones=None):
     """Recorta el manifest del kit visual al conjunto de assets del capítulo
-    más los assets referenciados por la zona. Devuelve un literal JS compacto."""
+    más los assets referenciados por las zonas. Devuelve un literal JS compacto."""
     sets = manifest.get("chapter_asset_sets", {})
     ids = set(sets.get(chapter, []))
     ids |= _zone_asset_ids(zone)
+    for _zid, zdata in (zones or {}).items():
+        ids |= _zone_asset_ids(zdata)
     ids |= {
         "tree_oak", "player_viajero", "npc_alizon", "npc_guardabosques",
         "campfire", "tent_blue", "workbench", "bush_flowers", "flowers_mixed",
@@ -216,6 +235,35 @@ class SchemaError(ValueError):
 
 def _err(campo, mensaje):
     raise SchemaError(f"[{campo}] {mensaje}")
+
+
+def _validar_weather(weather, prefijo):
+    """Valida la configuración de clima de una zona (none/rain/storm/frost)."""
+    if not isinstance(weather, dict):
+        _err(prefijo, "debe ser un objeto de configuración.")
+    mode = weather.get("mode", "none")
+    if not isinstance(mode, str) or mode not in {"none", "rain", "storm", "frost"}:
+        _err(prefijo + ".mode", "debe ser 'none', 'rain', 'storm' o 'frost'.")
+    numeric_limits = {
+        "density": (0, 1),
+        "dropCount": (0, 600),
+        "dropLength": (0, 80),
+        "dropSpeed": (0, 1500),
+        "wind": (0, 1.5),
+        "gust": (0, 0.75),
+        "gustPeriod": (0, 30),
+        "alpha": (0, 1),
+    }
+    for field, (minimum, maximum) in numeric_limits.items():
+        if field not in weather:
+            continue
+        value = weather[field]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            _err(f"{prefijo}.{field}", "debe ser un número finito.")
+        if value <= minimum or value > maximum:
+            _err(f"{prefijo}.{field}", f"debe ser > {minimum} y <= {maximum}.")
+    if "dropCount" in weather and not isinstance(weather["dropCount"], int):
+        _err(prefijo + ".dropCount", "debe ser un entero positivo.")
 
 
 def validar_esquema(data, fuente, manifest=None):
@@ -250,31 +298,7 @@ def validar_esquema(data, fuente, manifest=None):
 
     weather = zone.get("weather")
     if weather is not None:
-        if not isinstance(weather, dict):
-            _err("zone.weather", "debe ser un objeto de configuración.")
-        mode = weather.get("mode", "none")
-        if not isinstance(mode, str) or mode not in {"none", "rain", "storm"}:
-            _err("zone.weather.mode", "debe ser 'none', 'rain' o 'storm'.")
-        numeric_limits = {
-            "density": (0, 1),
-            "dropCount": (0, 600),
-            "dropLength": (0, 80),
-            "dropSpeed": (0, 1500),
-            "wind": (0, 1.5),
-            "gust": (0, 0.75),
-            "gustPeriod": (0, 30),
-            "alpha": (0, 1),
-        }
-        for field, (minimum, maximum) in numeric_limits.items():
-            if field not in weather:
-                continue
-            value = weather[field]
-            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
-                _err(f"zone.weather.{field}", "debe ser un número finito.")
-            if value <= minimum or value > maximum:
-                _err(f"zone.weather.{field}", f"debe ser > {minimum} y <= {maximum}.")
-        if "dropCount" in weather and not isinstance(weather["dropCount"], int):
-            _err("zone.weather.dropCount", "debe ser un entero positivo.")
+        _validar_weather(weather, "zone.weather")
 
     def _ids_unicos(items, seccion, campo_id="id", requerido=True):
         vistos = set()
@@ -294,6 +318,41 @@ def validar_esquema(data, fuente, manifest=None):
     _ids_unicos(zone.get("decor", []), "zone.decor", requerido=False)
     _ids_unicos(zone.get("doors", []), "zone.doors")
 
+    # Zonas adicionales (interiores). La zona exterior se llama 'exterior'.
+    zonas = data.get("zones") or {}
+    if zonas and not isinstance(zonas, dict):
+        _err("zones", "debe ser un objeto { zoneId: {...} }.")
+    interact_ids = {i["id"] for i in zone["interactables"]}
+    for zid, zdata in zonas.items():
+        pref = f"zones.{zid}"
+        for c in ("rows", "cols", "map", "npcs", "interactables", "doors"):
+            if c not in zdata:
+                _err(pref + "." + c, f"falta la clave '{c}' en la zona")
+        zmap = zdata["map"]
+        if len(zmap) != zdata["rows"]:
+            _err(pref + ".rows", f"map tiene {len(zmap)} filas pero rows={zdata['rows']}")
+        zw = len(zmap[0]) if zmap else 0
+        if zw != zdata["cols"]:
+            _err(pref + ".cols", f"map tiene {zw} columnas pero cols={zdata['cols']}")
+        for i, fila in enumerate(zmap):
+            if len(fila) != zw:
+                _err(pref + ".map", f"fila {i} tiene {len(fila)} chars, se esperaba {zw}")
+        zwc = zdata.get("weather")
+        if zwc is not None:
+            _validar_weather(zwc, pref + ".weather")
+        _ids_unicos(zdata.get("npcs", []), pref + ".npcs")
+        _ids_unicos(zdata.get("interactables", []), pref + ".interactables")
+        _ids_unicos(zdata.get("decor", []), pref + ".decor", requerido=False)
+        _ids_unicos(zdata.get("doors", []), pref + ".doors")
+        for it in zdata.get("interactables", []):
+            if it.get("id"):
+                interact_ids.add(it["id"])
+            if it.get("type") == "portal":
+                if not it.get("toZone") or it["toZone"] not in zonas and it["toZone"] != "exterior":
+                    _err(pref + ".interactables", f"portal '{it.get('id')}' apunta a zona inexistente '{it.get('toZone')}'")
+                if "spawnX" not in it or "spawnY" not in it:
+                    _err(pref + ".interactables", f"portal '{it.get('id')}' debe definir spawnX/spawnY")
+
     lesson = data["lesson"]
     for c in ("id", "title", "concept", "zone", "story", "introDialogue",
               "objectives", "challenges"):
@@ -306,7 +365,6 @@ def validar_esquema(data, fuente, manifest=None):
 
     ch_ids = _ids_unicos(challenges, "lesson.challenges")
 
-    interact_ids = {i["id"] for i in zone["interactables"]}
     npc_ids = {n["id"] for n in zone["npcs"]}
     for ch in challenges:
         cid = ch["id"]
@@ -345,40 +403,66 @@ def validar_esquema(data, fuente, manifest=None):
                         _err(f"lesson.challenges[{cid}].validator.functions[{s}].cases[{n}]", "requiere args[] y expected.")
                     if len(case["args"]) != len(fn_spec["params"]):
                         _err(f"lesson.challenges[{cid}].validator.functions[{s}].cases[{n}]", "cantidad de argumentos no coincide con params.")
+        if v.get("kind") == "class_cases":
+            reqs = ch.get("requirements") or {}
+            clases = reqs.get("classes") or []
+            if not isinstance(clases, list) or not clases:
+                _err(f"lesson.challenges[{cid}].requirements.classes", "debe contener clases a verificar.")
+            for ci, cls_spec in enumerate(clases):
+                pref = f"lesson.challenges[{cid}].requirements.classes[{ci}]"
+                if not cls_spec.get("name"):
+                    _err(pref + ".name", "requiere nombre de clase.")
+                for m in cls_spec.get("methods", []) or []:
+                    if not m.get("name"):
+                        _err(pref + ".methods", "cada método requiere nombre.")
+                    cases = m.get("cases") or []
+                    if not isinstance(cases, list) or not cases:
+                        _err(pref + ".methods." + str(m.get("name")) + ".cases", "cada método requiere al menos un caso.")
+                    for n, case in enumerate(cases):
+                        if not isinstance(case, dict) or not isinstance(case.get("args"), list) or "expected" not in case:
+                            _err(pref + ".methods." + str(m.get("name")) + f".cases[{n}]", "requiere args[] y expected.")
         if a.get("kind") == "station_transition":
             if a.get("id") != target:
                 _err(f"lesson.challenges[{cid}].successAction.id", "debe coincidir con target en una transición de estación.")
-            station = next(it for it in zone["interactables"] if it["id"] == target)
+            station = None
+            for _z in _all_zones(data).values():
+                for it in _z.get("interactables", []):
+                    if it["id"] == target:
+                        station = it
+            if station is None:
+                _err(f"lesson.challenges[{cid}].target", "la estación target no existe en ninguna zona.")
             if station.get("missionNode") != cid:
                 _err(f"lesson.challenges[{cid}].target", "la estación target debe enlazar este desafío mediante missionNode.")
 
     if manifest:
         assets = manifest.get("assets", {})
-        for section in ("npcs", "interactables", "decor"):
-            for item in zone.get(section, []):
-                asset_id = item.get("asset")
-                if asset_id and asset_id not in assets:
-                    _err(f"zone.{section}[{item.get('id', item.get('kind', '?'))}].asset", f"asset '{asset_id}' inexistente.")
+        for _z in _all_zones(data).values():
+            for section in ("npcs", "interactables", "decor"):
+                for item in _z.get(section, []):
+                    asset_id = item.get("asset")
+                    if asset_id and asset_id not in assets:
+                        _err(f"zone.{section}[{item.get('id', item.get('kind', '?'))}].asset", f"asset '{asset_id}' inexistente.")
 
-    for it in zone["interactables"]:
-        node = it.get("missionNode")
-        if node and node not in ch_ids:
-            _err(f"zone.interactables[{it['id']}].missionNode", f"apunta a desafío '{node}' inexistente.")
-        if manifest:
-            marker_id = it.get("markerAsset")
-            if marker_id and marker_id not in manifest.get("assets", {}):
-                _err(f"zone.interactables[{it['id']}].markerAsset", f"asset '{marker_id}' inexistente.")
-        state_map = it.get("stateMap")
-        if state_map is not None:
-            missing_states = {"pending", "active", "completed"} - set(state_map)
-            if missing_states:
-                _err(f"zone.interactables[{it['id']}].stateMap", f"faltan estados: {sorted(missing_states)}")
+    for _z in _all_zones(data).values():
+        for it in _z["interactables"]:
+            node = it.get("missionNode")
+            if node and node not in ch_ids:
+                _err(f"zone.interactables[{it['id']}].missionNode", f"apunta a desafío '{node}' inexistente.")
             if manifest:
-                asset = manifest.get("assets", {}).get(it.get("asset"), {})
-                available = set(asset.get("states", {})) | set(asset.get("extraStates", {}))
-                unknown = set(state_map.values()) - available
-                if unknown:
-                    _err(f"zone.interactables[{it['id']}].stateMap", f"estados no presentes en asset: {sorted(unknown)}")
+                marker_id = it.get("markerAsset")
+                if marker_id and marker_id not in manifest.get("assets", {}):
+                    _err(f"zone.interactables[{it['id']}].markerAsset", f"asset '{marker_id}' inexistente.")
+            state_map = it.get("stateMap")
+            if state_map is not None:
+                missing_states = {"pending", "active", "completed"} - set(state_map)
+                if missing_states:
+                    _err(f"zone.interactables[{it['id']}].stateMap", f"faltan estados: {sorted(missing_states)}")
+                if manifest:
+                    asset = manifest.get("assets", {}).get(it.get("asset"), {})
+                    available = set(asset.get("states", {})) | set(asset.get("extraStates", {}))
+                    unknown = set(state_map.values()) - available
+                    if unknown:
+                        _err(f"zone.interactables[{it['id']}].stateMap", f"estados no presentes en asset: {sorted(unknown)}")
 
     intro_target = lesson.get("introTarget")
     if intro_target and intro_target not in npc_ids and intro_target not in interact_ids:
@@ -501,11 +585,15 @@ def autocompletar_leccion(lesson):
         relleno = set()
         if not ch.get("example"):
             ej = _autoejemplo(v)
+            if not ej and v.get("kind") == "class_cases":
+                ej = _autoejemplo_class(ch.get("requirements") or {})
             if ej:
                 ch["example"] = ej
                 relleno.add("example")
         if not ch.get("starterCode"):
             st = _autostarter(v)
+            if not st and v.get("kind") == "class_cases":
+                st = _autostarter_class(ch.get("requirements") or {})
             if st:
                 ch["starterCode"] = st
                 relleno.add("starterCode")
@@ -516,6 +604,57 @@ def autocompletar_leccion(lesson):
         if relleno:
             autollenos.append((ch["id"], sorted(relleno)))
     return autollenos
+
+
+def _autoejemplo_class(reqs):
+    """Deriva un ejemplo POO: instancia la clase con initArgs y muestra el
+    resultado de un caso de cada método."""
+    clases = (reqs.get("classes") or [])
+    if not clases:
+        return ""
+    lineas = []
+    for cs in clases:
+        args = ", ".join(py_repr(a) for a in (cs.get("initArgs") or []))
+        lineas.append(f"{cs['name']}({args})")
+        for m in (cs.get("methods") or [])[:2]:
+            casos = (m.get("cases") or [])
+            if casos:
+                c = casos[0]
+                cargs = ", ".join(py_repr(a) for a in (c.get("args") or []))
+                lineas.append(f"{cs['name']}.{m['name']}({cargs}) -> {py_repr(c.get('expected'))}")
+    return "\n".join(lineas)
+
+
+def _autostarter_class(reqs):
+    """Deriva un esqueleto de clase: class + __init__ con self.attr."""
+    clases = (reqs.get("classes") or [])
+    if not clases:
+        return ""
+    bloques = []
+    for cs in clases:
+        params = (cs.get("initParams") or [])
+        if not params and cs.get("initArgs"):
+            params = [f"param{i}" for i in range(len(cs["initArgs"]))]
+        lineas = [f"class {cs['name']}:"]
+        if params:
+            lineas.append(f"    def __init__(self, {', '.join(params)}):")
+            for p in params:
+                if p == "self":
+                    continue
+                lineas.append(f"        self.{p} = {p}")
+            lineas.append("")
+        for m in (cs.get("methods") or []):
+            if m.get("name") == "__init__":
+                continue
+            cargs = ((m.get("cases") or [{}])[0].get("args") or []) if (m.get("cases") or []) else []
+            ps = ["self"] + [f"arg{i}" for i in range(len(cargs))]
+            if m.get("classMethod"):
+                ps = ["cls"] + ps[1:]
+                lineas.append("    @classmethod")
+            lineas.append(f"    def {m['name']}({', '.join(ps)}):")
+            lineas.append("        return None")
+        bloques.append("\n".join(lineas))
+    return "\n\n".join(bloques)
 
 
 def auditar_calidad(lesson):
@@ -529,7 +668,7 @@ def auditar_calidad(lesson):
         if len((ch.get("objective") or "").strip()) < 25:
             flags.append("objetivo corto (<25 chars)")
             problemas += 1
-        if not ch.get("example") and v.get("kind") in ("function_cases", "def_return"):
+        if not ch.get("example") and v.get("kind") in ("function_cases", "def_return", "class_cases"):
             flags.append("sin ejemplo")
             problemas += 1
         if not ch.get("starterCode"):
@@ -538,6 +677,13 @@ def auditar_calidad(lesson):
         if len(ch.get("hints", [])) < 2:
             flags.append("pocas pistas (<2)")
             problemas += 1
+        if v.get("kind") == "class_cases":
+            reqs = ch.get("requirements") or {}
+            for cs in (reqs.get("classes") or []):
+                for m in (cs.get("methods") or []):
+                    if len((m.get("cases") or [])) < 2:
+                        flags.append(f"{cs['name']}.{m['name']}: <2 casos de prueba")
+                        problemas += 1
         if v.get("kind") == "function_cases":
             for f in (v.get("functions") or []):
                 if len(f.get("cases", [])) < 2:
@@ -731,13 +877,14 @@ def main():
 
     book_pages = data.get("book_pages", [])
     chapter = data.get("chapter", "")
+    zonas = _all_zones(data)
 
-    assets_js = build_assets_js(manifest, chapter, zone)
+    assets_js = build_assets_js(manifest, chapter, zone, zonas)
     renderer_js = ASSET_RENDERER.read_text(encoding="utf-8")
 
     template = TEMPLATE.read_text(encoding="utf-8")
     missing = [
-        p for p in ("/*__LESSONS_JS__*/", "/*__BOOK_JS__*/", "/*__ZONE_JS__*/", "/*__ASSETS_JS__*/", "/*__ASSET_RENDERER_JS__*/")
+        p for p in ("/*__LESSONS_JS__*/", "/*__BOOK_JS__*/", "/*__ZONE_JS__*/", "/*__ZONES_JS__*/", "/*__ASSETS_JS__*/", "/*__ASSET_RENDERER_JS__*/")
         if p not in template
     ]
     if missing:
@@ -747,12 +894,14 @@ def main():
     lessons_js = build_lessons_js(lesson)
     book_js = build_book_js(book_pages)
     zone_js = build_zone_js(zone)
+    zones_js = build_zones_js(zonas)
 
     page = (
         template
         .replace("/*__LESSONS_JS__*/", lessons_js)
         .replace("/*__BOOK_JS__*/", book_js)
         .replace("/*__ZONE_JS__*/", zone_js)
+        .replace("/*__ZONES_JS__*/", zones_js)
         .replace("/*__ASSETS_JS__*/", assets_js)
         .replace("/*__ASSET_RENDERER_JS__*/", renderer_js)
     )
