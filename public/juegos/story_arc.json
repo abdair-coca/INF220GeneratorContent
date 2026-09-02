@@ -1,112 +1,123 @@
 {
-  "universe": {
-    "name": "El Refugio Lógico",
-    "premise": "Has dejado atrás la 'Ciudad de la Interfaz', un lugar ruidoso donde todo está automatizado y la gente ha olvidado cómo funciona el mundo por dentro. Te adentras en 'El Gran Backend', un bosque salvaje, puro y complejo, acompañado por tu fiel compañera de expedición, Alizon. Aquí no hay botones mágicos; para sobrevivir debes dominar la lógica de la naturaleza leyendo un antiguo manual de supervivencia y construyendo todo con tus propias manos.",
-    "law": "Nada en El Gran Backend está automatizado. Para construir o sobrevivir hay que entender la lógica (planear con diagramas, escribir funciones, decidir con condiciones) y ejecutarla con código. No basta con desear un refugio: hay que construirlo.",
-    "characters": [
-      {
-        "id": "viajero",
-        "name": "El Viajero (el jugador)",
-        "role": "Protagonista. Llega de la Ciudad de la Interfaz sin saber sobrevivir en el bosque.",
-        "voice": "Es el jugador. Aprende leyendo el manual y escribiendo código para construir.",
-        "arc": "De forastero que no sabe hacer nada, a superviviente que domina la lógica de la naturaleza y mapea el bosque."
-      },
-      {
-        "id": "Alizon",
-        "name": "Alizon",
-        "role": "Compañera fiel de expedición. NPC acompañante que colabora en tareas.",
-        "voice": "Opera bajo una máquina de estados (Idle, Gathering, Cooking). Si el jugador talla madera, Alizon transiciona a recolección para ayudarle.",
-        "arc": "Acompaña al viajero en todos los capítulos; sus estados de IA reflejan el trabajo colaborativo de la expedición."
-      }
-    ],
-    "themes": [
-      "No basta con desear un refugio: hay que planearlo (diagramas) y construirlo (funciones y decisiones).",
-      "La organización es la clave entre el caos y la calma.",
-      "La lógica es la herramienta de supervivencia definitiva.",
-      "La naturaleza es salvaje, pura y compleja: se domina con patrones, no con atajos."
-    ]
-  },
-  "chapters": [
-    {
-      "lesson": "funciones_selectivas",
-      "chapter": 1,
-      "id": "planos_del_viajero",
-      "title": "Los Planos del Viajero — La Lógica del Refugio",
-      "concept": "funciones_selectivas",
-      "historia": "Al llegar al claro del bosque en su primer día, el viajero y Alizon se dan cuenta de que no pueden dormir a la intemperie. El antiguo manual de supervivencia indica que no basta con desear un refugio: hay que planearlo y construirlo. Primero leen los planos (diagramas de flujo, GL01, teoría), luego fabrican cada pieza con funciones (GL02) y toman decisiones con estructuras selectivas (GL03).",
-      "mision": "Montar el campamento habitando el claro. Usar funciones para fabricar las piezas del refugio (definir recetas con parámetros y return) y estructuras selectivas para tomar decisiones que el bosque exige (mayor de tres, clasificar el estado del campamento). Los diagramas de flujo son el plano mental que guía todo.",
-      "cliffhanger": "El campamento está en pie y habitable, pero una tormenta se acerca por el horizonte y los animales merodean las provisiones. El sendero hacia lo profundo del bosque se abre, y algo aguarda más allá de la luz del fuego..."
-    },
-    {
-      "lesson": "encapsulamiento",
-      "chapter": 2,
-      "id": "resguardo_tormenta",
-      "title": "El Resguardo frente a la Tormenta — Encapsulamiento",
-      "concept": "encapsulamiento",
-      "historia": "Una tormenta se acerca y los animales salvajes merodean el campamento por la noche. Las provisiones están expuestas. Si cualquiera puede alterar tu comida, la expedición fracasará.",
-      "mision": "Construir baúles seguros. Declarar variables como privadas para que ni la lluvia ni los osos puedan modificar el inventario de comida directamente. Acceder a las raciones solo mediante métodos seguros (getters y setters).",
-      "cliffhanger": "Las provisiones están a salvo. Pero la supervivencia exige adaptarse: una simple rama ya no es suficiente..."
-    },
-    {
-      "lesson": "herencia_polimorfismo",
-      "chapter": 3,
-      "id": "herramientas_medida",
-      "title": "Herramientas a Medida — Herencia y Polimorfismo",
-      "concept": "herencia_polimorfismo",
-      "historia": "La supervivencia exige adaptarse. Una simple rama ya no es suficiente. Necesitan forjar herramientas especializadas a partir de un diseño base común.",
-      "mision": "Crear la clase padre Herramienta. Con Herencia, derivar un Hacha y una CañaDePescar. Con Polimorfismo, ambas comparten el método usar() pero actúan distinto: el hacha tala árboles y la caña atrapa la cena.",
-      "cliffhanger": "Las herramientas están forjadas. Llega el invierno y el trabajo duro comienza..."
-    },
-    {
-      "lesson": "pilas_colas_listas",
-      "chapter": 4,
-      "id": "ritmo_supervivencia",
-      "title": "El Ritmo de la Supervivencia — Pilas, Colas y Listas",
-      "concept": "estructuras_datos_lineales",
-      "historia": "Llega el invierno y el trabajo duro comienza. La organización es la clave entre el caos y la calma. Hay que cortar troncos pesados, mantener el cuerpo fuerte y preparar la comida al fuego abierto, recordando las viejas recetas de campamento.",
-      "mision": "Pilas (LIFO): talar troncos pesados y apilarlos uno sobre otro; el último tronco que se pone arriba es el primero que se toma para el fuego. Colas (FIFO): cocinar sobre las brasas; el primer ingrediente que entra (carne o papas) es el primero en recibir el calor. Listas (Arrays/Lists): organizar los bolsillos de la mochila, iterando para encontrar exactamente lo que se necesita.",
-      "cliffhanger": "Con el campamento asegurado y el fuego crepitando, es hora de explorar las profundidades del bosque..."
-    },
-    {
-      "lesson": "arboles_grafos",
-      "chapter": 5,
-      "id": "senderos_ocultos",
-      "title": "Los Senderos Ocultos — Árboles y Grafos",
-      "concept": "arboles_grafos",
-      "historia": "Con el campamento asegurado y el fuego crepitando, es hora de explorar las profundidades del bosque para mapear la región y encontrar manantiales ocultos.",
-      "mision": "Árboles Binarios: seguir el cauce de un río que se bifurca constantemente en dos corrientes; aprender a recorrer rutas (in-order, pre-order) para no perderse. Grafos: mapear los claros del bosque y las cuevas conectándolos mediante nodos y aristas, aplicando algoritmos de búsqueda (como Dijkstra) para encontrar el camino más corto de regreso al refugio antes de que caiga la noche.",
-      "cliffhanger": "El mapa del bosque está completo. El Gran Backend ya no tiene secretos para quien domina su lógica."
-    }
+ "universe": {
+  "name": "El Refugio Lógico",
+  "premise": "Has dejado atrás la 'Ciudad de la Interfaz', un lugar ruidoso donde todo está automatizado y la gente ha olvidado cómo funciona el mundo por dentro. Te adentras en 'El Gran Backend', un bosque salvaje, puro y complejo, acompañado por tu fiel compañera de expedición, Alizon. Aquí no hay botones mágicos; para sobrevivir debes dominar la lógica de la naturaleza leyendo un antiguo manual de supervivencia y construyendo todo con tus propias manos.",
+  "law": "Nada en El Gran Backend está automatizado. Para construir o sobrevivir hay que entender la lógica (planear con diagramas, escribir funciones, decidir con condiciones) y ejecutarla con código. No basta con desear un refugio: hay que construirlo.",
+  "characters": [
+   {
+    "id": "viajero",
+    "name": "El Viajero (el jugador)",
+    "role": "Protagonista. Llega de la Ciudad de la Interfaz sin saber sobrevivir en el bosque.",
+    "voice": "Es el jugador. Aprende leyendo el manual y escribiendo código para construir.",
+    "arc": "De forastero que no sabe hacer nada, a superviviente que domina la lógica de la naturaleza y mapea el bosque."
+   },
+   {
+    "id": "Alizon",
+    "name": "Alizon",
+    "role": "Compañera fiel de expedición. NPC acompañante que colabora en tareas.",
+    "voice": "Opera bajo una máquina de estados (Idle, Gathering, Cooking). Si el jugador talla madera, Alizon transiciona a recolección para ayudarle.",
+    "arc": "Acompaña al viajero en todos los capítulos; sus estados de IA reflejan el trabajo colaborativo de la expedición."
+   }
   ],
-  "engine": {
-    "name": "El Motor del Bosque",
-    "description": "Reglas del motor de juego (RPG educativo 2D top-down) que deben cumplir todos los juegos de los niveles/lecciones.",
-    "template": "Juego_funciones_02.html (en inf-220-g2/clases/) es el conejillo de indias: ahí se arma la plantilla perfecta que se replicará en los demás niveles y lecciones.",
-    "rules": {
-      "fisica": {
-        "title": "El Motor del Bosque — Reglas de Física",
-        "items": [
-          "Hitboxes inteligentes (colisiones): colisión solo en el tronco de los árboles; el jugador puede caminar 'por detrás' de las hojas (alterando el z-index o dibujando al jugador antes que la copa del árbol).",
-          "Fricción y sobrecarga: cargar recursos pesados (madera) o empujar troncos grandes reduce la velocidad de movimiento; mover objetos pesados requiere esfuerzo continuo y se siente diferente a recolectar bayas.",
-          "Físicas de partículas orgánicas: viento aleatorio que mueve sutilmente los sistemas de partículas (humo de la fogata, chispas al chocar piedras)."
-        ]
-      },
-      "dinamismo": {
-        "title": "El Motor del Bosque — Reglas de Dinamismo (Game Feel)",
-        "items": [
-          "El Ritmo del Bucle: requestAnimationFrame a 60 FPS constante; los impactos fuertes (talar un árbol, resolver un desafío) incluyen hit stop (~50 ms) o screen shake (temblor de cámara).",
-          "Ciclos de Luz y Tiempo: ciclo día/noche dinámico oscureciendo el lienzo global (ctx.globalAlpha) y creando halos de luz alrededor del jugador y las fogatas; de noche es obligatorio estar cerca del fuego o usar objetos luminosos.",
-          "Animaciones de Anticipación y Recuperación: antes de golpear con el hacha el sprite retrocede unos píxeles (anticipación), da el golpe y tarda un instante en volver a la postura base."
-        ]
-      },
-      "arquitectura": {
-        "title": "El Motor del Bosque — Reglas de Lógica y Arquitectura",
-        "items": [
-          "Gestión del Estado Global: inventario, progreso de misiones y objetos construidos como una base de datos relacional; el nivel no guarda 'la fogata está encendida' sino que LevelManager consulta el estado del objeto Fogata que reside en el almacén de datos del jugador.",
-          "Máquinas de Estados para NPCs (IA): NPCs como Alizon operan bajo una máquina de estados finitos (Idle, Gathering, Cooking); si el jugador tala madera, el NPC transiciona automáticamente a recolección para ayudar a apilarla.",
-          "Aislamiento del Intérprete (Sandbox): el mini-intérprete de Python/JS que resuelve desafíos corre aislado; un bucle infinito se detecta a los 1000 ciclos y se detiene lanzando un mensaje de error amigable en lugar de congelar la pestaña del navegador."
-        ]
-      }
-    }
+  "themes": [
+   "No basta con desear un refugio: hay que planearlo (diagramas) y construirlo (funciones y decisiones).",
+   "La organización es la clave entre el caos y la calma.",
+   "La lógica es la herramienta de supervivencia definitiva.",
+   "La naturaleza es salvaje, pura y compleja: se domina con patrones, no con atajos."
+  ]
+ },
+ "chapters": [
+  {
+   "lesson": "funciones_selectivas",
+   "chapter": 1,
+   "id": "planos_del_viajero",
+   "title": "Los Planos del Viajero — La Lógica del Refugio",
+   "concept": "funciones_selectivas",
+   "historia": "Al llegar al claro del bosque en su primer día, el viajero y Alizon se dan cuenta de que no pueden dormir a la intemperie. El antiguo manual de supervivencia indica que no basta con desear un refugio: hay que planearlo y construirlo. Primero leen los planos (diagramas de flujo, GL01, teoría), luego fabrican cada pieza con funciones (GL02) y toman decisiones con estructuras selectivas (GL03).",
+   "mision": "Montar el campamento habitando el claro. Usar funciones para fabricar las piezas del refugio (definir recetas con parámetros y return) y estructuras selectivas para tomar decisiones que el bosque exige (mayor de tres, clasificar el estado del campamento). Los diagramas de flujo son el plano mental que guía todo.",
+   "cliffhanger": "El campamento está en pie y habitable, pero una tormenta se acerca por el horizonte y los animales merodean las provisiones. El sendero hacia lo profundo del bosque se abre, y algo aguarda más allá de la luz del fuego..."
+  },
+  {
+   "lesson": "encapsulamiento",
+   "chapter": 2,
+   "id": "resguardo_tormenta",
+   "title": "El Resguardo frente a la Tormenta — Encapsulamiento",
+   "concept": "encapsulamiento",
+   "historia": "Una tormenta se acerca y los animales salvajes merodean el campamento por la noche. Las provisiones están expuestas. Si cualquiera puede alterar tu comida, la expedición fracasará.",
+   "mision": "Construir baúles seguros. Declarar variables como privadas para que ni la lluvia ni los osos puedan modificar el inventario de comida directamente. Acceder a las raciones solo mediante métodos seguros (getters y setters).",
+   "cliffhanger": "Las provisiones están a salvo. Pero la supervivencia exige adaptarse: una simple rama ya no es suficiente..."
+  },
+  {
+   "lesson": "herencia_polimorfismo",
+   "chapter": 3,
+   "id": "herramientas_medida",
+   "title": "Herramientas a Medida — Herencia y Polimorfismo",
+   "concept": "herencia_polimorfismo",
+   "historia": "La supervivencia exige adaptarse. Una simple rama ya no es suficiente. Necesitan forjar herramientas especializadas a partir de un diseño base común.",
+   "mision": "Crear la clase padre Herramienta. Con Herencia, derivar un Hacha y una CañaDePescar. Con Polimorfismo, ambas comparten el método usar() pero actúan distinto: el hacha tala árboles y la caña atrapa la cena.",
+   "cliffhanger": "Las herramientas están forjadas. Llega el invierno y el trabajo duro comienza..."
+  },
+  {
+   "lesson": "pilas_colas_listas",
+   "chapter": 4,
+   "id": "ritmo_supervivencia",
+   "title": "El Ritmo de la Supervivencia — Pilas, Colas y Listas",
+   "concept": "estructuras_datos_lineales",
+   "historia": "Llega el invierno y el trabajo duro comienza. La organización es la clave entre el caos y la calma. Hay que cortar troncos pesados, mantener el cuerpo fuerte y preparar la comida al fuego abierto, recordando las viejas recetas de campamento.",
+   "mision": "Pilas (LIFO): talar troncos pesados y apilarlos uno sobre otro; el último tronco que se pone arriba es el primero que se toma para el fuego. Colas (FIFO): cocinar sobre las brasas; el primer ingrediente que entra (carne o papas) es el primero en recibir el calor. Listas (Arrays/Lists): organizar los bolsillos de la mochila, iterando para encontrar exactamente lo que se necesita.",
+   "cliffhanger": "Con el campamento asegurado y el fuego crepitando, es hora de explorar las profundidades del bosque..."
+  },
+  {
+   "lesson": "arboles_grafos",
+   "chapter": 5,
+   "id": "senderos_ocultos",
+   "title": "Los Senderos Ocultos — Árboles y Grafos",
+   "concept": "arboles_grafos",
+   "historia": "Con el campamento asegurado y el fuego crepitando, es hora de explorar las profundidades del bosque para mapear la región y encontrar manantiales ocultos.",
+   "mision": "Árboles Binarios: seguir el cauce de un río que se bifurca constantemente en dos corrientes; aprender a recorrer rutas (in-order, pre-order) para no perderse. Grafos: mapear los claros del bosque y las cuevas conectándolos mediante nodos y aristas, aplicando algoritmos de búsqueda (como Dijkstra) para encontrar el camino más corto de regreso al refugio antes de que caiga la noche.",
+   "cliffhanger": "El mapa del bosque está completo. El Gran Backend ya no tiene secretos para quien domina su lógica."
   }
+ ],
+ "engine": {
+  "name": "El Motor del Bosque",
+  "description": "Reglas del motor de juego (RPG educativo 2D top-down) que deben cumplir todos los juegos de los niveles/lecciones.",
+  "template": "Juego_funciones_02.html (en inf-220-g2/clases/) es el conejillo de indias: ahí se arma la plantilla perfecta que se replicará en los demás niveles y lecciones.",
+  "rules": {
+   "fisica": {
+    "title": "El Motor del Bosque — Reglas de Física",
+    "items": [
+     "Hitboxes inteligentes (colisiones): colisión solo en el tronco de los árboles; el jugador puede caminar 'por detrás' de las hojas (alterando el z-index o dibujando al jugador antes que la copa del árbol).",
+     "Fricción y sobrecarga: cargar recursos pesados (madera) o empujar troncos grandes reduce la velocidad de movimiento; mover objetos pesados requiere esfuerzo continuo y se siente diferente a recolectar bayas.",
+     "Físicas de partículas orgánicas: viento aleatorio que mueve sutilmente los sistemas de partículas (humo de la fogata, chispas al chocar piedras)."
+    ]
+   },
+   "dinamismo": {
+    "title": "El Motor del Bosque — Reglas de Dinamismo (Game Feel)",
+    "items": [
+     "El Ritmo del Bucle: requestAnimationFrame a 60 FPS constante; los impactos fuertes (talar un árbol, resolver un desafío) incluyen hit stop (~50 ms) o screen shake (temblor de cámara).",
+     "Ciclos de Luz y Tiempo: ciclo día/noche dinámico oscureciendo el lienzo global (ctx.globalAlpha) y creando halos de luz alrededor del jugador y las fogatas; de noche es obligatorio estar cerca del fuego o usar objetos luminosos.",
+     "Animaciones de Anticipación y Recuperación: antes de golpear con el hacha el sprite retrocede unos píxeles (anticipación), da el golpe y tarda un instante en volver a la postura base."
+    ]
+   },
+   "arquitectura": {
+    "title": "El Motor del Bosque — Reglas de Lógica y Arquitectura",
+    "items": [
+     "Gestión del Estado Global: inventario, progreso de misiones y objetos construidos como una base de datos relacional; el nivel no guarda 'la fogata está encendida' sino que LevelManager consulta el estado del objeto Fogata que reside en el almacén de datos del jugador.",
+     "Máquinas de Estados para NPCs (IA): NPCs como Alizon operan bajo una máquina de estados finitos (Idle, Gathering, Cooking); si el jugador tala madera, el NPC transiciona automáticamente a recolección para ayudar a apilarla.",
+     "Aislamiento del Intérprete (Sandbox): el mini-intérprete de Python/JS que resuelve desafíos corre aislado; un bucle infinito se detecta a los 1000 ciclos y se detiene lanzando un mensaje de error amigable en lugar de congelar la pestaña del navegador."
+    ]
+   }
+  }
+ },
+ "practicas": [
+  {
+   "lesson": "practica5_objetos",
+   "id": "objetos_perdidos",
+   "title": "Los Objetos Perdidos — Clases, Objetos y Métodos",
+   "concept": "clases, objetos y métodos",
+   "historia": "En lo profundo del Gran Backend, el viajero y Alizon tropiezan con las ruinas de la antigua Ciudad de la Interfaz: un cementerio de objetos que la gente usaba sin entender. Alizon confiesa que ella también es de la ciudad: 'Los usábamos sin entenderlos; nunca supimos construir ninguno. Hasta hoy.'",
+   "mision": "Reconstruir los diez objetos perdidos por dentro, convirtiéndolos en clases con atributos y métodos (Persona, Rectangulo, CuentaBancaria, Producto, Estudiante con @classmethod, Empleado con privados, CarritoDeCompras, Vehiculo, Libro y Fecha+Estudiante por composición). Cada objeto reconstruido empuja la escarcha que avanza desde las ruinas.",
+   "cliffhanger": "Con los diez objetos vivos, el campamento es una mini-sociedad que funciona. Alizon: 'La ciudad lo tenía todo y no entendía nada. Acá lo construiste todo y lo entendés todo. Ahora el bosque no tiene secretos para tus manos.' Algo se acerca desde el horizonte y los objetos del campamento ahora necesitan protegerse... (El Resguardo frente a la Tormenta — Encapsulamiento)"
+  }
+ ]
 }
