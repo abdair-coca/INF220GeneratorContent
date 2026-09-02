@@ -1511,6 +1511,7 @@ class PythonEngine {
   _safePostfix(env, evaluate) { let v = this._safePrimary(env, evaluate); while (true) { if (this._safePeek().v === "[") { this._safeTake(); const index = this._safeOr(env, evaluate); if (this._safePeek().v !== "]") throw { type: "SyntaxError", message: "Falta ']'." }; this._safeTake(); if (evaluate) { if (!Array.isArray(v) && typeof v !== "string") throw { type: "TypeError", message: "Solo puedes indexar listas o textos." }; v = v[index]; } continue; } if (this._safePeek().v === ".") { this._safeTake(); const attr = this._safeTake(); if (this._safePeek().v === "(") {
         this._safeTake(); const args = []; if (this._safePeek().v !== ")") { args.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); args.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake();
         if (!evaluate) continue;
+        if (attr.v === "append" && Array.isArray(v)) { if (args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.push(args[0]); v = null; continue; }
         if (v && v.__method === "append") { if (!Array.isArray(v.target) || args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.target.push(args[0]); v = null; continue; }
         if (v && this._isInstance(v)) {
           const method = this._findMethod(v.__class__, attr.v);
@@ -1836,7 +1837,15 @@ const VALIDATORS = {
       const createCount = clsSpec.instances || 1;
       let inst;
       for (let n = 0; n < createCount; n++) {
-        inst = engine._instantiate(clsSpec.name, clsSpec.initArgs || []);
+        const resolvedArgs = (clsSpec.initArgs || []).map(a => {
+          if (a && typeof a === "object" && a.__ref) {
+            const ref = engine._instantiate(a.__ref, a.args || []);
+            if (ref.error) return a;
+            return ref.value;
+          }
+          return a;
+        });
+        inst = engine._instantiate(clsSpec.name, resolvedArgs);
         if (inst.error) return { valid: false, error: inst.error };
       }
       const obj = inst.value;
