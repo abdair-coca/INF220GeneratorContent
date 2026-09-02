@@ -1,0 +1,1915 @@
+{
+  "meta": {
+    "materia": "INF-220 · Programación Orientada a Objetos",
+    "codigo": "PRACTICA5",
+    "facultad": "UATF · Facultad de Ciencias Puras · Ing. Informática",
+    "titulo": "El Refugio Lógico: Los Objetos Perdidos",
+    "subtitulo": "Diez objetos de la Ciudad de la Interfaz, reconstruidos por dentro con clases, objetos y métodos.",
+    "semestre": "Ing. Informática · 2º semestre · Gestión 2026-02",
+    "duracion": "Práctica abierta",
+    "docente": "Docente: Ph.D. Juan Ramiro Villa · Auxiliar: Univ. Abdair Magdiel Coca Carlo"
+  },
+  "chapter": "practica_5_objetos",
+  "zone": {
+    "rows": 18,
+    "cols": 24,
+    "map": [
+      "TTTTTTTTTTTTTTTTTTTTTTTT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGHHHHHHHHHHHHHHHHHHHHHT",
+      "TGHHHHHHHHHHHHHHHHHHHHHT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "THHHHHHHHHHHHHHHHHHHHHHT",
+      "THHHHHHHHHHHHHHHHHHHHHHT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGHHHHHHHHHHGGGGGGT",
+      "TGGGGGGHHHHHHHHHHGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    "flags": {},
+    "weather": {
+      "mode": "frost",
+      "density": 0.7,
+      "dropCount": 150,
+      "dropLength": 10,
+      "dropSpeed": 220,
+      "wind": 0.12,
+      "gust": 0.05,
+      "gustPeriod": 6,
+      "alpha": 0.5,
+      "color": "#cfe6f2",
+      "overlayColor": "#8fb8c9"
+    },
+    "npcs": [
+      {
+        "id": "alizon",
+        "x": 352,
+        "y": 250,
+        "w": 26,
+        "h": 28,
+        "asset": "npc_alizon",
+        "name": "Alizon",
+        "dialogue": [
+          "Las ruinas de la Ciudad de la Interfaz están frente a nosotros. Cada objeto que la gente tocaba sin entender sigue inerte bajo la escarcha.",
+          "Yo también soy de la ciudad. Los usábamos sin entenderlos; nunca supimos construir ninguno. Hasta hoy.",
+          "Reconstruí cada objeto por dentro: conviertilo en una clase con sus atributos y métodos. La escarcha retrocederá con cada objeto que vuelva a la vida."
+        ]
+      }
+    ],
+    "interactables": [
+      {
+        "id": "altar_alma",
+        "type": "station",
+        "asset": "objeto_persona",
+        "markerAsset": "marker_objeto_alma",
+        "x": 120,
+        "y": 90,
+        "w": 56,
+        "h": 56,
+        "missionNode": "objeto_alma",
+        "stateMap": {
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
+        },
+        "solid": {
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
+        },
+        "sortOffset": 52
+      },
+      {
+        "id": "altar_medida",
+        "type": "station",
+        "asset": "objeto_rectangulo",
+        "markerAsset": "marker_objeto_medida",
+        "x": 640,
+        "y": 90,
+        "w": 56,
+        "h": 56,
+        "missionNode": "objeto_medida",
+        "stateMap": {
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
+        },
+        "solid": {
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
+        },
+        "sortOffset": 52
+      },
+      {
+        "id": "portal_posada",
+        "type": "portal",
+        "asset": "fachada_posada",
+        "toZone": "posada",
+        "spawnX": 160,
+        "spawnY": 300,
+        "x": 64,
+        "y": 210,
+        "w": 56,
+        "h": 56,
+        "stateMap": {
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
+        },
+        "solid": {
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
+        },
+        "sortOffset": 52
+      },
+      {
+        "id": "portal_banco",
+        "type": "portal",
+        "asset": "fachada_banco",
+        "toZone": "banco",
+        "spawnX": 160,
+        "spawnY": 300,
+        "x": 672,
+        "y": 210,
+        "w": 56,
+        "h": 56,
+        "stateMap": {
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
+        },
+        "solid": {
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
+        },
+        "sortOffset": 52
+      },
+      {
+        "id": "portal_escuela",
+        "type": "portal",
+        "asset": "fachada_escuela",
+        "toZone": "escuela",
+        "spawnX": 160,
+        "spawnY": 300,
+        "x": 64,
+        "y": 330,
+        "w": 56,
+        "h": 56,
+        "stateMap": {
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
+        },
+        "solid": {
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
+        },
+        "sortOffset": 52
+      },
+      {
+        "id": "portal_taller",
+        "type": "portal",
+        "asset": "fachada_taller",
+        "toZone": "taller",
+        "spawnX": 160,
+        "spawnY": 300,
+        "x": 672,
+        "y": 330,
+        "w": 56,
+        "h": 56,
+        "stateMap": {
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
+        },
+        "solid": {
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
+        },
+        "sortOffset": 52
+      },
+      {
+        "id": "fogata_central",
+        "type": "fogata",
+        "asset": "campfire",
+        "x": 352,
+        "y": 300,
+        "w": 48,
+        "h": 40,
+        "solid": {
+          "x": 8,
+          "y": 26,
+          "w": 32,
+          "h": 10
+        },
+        "sortOffset": 36
+      }
+    ],
+    "decor": [
+      {
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 60,
+        "y": 430,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 700,
+        "y": 60,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "kind": "grass",
+        "asset": "grass_tufts",
+        "x": 150,
+        "y": 60,
+        "w": 48,
+        "h": 16
+      },
+      {
+        "kind": "grass",
+        "asset": "grass_tufts",
+        "x": 580,
+        "y": 440,
+        "w": 48,
+        "h": 16
+      },
+      {
+        "kind": "grass",
+        "asset": "grass_tufts",
+        "x": 300,
+        "y": 150,
+        "w": 48,
+        "h": 16
+      }
+    ],
+    "doors": []
+  },
+  "zones": {
+    "posada": {
+      "rows": 10,
+      "cols": 12,
+      "map": [
+        "WWWWWWWWWWWW",
+        "WFFFFFFFFWWW",
+        "WFFFFFFCFFFW",
+        "WFFFFFFFFWWW",
+        "WFFFCFFFFFFW",
+        "WFFFFFFFFWWW",
+        "WFFFCFFFFFFW",
+        "WFFFFFFFFWWW",
+        "WFFFFFFFFWWW",
+        "WWWWWWWWWWWW"
+      ],
+      "flags": {},
+      "weather": {
+        "mode": "none"
+      },
+      "npcs": [],
+      "interactables": [
+        {
+          "id": "portal_posada_salida",
+          "type": "portal",
+          "asset": "tent_blue",
+          "toZone": "exterior",
+          "spawnX": 352,
+          "spawnY": 96,
+          "x": 96,
+          "y": 64,
+          "w": 56,
+          "h": 56,
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_caja",
+          "type": "station",
+          "asset": "objeto_cuenta",
+          "markerAsset": "marker_objeto_caja",
+          "x": 160,
+          "y": 170,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_caja",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_nomina",
+          "type": "station",
+          "asset": "objeto_empleado",
+          "markerAsset": "marker_objeto_nomina",
+          "x": 256,
+          "y": 250,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_nomina",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_ficha",
+          "type": "station",
+          "asset": "objeto_fecha",
+          "markerAsset": "marker_objeto_ficha",
+          "x": 320,
+          "y": 150,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_ficha",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        }
+      ],
+      "decor": [],
+      "doors": []
+    },
+    "banco": {
+      "rows": 10,
+      "cols": 12,
+      "map": [
+        "WWWWWWWWWWWW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WWWWWWWWWWWW"
+      ],
+      "flags": {},
+      "weather": {
+        "mode": "none"
+      },
+      "npcs": [],
+      "interactables": [
+        {
+          "id": "portal_banco_salida",
+          "type": "portal",
+          "asset": "tent_blue",
+          "toZone": "exterior",
+          "spawnX": 672,
+          "spawnY": 96,
+          "x": 96,
+          "y": 64,
+          "w": 56,
+          "h": 56,
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_almacen",
+          "type": "station",
+          "asset": "objeto_producto",
+          "markerAsset": "marker_objeto_almacen",
+          "x": 200,
+          "y": 220,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_almacen",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        }
+      ],
+      "decor": [],
+      "doors": []
+    },
+    "escuela": {
+      "rows": 10,
+      "cols": 12,
+      "map": [
+        "WWWWWWWWWWWW",
+        "WFFFFFFFFWWW",
+        "WFFFFFFFCFFW",
+        "WFFFFFFFFWWW",
+        "WFFCFFFFFFFW",
+        "WFFFFFFFFWWW",
+        "WFFFFFCFFFFW",
+        "WFFFFFFFFWWW",
+        "WFFFCFFFFFFW",
+        "WWWWWWWWWWWW"
+      ],
+      "flags": {},
+      "weather": {
+        "mode": "none"
+      },
+      "npcs": [],
+      "interactables": [
+        {
+          "id": "portal_escuela_salida",
+          "type": "portal",
+          "asset": "tent_blue",
+          "toZone": "exterior",
+          "spawnX": 64,
+          "spawnY": 350,
+          "x": 96,
+          "y": 64,
+          "w": 56,
+          "h": 56,
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_escuela",
+          "type": "station",
+          "asset": "objeto_estudiante",
+          "markerAsset": "marker_objeto_escuela",
+          "x": 180,
+          "y": 220,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_escuela",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_manual",
+          "type": "station",
+          "asset": "objeto_libro",
+          "markerAsset": "marker_objeto_manual",
+          "x": 288,
+          "y": 150,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_manual",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        }
+      ],
+      "decor": [],
+      "doors": []
+    },
+    "taller": {
+      "rows": 10,
+      "cols": 12,
+      "map": [
+        "WWWWWWWWWWWW",
+        "WFFFFFFFFWWW",
+        "WFFFCFFFFFCW",
+        "WFFFFFFFFWWW",
+        "WFFFFFCFFFFW",
+        "WFFFFFFFFWWW",
+        "WFFFFFFFCFFW",
+        "WFFFFFFFFWWW",
+        "WFFCFFFFFFFW",
+        "WWWWWWWWWWWW"
+      ],
+      "flags": {},
+      "weather": {
+        "mode": "none"
+      },
+      "npcs": [],
+      "interactables": [
+        {
+          "id": "portal_taller_salida",
+          "type": "portal",
+          "asset": "tent_blue",
+          "toZone": "exterior",
+          "spawnX": 672,
+          "spawnY": 350,
+          "x": 96,
+          "y": 64,
+          "w": 56,
+          "h": 56,
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_carro",
+          "type": "station",
+          "asset": "objeto_carrito",
+          "markerAsset": "marker_objeto_carro",
+          "x": 180,
+          "y": 220,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_carro",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        },
+        {
+          "id": "altar_carreta",
+          "type": "station",
+          "asset": "objeto_vehiculo",
+          "markerAsset": "marker_objeto_carreta",
+          "x": 288,
+          "y": 150,
+          "w": 56,
+          "h": 56,
+          "missionNode": "objeto_carreta",
+          "stateMap": {
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
+          },
+          "solid": {
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
+          },
+          "sortOffset": 52
+        }
+      ],
+      "decor": [],
+      "doors": []
+    }
+  },
+  "lesson": {
+    "id": "practica5_objetos",
+    "title": "Los Objetos Perdidos",
+    "concept": "clases, objetos y métodos",
+    "zone": "exterior",
+    "introTarget": "alizon",
+    "story": [
+      "En lo profundo del Gran Backend, el viajero y Alizon tropiezan con las ruinas de la antigua Ciudad de la Interfaz: un cementerio de objetos que la gente usaba sin entender.",
+      "La escarcha avanza desde las ruinas. Cada objeto reconstruido por dentro (convertido en una clase con atributos y métodos) vuelve a la vida y empuja la escarcha de vuelta."
+    ],
+    "introDialogue": {
+      "speaker": "Alizon",
+      "lines": [
+        "Estas son las ruinas de mi ciudad. Cada objeto que ves estuvo vivo cuando alguien lo entendía.",
+        "En la ciudad tocábamos los botones. Acá construís el interior: clases, atributos y métodos.",
+        "Seguí el radar, entrá a los edificios y reconstruí los diez objetos. La escarcha retrocederá con cada uno."
+      ]
+    },
+    "objectives": {
+      "intro": "Habla con Alizon y seguí el radar hasta el primer objeto.",
+      "objeto_alma": "Define la clase Persona: __init__(nombre, edad), saludar() que incluya el nombre y es_mayor_de_edad() con edad >= 18.",
+      "objeto_medida": "Define la clase Rectangulo: __init__(base, altura), calcular_area(), calcular_perimetro() y es_cuadrado().",
+      "objeto_caja": "Define la clase CuentaBancaria: __init__(titular, saldo_inicial), depositar(), retirar() y consultar_saldo().",
+      "objeto_nomina": "Define la clase Empleado con __salario privado: get_salario(), aumentar_salario() y __str__().",
+      "objeto_ficha": "Define las clases Fecha y Estudiante con composición: Fecha.__str__() y Estudiante.mostrar_ficha().",
+      "objeto_almacen": "Define la clase Producto: __init__(nombre, precio, stock), vender(), reponer_stock() y valor_inventario().",
+      "objeto_escuela": "Define la clase Estudiante con atributo de clase total_estudiantes y @classmethod obtener_total().",
+      "objeto_manual": "Define la clase Libro: prestar(), devolver() y __str__() con estado Disponible/Prestado.",
+      "objeto_carro": "Define la clase CarritoDeCompras: agregar_producto(), eliminar_producto(), calcular_total() y vaciar_carrito().",
+      "objeto_carreta": "Define la clase Vehiculo: __init__(marca, modelo, velocidad_maxima), acelerar(), frenar() y mostrar_info()."
+    },
+    "progression": {
+      "mode": "sequential",
+      "strict": true
+    },
+    "completion": {
+      "score": 100
+    },
+    "ui": {
+      "bookTitle": "Manual de Supervivencia",
+      "editorLabel": "OBJETOS · TALLER DE RECONSTRUCCIÓN",
+      "showDuration": false
+    },
+    "storm": {
+      "thresholds": [
+        {
+          "maxSolved": 2,
+          "phase": "solved_0_2"
+        },
+        {
+          "maxSolved": 5,
+          "phase": "solved_3_5"
+        },
+        {
+          "maxSolved": 8,
+          "phase": "solved_6_8"
+        },
+        {
+          "maxSolved": 9,
+          "phase": "solved_9"
+        },
+        {
+          "maxSolved": 10,
+          "phase": "solved_10"
+        }
+      ]
+    },
+    "challenges": [
+      {
+        "id": "objeto_alma",
+        "title": "La Primera Alma",
+        "target": "altar_alma",
+        "objective": "Define la clase Persona con __init__(nombre, edad). El método saludar() debe retornar un mensaje que incluya el nombre (por ejemplo 'Hola, soy Ana') y es_mayor_de_edad() debe retornar True si edad es 18 o más y False en caso contrario.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "Cada clase necesita __init__ que guarde sus atributos con self.",
+          "saludar() retorna un texto con return, usando el nombre del objeto.",
+          "es_mayor_de_edad() compara edad con 18 y retorna True o False."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Persona",
+              "initArgs": [
+                "Ana",
+                20
+              ],
+              "methods": [
+                {
+                  "name": "saludar",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Hola, soy Ana"
+                    }
+                  ]
+                },
+                {
+                  "name": "es_mayor_de_edad",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Persona",
+              "initArgs": [
+                "Luis",
+                15
+              ],
+              "methods": [
+                {
+                  "name": "saludar",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Hola, soy Luis"
+                    }
+                  ]
+                },
+                {
+                  "name": "es_mayor_de_edad",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_alma"
+        },
+        "successDialogue": [
+          "El maniquí pronuncia tu nombre. La primera voz del refugio despierta.",
+          "Alizon sonríe: 'Así hablaba el censo, cuando la ciudad aún lo entendía.'"
+        ],
+        "concepts": [
+          "clases",
+          "objetos",
+          "metodos",
+          "atributos"
+        ]
+      },
+      {
+        "id": "objeto_medida",
+        "title": "La Medida del Claro",
+        "target": "altar_medida",
+        "objective": "Define la clase Rectangulo con __init__(base, altura). calcular_area() retorna base * altura, calcular_perimetro() retorna 2 * (base + altura) y es_cuadrado() retorna True si base y altura son iguales y False si no.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "Guarda base y altura como atributos en __init__.",
+          "El área es base * altura; el perímetro es 2 * (base + altura).",
+          "es_cuadrado() compara base con altura y retorna el booleano."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Rectangulo",
+              "initArgs": [
+                5,
+                10
+              ],
+              "methods": [
+                {
+                  "name": "calcular_area",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 50
+                    }
+                  ]
+                },
+                {
+                  "name": "calcular_perimetro",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 30
+                    }
+                  ]
+                },
+                {
+                  "name": "es_cuadrado",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Rectangulo",
+              "initArgs": [
+                4,
+                4
+              ],
+              "methods": [
+                {
+                  "name": "calcular_area",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 16
+                    }
+                  ]
+                },
+                {
+                  "name": "calcular_perimetro",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 16
+                    }
+                  ]
+                },
+                {
+                  "name": "es_cuadrado",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_medida"
+        },
+        "successDialogue": [
+          "El marco de carpintero mide el claro sin dudar. El área pisa el suelo y el perímetro levanta las paredes."
+        ],
+        "concepts": [
+          "clases",
+          "metodos",
+          "atributos",
+          "return"
+        ]
+      },
+      {
+        "id": "objeto_caja",
+        "title": "La Caja del Refugio",
+        "target": "altar_caja",
+        "objective": "Define la clase CuentaBancaria con __init__(titular, saldo_inicial). depositar(monto) debe rechazar montos menores o iguales a cero (no cambiar el saldo), retirar(monto) retorna True si hay saldo suficiente (y descuenta) o False si no, y consultar_saldo() retorna el saldo actual.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "El saldo se guarda como atributo en __init__.",
+          "depositar valida que monto sea mayor que cero antes de sumar.",
+          "retirar compara monto con el saldo: si alcanza, descuenta y retorna True."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "CuentaBancaria",
+              "initArgs": [
+                "Ana",
+                100
+              ],
+              "methods": [
+                {
+                  "name": "consultar_saldo",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 100
+                    }
+                  ]
+                },
+                {
+                  "name": "depositar",
+                  "cases": [
+                    {
+                      "args": [
+                        50
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "consultar_saldo",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 150
+                    }
+                  ]
+                },
+                {
+                  "name": "depositar",
+                  "cases": [
+                    {
+                      "args": [
+                        -5
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "consultar_saldo",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 150
+                    }
+                  ]
+                },
+                {
+                  "name": "retirar",
+                  "cases": [
+                    {
+                      "args": [
+                        200
+                      ],
+                      "expected": false
+                    }
+                  ]
+                },
+                {
+                  "name": "consultar_saldo",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 150
+                    }
+                  ]
+                },
+                {
+                  "name": "retirar",
+                  "cases": [
+                    {
+                      "args": [
+                        30
+                      ],
+                      "expected": true
+                    }
+                  ]
+                },
+                {
+                  "name": "consultar_saldo",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 120
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_caja"
+        },
+        "successDialogue": [
+          "La caja cantó al recibir un depósito.",
+          "Alizon sonríe: 'Así sonaba en la ciudad, cuando aún la entendíamos.'"
+        ],
+        "concepts": [
+          "clases",
+          "metodos",
+          "condiciones",
+          "atributos"
+        ]
+      },
+      {
+        "id": "objeto_nomina",
+        "title": "La Nómina Justa",
+        "target": "altar_nomina",
+        "objective": "Define la clase Empleado con __init__(nombre, salario) donde el salario es un atributo privado (__salario). get_salario() lo retorna, aumentar_salario(porcentaje) lo aumenta solo si el porcentaje es mayor o igual a cero (rechaza negativos) y __str__() retorna un texto legible con nombre y salario.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "Declara el salario con doble guion bajo: self.__salario.",
+          "aumentar_salario valida que el porcentaje no sea negativo.",
+          "__str__ retorna un texto que muestre el nombre y el salario."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Empleado",
+              "initArgs": [
+                "Ana",
+                1000
+              ],
+              "privateAttrs": [
+                "__salario"
+              ],
+              "methods": [
+                {
+                  "name": "get_salario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 1000
+                    },
+                    {
+                      "args": [],
+                      "expected": 1000
+                    }
+                  ]
+                },
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Ana - 1000"
+                    },
+                    {
+                      "args": [],
+                      "expected": "Ana - 1000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Empleado",
+              "initArgs": [
+                "Ana",
+                1000
+              ],
+              "privateAttrs": [
+                "__salario"
+              ],
+              "methods": [
+                {
+                  "name": "aumentar_salario",
+                  "cases": [
+                    {
+                      "args": [
+                        10
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "get_salario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 1100
+                    }
+                  ]
+                },
+                {
+                  "name": "aumentar_salario",
+                  "cases": [
+                    {
+                      "args": [
+                        -10
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "get_salario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 1100
+                    }
+                  ]
+                },
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Ana - 1100"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_nomina"
+        },
+        "successDialogue": [
+          "El cofre abre su candado solo ante el método correcto. El salario sigue siendo un secreto guardado."
+        ],
+        "concepts": [
+          "encapsulamiento",
+          "privados",
+          "metodos",
+          "__str__"
+        ]
+      },
+      {
+        "id": "objeto_ficha",
+        "title": "La Ficha del Expedicionario",
+        "target": "altar_ficha",
+        "objective": "Define la clase Fecha con __init__(dia, mes, anio) y __str__() que retorne el formato dia/mes/anio (por ejemplo 12/3/2005). Define la clase Estudiante con __init__(nombre, fecha_nacimiento) que recibe un objeto Fecha ya construido y mostrar_ficha() que combine el nombre con la fecha.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "Fecha es una clase independiente con su propio __str__.",
+          "Estudiante guarda la Fecha recibida como atributo (composición).",
+          "mostrar_ficha() usa str() sobre el objeto Fecha para mostrar la fecha."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Fecha",
+              "initArgs": [
+                12,
+                3,
+                2005
+              ],
+              "methods": [
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "12/3/2005"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Fecha",
+              "initArgs": [
+                1,
+                1,
+                2000
+              ],
+              "methods": [
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "1/1/2000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Estudiante",
+              "initArgs": [
+                "Ana",
+                {
+                  "__ref": "Fecha",
+                  "args": [
+                    12,
+                    3,
+                    2005
+                  ]
+                }
+              ],
+              "methods": [
+                {
+                  "name": "mostrar_ficha",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Ana - 12/3/2005"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Estudiante",
+              "initArgs": [
+                "Luis",
+                {
+                  "__ref": "Fecha",
+                  "args": [
+                    1,
+                    1,
+                    2000
+                  ]
+                }
+              ],
+              "methods": [
+                {
+                  "name": "mostrar_ficha",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Luis - 1/1/2000"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_ficha"
+        },
+        "successDialogue": [
+          "La ficha une el nombre con su fecha. La expedición ya tiene memoria."
+        ],
+        "concepts": [
+          "composicion",
+          "clases",
+          "__str__"
+        ]
+      },
+      {
+        "id": "objeto_almacen",
+        "title": "El Almacén del Bosque",
+        "target": "altar_almacen",
+        "objective": "Define la clase Producto con __init__(nombre, precio, stock). vender(cantidad) retorna True si hay stock suficiente (y reduce el stock) o False si no, reponer_stock(cantidad) incrementa el stock y valor_inventario() retorna precio * stock.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "Guarda nombre, precio y stock como atributos.",
+          "vender verifica que cantidad no supere el stock antes de restar.",
+          "valor_inventario multiplica precio por stock."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Producto",
+              "initArgs": [
+                "Manta",
+                25,
+                10
+              ],
+              "methods": [
+                {
+                  "name": "valor_inventario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 250
+                    }
+                  ]
+                },
+                {
+                  "name": "vender",
+                  "cases": [
+                    {
+                      "args": [
+                        3
+                      ],
+                      "expected": true
+                    }
+                  ]
+                },
+                {
+                  "name": "valor_inventario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 175
+                    }
+                  ]
+                },
+                {
+                  "name": "vender",
+                  "cases": [
+                    {
+                      "args": [
+                        20
+                      ],
+                      "expected": false
+                    }
+                  ]
+                },
+                {
+                  "name": "valor_inventario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 175
+                    }
+                  ]
+                },
+                {
+                  "name": "reponer_stock",
+                  "cases": [
+                    {
+                      "args": [
+                        5
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "valor_inventario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 300
+                    }
+                  ]
+                },
+                {
+                  "name": "reponer_stock",
+                  "cases": [
+                    {
+                      "args": [
+                        3
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "valor_inventario",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 375
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_almacen"
+        },
+        "successDialogue": [
+          "Madera, metal y piedra quedan contados en compartimentos. El almacén sabe cuánto vale todo."
+        ],
+        "concepts": [
+          "clases",
+          "metodos",
+          "condiciones",
+          "atributos"
+        ]
+      },
+      {
+        "id": "objeto_escuela",
+        "title": "La Escuela del Manual",
+        "target": "altar_escuela",
+        "objective": "Define la clase Estudiante con atributo de clase total_estudiantes que inicia en 0. Cada vez que se crea un objeto Estudiante (__init__), el contador debe aumentar en 1. El método @classmethod obtener_total() retorna el total acumulado de estudiantes creados.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "El contador es un atributo de clase: total_estudiantes = 0 dentro de la clase.",
+          "En __init__, incrementa el contador usando el nombre de la clase.",
+          "obtener_total es @classmethod y retorna el contador acumulado."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Estudiante",
+              "instances": 3,
+              "initArgs": [
+                "Ana"
+              ],
+              "classMethods": [
+                {
+                  "name": "obtener_total"
+                }
+              ],
+              "methods": [
+                {
+                  "name": "obtener_total",
+                  "classMethod": true,
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 3
+                    },
+                    {
+                      "args": [],
+                      "expected": 3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_escuela"
+        },
+        "successDialogue": [
+          "La pizarra cuenta tres aprendices inscritos. Cada objeto que nace, suma."
+        ],
+        "concepts": [
+          "classmethod",
+          "atributos de clase",
+          "clases"
+        ]
+      },
+      {
+        "id": "objeto_manual",
+        "title": "El Único Manual",
+        "target": "altar_manual",
+        "objective": "Define la clase Libro con __init__(titulo, autor) y disponible en True por defecto. prestar() retorna True si el libro estaba disponible (y lo marca como no disponible) o False si ya estaba prestado. devolver() lo vuelve a marcar como disponible y __str__() muestra el título, autor y estado (Disponible o Prestado).",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "El libro nace disponible=True en __init__.",
+          "prestar retorna False y no cambia nada si ya está prestado.",
+          "__str__ incluye el estado: Disponible o Prestado."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Libro",
+              "initArgs": [
+                "Manual de Supervivencia",
+                "Guardabosques"
+              ],
+              "methods": [
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Manual de Supervivencia - Guardabosques (Disponible)"
+                    }
+                  ]
+                },
+                {
+                  "name": "prestar",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": true
+                    }
+                  ]
+                },
+                {
+                  "name": "prestar",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": false
+                    }
+                  ]
+                },
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Manual de Supervivencia - Guardabosques (Prestado)"
+                    }
+                  ]
+                },
+                {
+                  "name": "devolver",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": null
+                    },
+                    {
+                      "args": [],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "__str__",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Manual de Supervivencia - Guardabosques (Disponible)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_manual"
+        },
+        "successDialogue": [
+          "El libro se presta solo una vez y vuelve entero. La biblioteca respira de nuevo."
+        ],
+        "concepts": [
+          "clases",
+          "metodos",
+          "__str__",
+          "booleanos"
+        ]
+      },
+      {
+        "id": "objeto_carro",
+        "title": "El Carro de Víveres",
+        "target": "altar_carro",
+        "objective": "Define la clase CarritoDeCompras que inicia con productos vacío (lista). agregar_producto(nombre, precio) agrega un producto, eliminar_producto(nombre) retorna True si lo encontró y lo eliminó o False si no existe, calcular_total() suma el precio de todos los productos y vaciar_carrito() deja el carrito vacío.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "productos es una lista que inicia vacía en __init__.",
+          "eliminar_producto busca por nombre y retorna True/False.",
+          "calcular_total suma los precios; con carrito vacío retorna 0."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "CarritoDeCompras",
+              "initArgs": [],
+              "methods": [
+                {
+                  "name": "calcular_total",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 0
+                    }
+                  ]
+                },
+                {
+                  "name": "agregar_producto",
+                  "cases": [
+                    {
+                      "args": [
+                        "Manta",
+                        25
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "agregar_producto",
+                  "cases": [
+                    {
+                      "args": [
+                        "Comida",
+                        10
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "calcular_total",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 35
+                    }
+                  ]
+                },
+                {
+                  "name": "eliminar_producto",
+                  "cases": [
+                    {
+                      "args": [
+                        "Comida"
+                      ],
+                      "expected": true
+                    }
+                  ]
+                },
+                {
+                  "name": "eliminar_producto",
+                  "cases": [
+                    {
+                      "args": [
+                        "Inexistente"
+                      ],
+                      "expected": false
+                    }
+                  ]
+                },
+                {
+                  "name": "calcular_total",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 25
+                    }
+                  ]
+                },
+                {
+                  "name": "vaciar_carrito",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": null
+                    },
+                    {
+                      "args": [],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "calcular_total",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_carro"
+        },
+        "successDialogue": [
+          "El carro suma, quita y sabe el total antes de pagar. La carretilla vuelve a rodar."
+        ],
+        "concepts": [
+          "clases",
+          "listas",
+          "metodos",
+          "composicion"
+        ]
+      },
+      {
+        "id": "objeto_carreta",
+        "title": "La Carreta Expedicionaria",
+        "target": "altar_carreta",
+        "objective": "Define la clase Vehiculo con __init__(marca, modelo, velocidad_maxima) y atributos velocidad_actual (inicia en 0) y velocidad_maxima. acelerar(incremento) aumenta la velocidad sin superar velocidad_maxima, frenar(decremento) la reduce sin bajar de 0 y mostrar_info() retorna un texto con marca, modelo y velocidad actual.",
+        "example": "",
+        "starterCode": "",
+        "hints": [
+          "velocidad_actual inicia en 0; velocidad_maxima viene de __init__.",
+          "acelerar suma pero no pasa de velocidad_maxima.",
+          "frenar resta pero no baja de 0."
+        ],
+        "validator": {
+          "kind": "class_cases"
+        },
+        "requirements": {
+          "classes": [
+            {
+              "name": "Vehiculo",
+              "initArgs": [
+                "Forestal",
+                "Carreta",
+                120
+              ],
+              "methods": [
+                {
+                  "name": "mostrar_info",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Forestal Carreta - velocidad 0"
+                    }
+                  ]
+                },
+                {
+                  "name": "acelerar",
+                  "cases": [
+                    {
+                      "args": [
+                        50
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "mostrar_info",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Forestal Carreta - velocidad 50"
+                    }
+                  ]
+                },
+                {
+                  "name": "acelerar",
+                  "cases": [
+                    {
+                      "args": [
+                        100
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "mostrar_info",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Forestal Carreta - velocidad 120"
+                    }
+                  ]
+                },
+                {
+                  "name": "frenar",
+                  "cases": [
+                    {
+                      "args": [
+                        200
+                      ],
+                      "expected": null
+                    },
+                    {
+                      "args": [
+                        50
+                      ],
+                      "expected": null
+                    }
+                  ]
+                },
+                {
+                  "name": "mostrar_info",
+                  "cases": [
+                    {
+                      "args": [],
+                      "expected": "Forestal Carreta - velocidad 0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "successAction": {
+          "kind": "station_transition",
+          "id": "altar_carreta"
+        },
+        "successDialogue": [
+          "La carreta acelera sin pasarse del límite y frena sin clavarse. El bosque estrecho ya no la detiene."
+        ],
+        "concepts": [
+          "clases",
+          "metodos",
+          "atributos",
+          "condiciones"
+        ]
+      }
+    ]
+  },
+  "book_pages": [
+    {
+      "id": "que_es_clase",
+      "title": "¿Qué es una clase?",
+      "unlockedBy": "clases",
+      "what": "Una clase es el plano de un objeto: define qué atributos (datos) y qué métodos (acciones) tendrá.",
+      "syntax": "class Persona:\n    def saludar(self):\n        return \"Hola\"",
+      "example": "p = Persona()\np.saludar()",
+      "commonError": "Escribir código de la clase sin indentarlo.",
+      "tip": "Las clases son los moldes; los objetos, las piezas."
+    },
+    {
+      "id": "init_self",
+      "title": "__init__ y self",
+      "unlockedBy": "clases",
+      "what": "El constructor __init__ se ejecuta al crear un objeto. self es el objeto mismo: sirve para guardar y leer sus atributos.",
+      "syntax": "class Persona:\n    def __init__(self, nombre):\n        self.nombre = nombre",
+      "example": "p = Persona(\"Ana\")\nprint(p.nombre)",
+      "commonError": "Olvidar self como primer parámetro.",
+      "tip": "Todo método recibe self primero."
+    },
+    {
+      "id": "atributos",
+      "title": "Atributos",
+      "unlockedBy": "atributos",
+      "what": "Los atributos son los datos que guarda cada objeto, definidos con self.nombre = valor dentro de __init__ o métodos.",
+      "syntax": "self.base = base\nself.altura = altura",
+      "example": "r = Rectangulo(5, 10)",
+      "commonError": "Leer un atributo que no fue creado.",
+      "tip": "Definí todos los atributos en __init__."
+    },
+    {
+      "id": "metodos",
+      "title": "Métodos",
+      "unlockedBy": "metodos",
+      "what": "Los métodos son las acciones que sabe hacer un objeto. Se definen dentro de la clase y reciben self.",
+      "syntax": "def calcular_area(self):\n    return self.base * self.altura",
+      "example": "area = r.calcular_area()",
+      "commonError": "Llamar el método sin paréntesis.",
+      "tip": "Los métodos hacen y retornan."
+    },
+    {
+      "id": "return",
+      "title": "Retorno de valores",
+      "unlockedBy": "return",
+      "what": "return entrega el resultado de un método para usarlo fuera. Sin return, el método devuelve None.",
+      "syntax": "def es_mayor_de_edad(self):\n    return self.edad >= 18",
+      "example": "if p.es_mayor_de_edad():\n    print(\"Mayor\")",
+      "commonError": "Usar print en vez de return.",
+      "tip": "return entrega; print solo muestra."
+    },
+    {
+      "id": "classmethod",
+      "title": "@classmethod y atributos de clase",
+      "unlockedBy": "classmethod",
+      "what": "Un atributo de clase se comparte entre todos los objetos. Un @classmethod se llama por la clase (no por el objeto) y recibe cls.",
+      "syntax": "class Estudiante:\n    total = 0\n    @classmethod\n    def contar(cls):\n        return cls.total",
+      "example": "print(Estudiante.contar())",
+      "commonError": "Olvidar el decorador @classmethod.",
+      "tip": "cls es la clase; self es el objeto."
+    },
+    {
+      "id": "encapsulamiento",
+      "title": "Encapsulamiento",
+      "unlockedBy": "encapsulamiento",
+      "what": "Los atributos privados (con doble guion bajo, como __salario) no se tocan desde fuera: solo se accede por métodos controlados.",
+      "syntax": "self.__salario = salario\ndef get_salario(self):\n    return self.__salario",
+      "example": "e.get_salario()",
+      "commonError": "Acceder a __salario directamente desde fuera.",
+      "tip": "El candado protege el dato."
+    },
+    {
+      "id": "composicion",
+      "title": "Composición",
+      "unlockedBy": "composicion",
+      "what": "Un objeto puede contener otro objeto como atributo. Fecha dentro de Estudiante es composición: una clase usa otra.",
+      "syntax": "self.fecha_nacimiento = fecha",
+      "example": "f = Fecha(12, 3, 2005)\ne = Estudiante(\"Ana\", f)",
+      "commonError": "Confundir composición con herencia.",
+      "tip": "Composición: tener. Herencia: ser."
+    },
+    {
+      "id": "str",
+      "title": "__str__",
+      "unlockedBy": "__str__",
+      "what": "__str__ define cómo se muestra un objeto cuando se convierte a texto (print o str).",
+      "syntax": "def __str__(self):\n    return self.titulo + \" (Disponible)\"",
+      "example": "print(libro)",
+      "commonError": "Retornar un tipo que no sea texto.",
+      "tip": "__str__ siempre retorna un string."
+    }
+  ]
+}
