@@ -1219,7 +1219,7 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
 }
 
 
-Object.assign(NS,{World,CollisionSystem,Player,Renderer,TILE_DEF,SPR,drawSpriteRows,TREE_TRUNK_TOP,CANOPY_H});
+Object.assign(NS,{World,CollisionSystem,Player,Renderer,TILE_DEF,SPR,drawSpriteRows,TREE_TRUNK_TOP,CANOPY_H,ZONE,ZONES});
 })();
 (function () {
 "use strict";
@@ -2083,7 +2083,7 @@ const {
   WeatherSystem,
   World, Player, Renderer, PythonEngine, WorldActions, DialogueSystem,
   InteractionSystem, LESSONS, BookSystem, ChallengeSystem, StatisticsSystem,
-  SaveSystem, TitiBridge, UIManager
+  SaveSystem, TitiBridge, UIManager, ZONES
 } = NS;
 
 /* =========================================================================
