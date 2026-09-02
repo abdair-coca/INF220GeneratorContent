@@ -679,11 +679,16 @@ def auditar_calidad(lesson):
             problemas += 1
         if v.get("kind") == "class_cases":
             reqs = ch.get("requirements") or {}
+            por_metodo = {}
             for cs in (reqs.get("classes") or []):
                 for m in (cs.get("methods") or []):
-                    if len((m.get("cases") or [])) < 2:
-                        flags.append(f"{cs['name']}.{m['name']}: <2 casos de prueba")
-                        problemas += 1
+                    key = (cs["name"], m["name"])
+                    por_metodo.setdefault(key, 0)
+                    por_metodo[key] += len((m.get("cases") or []))
+            for (cname, mname), total in sorted(por_metodo.items()):
+                if total < 2:
+                    flags.append(f"{cname}.{mname}: <2 casos de prueba")
+                    problemas += 1
         if v.get("kind") == "function_cases":
             for f in (v.get("functions") or []):
                 if len(f.get("cases", [])) < 2:
@@ -866,7 +871,10 @@ def main():
     # con código distinto de cero si alguno no cumple los estándares mínimos.
     if audit:
         print("AUDITORÍA de calidad de desafíos:", fuente.name)
-        problemas = auditar_calidad(lesson)
+        import copy
+        lesson_probe = copy.deepcopy(lesson)
+        autocompletar_leccion(lesson_probe)
+        problemas = auditar_calidad(lesson_probe)
         print(f"Problemas detectados: {problemas}")
         sys.exit(1 if problemas else 0)
 
