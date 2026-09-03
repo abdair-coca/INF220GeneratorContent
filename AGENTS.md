@@ -58,6 +58,75 @@ se arma la plantilla perfecta que se replicará en los demás niveles/lecciones.
    - Intérprete aislado (sandbox): detectar bucles infinitos a los 1000 ciclos y
      lanzar un error amigable en vez de congelar la pestaña.
 
+### Multi-zona y portales (escenarios interiores)
+
+El motor soporta **múltiples zonas** por juego (exterior + interiores). Cada
+zona es un mapa propio con su clima, NPCs, interactuables y decoración.
+
+- El JSON puede traer `zones: { posada: {...}, banco: {...}, ... }` además de
+  `zone` (el exterior, registrado como `exterior`). Sin `zones`, el juego es
+  single-zone (compatibilidad total con los juegos previos).
+- Los `interactables` con `"type": "portal"` y campos `toZone`, `spawnX`,
+  `spawnY` conectan zonas. Interactuar (E) con un portal llama
+  `Game.enterZone()`, que recarga el mundo, reposiciona al jugador y aplica el
+  clima de la zona.
+- **Retorno al portal de entrada**: al salir de un interior hacia `exterior`,
+  el jugador reaparece **junto al portal por el que entró**, no en el centro
+  del mapa. El motor guarda `_lastPortal` al entrar y lo usa al volver.
+- **Spawn seguro**: `_findWalkableSpawn()` garantiza que el jugador nunca
+  quede atrapado en una pared — si el spawn cae en un tile no caminable,
+  busca la celda caminable más cercana en espiral.
+- **Tiles de interior**: `W` (pared, no caminable), `F` (piso, caminable),
+  `C` (mueble, no caminable) además de los tiles exteriores.
+- **Radar/guía multi-zona**: el radar lista los retos de todas las zonas; la
+  guía dorada apunta al portal correcto si el reto activo vive en otra zona.
+
+### Decoración interactiva (tecla F)
+
+El mundo se siente vivo: hay decoración que se puede **activar** sin resolver
+problemas, con la tecla **F** (no E).
+
+- Los `decor` pueden llevar `interactable: true` + `stateDefault`/`stateOn`/
+  `stateOff`/`prompt`. La tecla F alterna el estado del decor cercano con
+  partículas y audio. Ejemplos: fogatas que se encienden/apagan, lámparas,
+  cofres que se abren.
+- `World.toggleDecor(id)`, `World.setDecorState(id, state)`,
+  `World.litDecor(id)`; `InteractionSystem.findNearbyDecor(player)`;
+  `Game._handleInteractDecor()`. El renderer muestra un prompt `F · <prompt>`
+  junto al decor animable y emite humo/chispas en fogatas encendidas.
+- Para dar vida al mundo: decorar los mapas (flores, arbustos, maderas,
+  cajas, fogatas, lámparas) además de los altares de retos. Las casas deben
+  quedar **cercanas entre sí** y tener **mobiliario interior** (mesa, silla,
+  cama, estante, cofre, tapete, lámpara, fogata) — assets en
+  `el_refugio_visual_assets_v1.json`.
+
+### Validadores POO (class_cases)
+
+Además del validator estático `structure`, el motor tiene **`class_cases`**:
+ejecuta el código del alumno en un intérprete Python en JS que soporta
+`class`, `__init__`, `self`, instancias, `@classmethod`, atributos de clase,
+name mangling de privados (`_Clase__atributo`), composición y `__str__`.
+
+- El spec vive en `requirements.classes[]`: `name`, `initArgs`, `instances`
+  (cuántos objetos crear; útil para contadores `@classmethod`), `methods[]`
+  con `cases[]` (`args`/`expected`), `classMethods[]` (exigen `@classmethod`)
+  y `privateAttrs[]` (exigen declaración privada).
+- **Instancias distintas**: para probar una clase con datos distintos (ej.
+  dos `Persona`), se usan **varias specs** con el mismo `name` e `initArgs`
+  distintos. El audit acumula casos por `(clase, método)` a través de todas
+  las specs; el autocompletado de `starterCode` **deduplica** la clase.
+- **Composición**: `initArgs` puede contener `{"__ref": "Fecha", "args":
+  [...]}` para instanciar un objeto auxiliar antes de construir el principal.
+- El generador valida el esquema, autocompleta `example`/`starterCode`/`hints`
+  (POO) y los incluye en `--audit`.
+
+### Clima
+
+Cada zona lleva su propio `weather`. Modos: `none`, `rain`, `storm`
+(requiere `lesson.storm.thresholds` para las fases) y `frost` (escarcha,
+partículas de nieve + overlay azul-blanca parametrizado por zona con
+`overlayColor`).
+
 ## Directory layout
 
 ```
@@ -78,7 +147,9 @@ se arma la plantilla perfecta que se replicará en los demás niveles/lecciones.
 │       ├── story_arc.json              ← universo + arco narrativo
 │       ├── juego_gl01_oficial.json     ← GL01 CAP 1 OFICIAL (funciones+selectivas; GL01 diagramas = teoría)
 │       ├── juego_gl01_clases.json      ← GL01 Clases y Objetos (práctica extra)
-│       └── juego_gl02_funciones.json   ← GL02 Funciones (práctica extra)
+│       ├── juego_gl02_funciones.json   ← GL02 Funciones (práctica extra)
+│       ├── juego_practica4_refugio.json← Práctica 4 (funciones, hub de estaciones)
+│       └── juego_practica5_objetos.json← Práctica 5 (POO, 5 zonas multi-escenario)
 ├── inf-220-g2/                     ← subrepo de ARTEFACTOS generados (user inits it, rama inf-220-g2-artifacts)
 │   ├── clases/                     ← generated HTML (guia_gl0x.html, Juego_*.html)
 │   ├── practicas/                  ← user drops practice docs here (user fills, we don't)
@@ -131,10 +202,12 @@ python tools/gl_generator.py --nuevo                        # create a new guide
 ## game_generator.py
 
 Genera los juegos RPG ("El Refugio Lógico") desde un JSON de lección + el kit
-visual. Vive en `tools/`. Inyecta 4 placeholders en el template
+visual. Vive en `tools/`. Inyecta 5 placeholders en el template
 `public/juegos/game_engine_template.html`:
 
-- `/*__ZONE_JS__*/` → mapa, NPCs, interactuables, decoración.
+- `/*__ZONE_JS__*/` → el mapa exterior (NPCs, interactuables, decoración).
+- `/*__ZONES_JS__*/` → el registro completo de zonas (exterior + interiores)
+  para juegos multi-escenario.
 - `/*__LESSONS_JS__*/` → la misión (challenges con validate/onSuccess).
 - `/*__BOOK_JS__*/` → páginas del Libro.
 - `/*__ASSETS_JS__*/` → subset del kit visual (recortado por capítulo).
@@ -181,7 +254,8 @@ Usalo antes de entregar una lección nueva.
 - `validator.kind`: `structure` (POO: classes/attrs/methods/instantiate/calls),
   `def_return`, `def_exists`, `print_call` (funciones), `function_cases`
   (multi-función con casos `args[]`/`expected`; el más expresivo y el que
-  permite el autocompletado pedagógico).
+  permite el autocompletado pedagógico), `class_cases` (POO **ejecutable**:
+  instancia clases y compara retornos de métodos; ver "Validadores POO").
 - `successAction.kind` (tema Refugio): `fogata`, `tienda`, `campamento`,
   `station_transition`.
   `campamento` abre el sendero y debe ser el desafío final.
