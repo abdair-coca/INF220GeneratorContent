@@ -15,37 +15,37 @@
     "cols": 24,
     "map": [
       "TTTTTTTTTTTTTTTTTTTTTTTT",
-      "TGGGGGGGGGGHHGGGGGGGGGGT",
-      "TGGGGGGGGGGHHGGGGGGGGGGT",
-      "TGHHHHHHHHHHHHHHHHHHHHHT",
-      "TGHHHHHHHHHHHHHHHHHHHHHT",
-      "TGGGGGGGGGGHHGGGGGGGGGGT",
-      "TGGGGGGGGGGHHGGGGGGGGGGT",
-      "TGGGGGGGGGGHHGGGGGGGGGGT",
-      "THHHHHHHHHHHHHHHHHHHHHHT",
-      "THHHHHHHHHHHHHHHHHHHHHHT",
+      "TGGGGGGGGGGGGGGGGGGGGGGT",
+      "TGGGHHGGGGGGGGGGGGHHGGGT",
+      "TGGGHHGGGGGGGGGGGGHHGGGT",
+      "TGGGHHHHHHHHHHHHHHHHGGGT",
       "TGGGGGGGGGGHHGGGGGGGGGGT",
       "TGGGGGGGGGGHHGGGGGGGGGGT",
       "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGHHHHHHHHHHHHHHHHHHGGT",
+      "TGGHHHHHHHHHHHHHHHHHHGGT",
       "TGGGGGGGGGGHHGGGGGGGGGGT",
-      "TGGGGGGHHHHHHHHHHGGGGGGT",
-      "TGGGGGGHHHHHHHHHHGGGGGGT",
       "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGHHGGGGGHHGGGGGHHGGGT",
+      "TGGGHHHHHHHHHHHHHHHHGGGT",
+      "TGGGGGGGGGGHHGGGGGGGGGGT",
+      "TGGGGGGGGGGGGGGGGGGGGGGT",
       "TTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     "flags": {},
     "weather": {
       "mode": "frost",
-      "density": 0.7,
-      "dropCount": 150,
-      "dropLength": 10,
-      "dropSpeed": 220,
-      "wind": 0.12,
-      "gust": 0.05,
+      "density": 0.45,
+      "dropCount": 110,
+      "dropLength": 8,
+      "dropSpeed": 160,
+      "wind": 0.07,
+      "gust": 0.03,
       "gustPeriod": 6,
-      "alpha": 0.5,
+      "alpha": 0.45,
       "color": "#cfe6f2",
-      "overlayColor": "#8fb8c9"
+      "overlayColor": "#080b1a"
     },
     "npcs": [
       {
@@ -57,9 +57,9 @@
         "asset": "npc_alizon",
         "name": "Alizon",
         "dialogue": [
-          "Las ruinas de la Ciudad de la Interfaz están frente a nosotros. Cada objeto que la gente tocaba sin entender sigue inerte bajo la escarcha.",
-          "Yo también soy de la ciudad. Los usábamos sin entenderlos; nunca supimos construir ninguno. Hasta hoy.",
-          "Reconstruí cada objeto por dentro: conviertilo en una clase con sus atributos y métodos. La escarcha retrocederá con cada objeto que vuelva a la vida."
+          "La noche cubre las ruinas de la Ciudad de la Interfaz. Cada objeto que la gente tocaba sin entender sigue inerte bajo la escarcha nocturna.",
+          "Yo también soy de la ciudad. Los usábamos como magia negra; nunca supimos construir ninguno. Hasta hoy.",
+          "Reconstruí cada objeto por dentro: convertilo en una clase con sus atributos y métodos. El calor y la luz volverán con cada objeto restaurado."
         ]
       }
     ],
@@ -69,7 +69,7 @@
         "type": "station",
         "asset": "objeto_persona",
         "markerAsset": "marker_objeto_alma",
-        "x": 120,
+        "x": 104,
         "y": 90,
         "w": 56,
         "h": 56,
@@ -92,7 +92,7 @@
         "type": "station",
         "asset": "objeto_rectangulo",
         "markerAsset": "marker_objeto_medida",
-        "x": 584,
+        "x": 600,
         "y": 90,
         "w": 56,
         "h": 56,
@@ -117,22 +117,22 @@
         "toZone": "posada",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 260,
-        "y": 196,
-        "w": 56,
-        "h": 56,
+        "x": 250,
+        "y": 180,
+        "w": 76,
+        "h": 70,
         "stateMap": {
           "pending": "pendiente",
           "active": "pendiente",
           "completed": "reconstruido"
         },
         "solid": {
-          "x": 8,
-          "y": 40,
-          "w": 40,
-          "h": 12
+          "x": 4,
+          "y": 28,
+          "w": 68,
+          "h": 38
         },
-        "sortOffset": 52
+        "sortOffset": 68
       },
       {
         "id": "portal_banco",
@@ -141,22 +141,22 @@
         "toZone": "banco",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 404,
-        "y": 196,
-        "w": 56,
-        "h": 56,
+        "x": 442,
+        "y": 180,
+        "w": 76,
+        "h": 70,
         "stateMap": {
           "pending": "pendiente",
           "active": "pendiente",
           "completed": "reconstruido"
         },
         "solid": {
-          "x": 8,
-          "y": 40,
-          "w": 40,
-          "h": 12
+          "x": 4,
+          "y": 28,
+          "w": 68,
+          "h": 38
         },
-        "sortOffset": 52
+        "sortOffset": 68
       },
       {
         "id": "portal_escuela",
@@ -165,22 +165,22 @@
         "toZone": "escuela",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 260,
-        "y": 356,
-        "w": 56,
-        "h": 56,
+        "x": 250,
+        "y": 350,
+        "w": 76,
+        "h": 70,
         "stateMap": {
           "pending": "pendiente",
           "active": "pendiente",
           "completed": "reconstruido"
         },
         "solid": {
-          "x": 8,
-          "y": 40,
-          "w": 40,
-          "h": 12
+          "x": 4,
+          "y": 28,
+          "w": 68,
+          "h": 38
         },
-        "sortOffset": 52
+        "sortOffset": 68
       },
       {
         "id": "portal_taller",
@@ -189,22 +189,22 @@
         "toZone": "taller",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 404,
-        "y": 356,
-        "w": 56,
-        "h": 56,
+        "x": 442,
+        "y": 350,
+        "w": 76,
+        "h": 70,
         "stateMap": {
           "pending": "pendiente",
           "active": "pendiente",
           "completed": "reconstruido"
         },
         "solid": {
-          "x": 8,
-          "y": 40,
-          "w": 40,
-          "h": 12
+          "x": 4,
+          "y": 28,
+          "w": 68,
+          "h": 38
         },
-        "sortOffset": 52
+        "sortOffset": 68
       }
     ],
     "decor": [
@@ -213,32 +213,12 @@
         "kind": "fogata",
         "asset": "decor_fogata",
         "interactable": true,
-        "stateDefault": "off",
-        "stateOn": "on",
-        "stateOff": "off",
-        "prompt": "Encender fogata",
-        "x": 332,
-        "y": 300,
-        "w": 48,
-        "h": 40,
-        "solid": {
-          "x": 14,
-          "y": 26,
-          "w": 20,
-          "h": 8
-        }
-      },
-      {
-        "id": "fogata_camp1",
-        "kind": "fogata",
-        "asset": "decor_fogata",
-        "interactable": true,
         "stateDefault": "on",
         "stateOn": "on",
         "stateOff": "off",
-        "prompt": "Fogata",
-        "x": 120,
-        "y": 230,
+        "prompt": "Fogata de la plaza",
+        "x": 356,
+        "y": 290,
         "w": 48,
         "h": 40,
         "solid": {
@@ -249,137 +229,16 @@
         }
       },
       {
-        "id": "fogata_camp2",
-        "kind": "fogata",
-        "asset": "decor_fogata",
-        "interactable": true,
-        "stateDefault": "on",
-        "stateOn": "on",
-        "stateOff": "off",
-        "prompt": "Fogata",
-        "x": 520,
-        "y": 230,
-        "w": 48,
-        "h": 40,
-        "solid": {
-          "x": 14,
-          "y": 26,
-          "w": 20,
-          "h": 8
-        }
-      },
-      {
-        "id": "flor1",
-        "kind": "flowers",
-        "asset": "flowers_mixed",
-        "x": 80,
-        "y": 150,
-        "w": 48,
-        "h": 20
-      },
-      {
-        "id": "flor2",
-        "kind": "flowers",
-        "asset": "flowers_mixed",
-        "x": 620,
-        "y": 150,
-        "w": 48,
-        "h": 20
-      },
-      {
-        "id": "flor3",
-        "kind": "flowers",
-        "asset": "flowers_mixed",
-        "x": 80,
-        "y": 360,
-        "w": 48,
-        "h": 20
-      },
-      {
-        "id": "flor4",
-        "kind": "flowers",
-        "asset": "flowers_mixed",
-        "x": 620,
-        "y": 360,
-        "w": 48,
-        "h": 20
-      },
-      {
-        "id": "flor5",
-        "kind": "flowers",
-        "asset": "flowers_mixed",
-        "x": 330,
-        "y": 420,
-        "w": 48,
-        "h": 20
-      },
-      {
-        "id": "pasto1",
-        "kind": "grass",
-        "asset": "grass_tufts",
-        "x": 150,
-        "y": 50,
-        "w": 48,
-        "h": 16
-      },
-      {
-        "id": "pasto2",
-        "kind": "grass",
-        "asset": "grass_tufts",
-        "x": 560,
-        "y": 50,
-        "w": 48,
-        "h": 16
-      },
-      {
-        "id": "pasto3",
-        "kind": "grass",
-        "asset": "grass_tufts",
-        "x": 300,
-        "y": 150,
-        "w": 48,
-        "h": 16
-      },
-      {
-        "id": "pasto4",
-        "kind": "grass",
-        "asset": "grass_tufts",
-        "x": 420,
-        "y": 470,
-        "w": 48,
-        "h": 16
-      },
-      {
-        "id": "cofre_camp",
-        "kind": "chest",
-        "asset": "mueble_cofre",
-        "interactable": true,
-        "stateDefault": "closed",
-        "stateOn": "open",
-        "stateOff": "closed",
-        "prompt": "Abrir cofre",
-        "x": 420,
-        "y": 286,
-        "w": 48,
-        "h": 36,
-        "solid": {
-          "x": 8,
-          "y": 18,
-          "w": 32,
-          "h": 16
-        }
-      },
-      {
-        "id": "lampara_plaza",
+        "id": "lampara_posada",
         "kind": "lamp",
         "asset": "decor_lampara",
         "interactable": true,
-        "stateDefault": "off",
+        "stateDefault": "on",
         "stateOn": "on",
         "stateOff": "off",
-        "prompt": "Encender lámpara",
-        "x": 250,
-        "y": 286,
+        "prompt": "Farol de la Posada",
+        "x": 236,
+        "y": 226,
         "w": 32,
         "h": 36,
         "solid": {
@@ -390,76 +249,227 @@
         }
       },
       {
-        "id": "bush1",
-        "kind": "bush",
-        "asset": "bush_flowers",
-        "x": 70,
+        "id": "lampara_banco",
+        "kind": "lamp",
+        "asset": "decor_lampara",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Farol del Banco",
+        "x": 492,
+        "y": 226,
+        "w": 32,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 20,
+          "w": 16,
+          "h": 12
+        }
+      },
+      {
+        "id": "lampara_escuela",
+        "kind": "lamp",
+        "asset": "decor_lampara",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Farol de la Escuela",
+        "x": 236,
+        "y": 386,
+        "w": 32,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 20,
+          "w": 16,
+          "h": 12
+        }
+      },
+      {
+        "id": "lampara_taller",
+        "kind": "lamp",
+        "asset": "decor_lampara",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Farol del Taller",
+        "x": 524,
+        "y": 396,
+        "w": 32,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 20,
+          "w": 16,
+          "h": 12
+        }
+      },
+      {
+        "id": "lampara_norte_izq",
+        "kind": "lamp",
+        "asset": "decor_lampara",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Farol del Santuario",
+        "x": 160,
         "y": 100,
-        "w": 48,
-        "h": 32
+        "w": 32,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 20,
+          "w": 16,
+          "h": 12
+        }
       },
       {
-        "id": "bush2",
-        "kind": "bush",
-        "asset": "bush_flowers",
-        "x": 640,
+        "id": "lampara_norte_der",
+        "kind": "lamp",
+        "asset": "decor_lampara",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Farol del Jardín",
+        "x": 560,
         "y": 100,
-        "w": 48,
-        "h": 32
+        "w": 32,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 20,
+          "w": 16,
+          "h": 12
+        }
       },
       {
-        "id": "bush3",
-        "kind": "bush",
-        "asset": "bush_flowers",
-        "x": 70,
-        "y": 420,
-        "w": 48,
-        "h": 32
-      },
-      {
-        "id": "bush4",
-        "kind": "bush",
-        "asset": "bush_flowers",
-        "x": 640,
-        "y": 420,
-        "w": 48,
-        "h": 32
-      },
-      {
-        "id": "madera1",
-        "kind": "wood",
-        "asset": "wood_pile",
-        "x": 190,
-        "y": 110,
-        "w": 48,
-        "h": 32
-      },
-      {
-        "id": "madera2",
-        "kind": "wood",
-        "asset": "wood_pile",
-        "x": 520,
-        "y": 420,
-        "w": 48,
-        "h": 32
-      },
-      {
-        "id": "caja1",
+        "id": "caja_taller_ext",
         "kind": "crate",
         "asset": "wooden_crate",
-        "x": 490,
-        "y": 250,
+        "x": 524,
+        "y": 354,
         "w": 40,
+        "h": 32,
+        "solid": {
+          "x": 2,
+          "y": 10,
+          "w": 36,
+          "h": 20
+        }
+      },
+      {
+        "id": "bush_santuario_1",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 64,
+        "y": 80,
+        "w": 48,
         "h": 32
       },
       {
-        "id": "caja2",
-        "kind": "crate",
-        "asset": "wooden_crate",
+        "id": "bush_santuario_2",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 64,
+        "y": 120,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush_jardin_1",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 650,
+        "y": 80,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush_jardin_2",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 650,
+        "y": 120,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush_sur_1",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 80,
+        "y": 480,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush_sur_2",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 630,
+        "y": 480,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "flor_santuario",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 80,
+        "y": 60,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "flor_jardin",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 620,
+        "y": 60,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "flor_plaza_1",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 280,
+        "y": 280,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "flor_plaza_2",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 440,
+        "y": 280,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "pasto_1",
+        "kind": "grass",
+        "asset": "grass_tufts",
         "x": 180,
-        "y": 330,
-        "w": 40,
-        "h": 32
+        "y": 60,
+        "w": 48,
+        "h": 16
+      },
+      {
+        "id": "pasto_2",
+        "kind": "grass",
+        "asset": "grass_tufts",
+        "x": 520,
+        "y": 60,
+        "w": 48,
+        "h": 16
       }
     ],
     "doors": []
@@ -470,14 +480,14 @@
       "cols": 12,
       "map": [
         "WWWWWWWWWWWW",
-        "WFFFFFFFFWWW",
-        "WFFFFFFCFFFW",
-        "WFFFFFFFFWWW",
-        "WFFFCFFFFFFW",
-        "WFFFFFFFFWWW",
-        "WFFFCFFFFFFW",
-        "WFFFFFFFFWWW",
-        "WFFFFFFFFWWW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
         "WWWWWWWWWWWW"
       ],
       "flags": {},
@@ -491,9 +501,9 @@
           "type": "portal",
           "asset": "puerta_interior",
           "toZone": "exterior",
-          "spawnX": 352,
-          "spawnY": 96,
-          "x": 96,
+          "spawnX": 288,
+          "spawnY": 258,
+          "x": 64,
           "y": 64,
           "w": 48,
           "h": 56,
@@ -510,8 +520,8 @@
           "type": "station",
           "asset": "objeto_cuenta",
           "markerAsset": "marker_objeto_caja",
-          "x": 320,
-          "y": 230,
+          "x": 80,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_caja",
@@ -533,8 +543,8 @@
           "type": "station",
           "asset": "objeto_empleado",
           "markerAsset": "marker_objeto_nomina",
-          "x": 200,
-          "y": 230,
+          "x": 180,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_nomina",
@@ -556,8 +566,8 @@
           "type": "station",
           "asset": "objeto_fecha",
           "markerAsset": "marker_objeto_ficha",
-          "x": 240,
-          "y": 110,
+          "x": 280,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_ficha",
@@ -577,61 +587,11 @@
       ],
       "decor": [
         {
-          "id": "fogata_posada",
-          "kind": "fogata",
-          "asset": "decor_fogata",
-          "interactable": true,
-          "stateDefault": "off",
-          "stateOn": "on",
-          "stateOff": "off",
-          "prompt": "Encender fogata",
-          "x": 120,
-          "y": 240,
-          "w": 48,
-          "h": 40,
-          "solid": {
-            "x": 14,
-            "y": 26,
-            "w": 20,
-            "h": 8
-          }
-        },
-        {
-          "id": "mesa_posada",
-          "kind": "furniture",
-          "asset": "mueble_mesa",
-          "x": 200,
-          "y": 180,
-          "w": 48,
-          "h": 32,
-          "solid": {
-            "x": 6,
-            "y": 20,
-            "w": 36,
-            "h": 8
-          }
-        },
-        {
-          "id": "silla_posada",
-          "kind": "furniture",
-          "asset": "mueble_silla",
-          "x": 160,
-          "y": 210,
-          "w": 36,
-          "h": 38,
-          "solid": {
-            "x": 4,
-            "y": 22,
-            "w": 28,
-            "h": 12
-          }
-        },
-        {
           "id": "cama_posada",
           "kind": "furniture",
           "asset": "mueble_cama",
           "x": 280,
-          "y": 150,
+          "y": 80,
           "w": 48,
           "h": 36,
           "solid": {
@@ -642,16 +602,46 @@
           }
         },
         {
-          "id": "lampara_posada",
+          "id": "tapete_posada",
+          "kind": "rug",
+          "asset": "mueble_tapete",
+          "x": 288,
+          "y": 124,
+          "w": 32,
+          "h": 22
+        },
+        {
+          "id": "cofre_posada",
+          "kind": "chest",
+          "asset": "mueble_cofre",
+          "interactable": true,
+          "stateDefault": "closed",
+          "stateOn": "open",
+          "stateOff": "closed",
+          "prompt": "Abrir cofre",
+          "openMessage": "¡Abriste el cofre del viajero! Contiene pergaminos de encapsulamiento y notas de POO.",
+          "x": 280,
+          "y": 146,
+          "w": 48,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 18,
+            "w": 32,
+            "h": 16
+          }
+        },
+        {
+          "id": "lampara_posada_noche",
           "kind": "lamp",
           "asset": "decor_lampara",
           "interactable": true,
-          "stateDefault": "off",
+          "stateDefault": "on",
           "stateOn": "on",
           "stateOff": "off",
-          "prompt": "Encender lámpara",
-          "x": 320,
-          "y": 180,
+          "prompt": "Farol de la habitación",
+          "x": 248,
+          "y": 80,
           "w": 32,
           "h": 36,
           "solid": {
@@ -665,8 +655,8 @@
           "id": "estante_posada",
           "kind": "furniture",
           "asset": "mueble_estante",
-          "x": 180,
-          "y": 100,
+          "x": 160,
+          "y": 70,
           "w": 52,
           "h": 48,
           "solid": {
@@ -677,13 +667,54 @@
           }
         },
         {
-          "id": "tapete_posada",
-          "kind": "rug",
-          "asset": "mueble_tapete",
-          "x": 220,
-          "y": 260,
+          "id": "mesa_posada",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 160,
+          "y": 140,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "silla_posada",
+          "kind": "furniture",
+          "asset": "mueble_silla",
+          "x": 124,
+          "y": 136,
+          "w": 36,
+          "h": 38,
+          "solid": {
+            "x": 4,
+            "y": 22,
+            "w": 28,
+            "h": 12
+          }
+        },
+        {
+          "id": "lampara_posada_mesa",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "on",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Lámpara de estudio",
+          "x": 170,
+          "y": 134,
           "w": 32,
-          "h": 22
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
         }
       ],
       "doors": []
@@ -714,9 +745,9 @@
           "type": "portal",
           "asset": "puerta_interior",
           "toZone": "exterior",
-          "spawnX": 672,
-          "spawnY": 96,
-          "x": 96,
+          "spawnX": 480,
+          "spawnY": 258,
+          "x": 64,
           "y": 64,
           "w": 48,
           "h": 56,
@@ -733,8 +764,8 @@
           "type": "station",
           "asset": "objeto_producto",
           "markerAsset": "marker_objeto_almacen",
-          "x": 200,
-          "y": 200,
+          "x": 190,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_almacen",
@@ -754,31 +785,11 @@
       ],
       "decor": [
         {
-          "id": "fogata_banco",
-          "kind": "fogata",
-          "asset": "decor_fogata",
-          "interactable": true,
-          "stateDefault": "off",
-          "stateOn": "on",
-          "stateOff": "off",
-          "prompt": "Encender fogata",
-          "x": 150,
-          "y": 240,
-          "w": 48,
-          "h": 40,
-          "solid": {
-            "x": 14,
-            "y": 26,
-            "w": 20,
-            "h": 8
-          }
-        },
-        {
-          "id": "estante_banco",
+          "id": "estante_banco_1",
           "kind": "furniture",
           "asset": "mueble_estante",
-          "x": 300,
-          "y": 140,
+          "x": 140,
+          "y": 70,
           "w": 52,
           "h": 48,
           "solid": {
@@ -789,6 +800,80 @@
           }
         },
         {
+          "id": "estante_banco_2",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 200,
+          "y": 70,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "mesa_banco",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 170,
+          "y": 140,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "silla_banco",
+          "kind": "furniture",
+          "asset": "mueble_silla",
+          "x": 130,
+          "y": 136,
+          "w": 36,
+          "h": 38,
+          "solid": {
+            "x": 4,
+            "y": 22,
+            "w": 28,
+            "h": 12
+          }
+        },
+        {
+          "id": "lampara_banco_escritorio",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "on",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Lámpara del mostrador",
+          "x": 180,
+          "y": 134,
+          "w": 32,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
+        },
+        {
+          "id": "tapete_banco",
+          "kind": "rug",
+          "asset": "mueble_tapete",
+          "x": 288,
+          "y": 140,
+          "w": 32,
+          "h": 22
+        },
+        {
           "id": "cofre_banco",
           "kind": "chest",
           "asset": "mueble_cofre",
@@ -797,8 +882,9 @@
           "stateOn": "open",
           "stateOff": "closed",
           "prompt": "Abrir cofre",
+          "openMessage": "¡Abriste la caja fuerte de la bóveda! Contiene lingotes de lógica pura y contratos de métodos constructores.",
           "x": 280,
-          "y": 230,
+          "y": 100,
           "w": 48,
           "h": 36,
           "solid": {
@@ -809,13 +895,24 @@
           }
         },
         {
-          "id": "tapete_banco",
-          "kind": "rug",
-          "asset": "mueble_tapete",
-          "x": 180,
-          "y": 260,
+          "id": "lampara_banco_boveda",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "on",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Lámpara de la bóveda",
+          "x": 300,
+          "y": 70,
           "w": 32,
-          "h": 22
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
         }
       ],
       "doors": []
@@ -825,14 +922,14 @@
       "cols": 12,
       "map": [
         "WWWWWWWWWWWW",
-        "WFFFFFFFFWWW",
-        "WFFFFFFFCFFW",
-        "WFFFFFFFFWWW",
-        "WFFCFFFFFFFW",
-        "WFFFFFFFFWWW",
-        "WFFFFFCFFFFW",
-        "WFFFFFFFFWWW",
-        "WFFFCFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
         "WWWWWWWWWWWW"
       ],
       "flags": {},
@@ -846,9 +943,9 @@
           "type": "portal",
           "asset": "puerta_interior",
           "toZone": "exterior",
-          "spawnX": 64,
-          "spawnY": 350,
-          "x": 96,
+          "spawnX": 288,
+          "spawnY": 428,
+          "x": 64,
           "y": 64,
           "w": 48,
           "h": 56,
@@ -865,8 +962,8 @@
           "type": "station",
           "asset": "objeto_estudiante",
           "markerAsset": "marker_objeto_escuela",
-          "x": 200,
-          "y": 200,
+          "x": 130,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_escuela",
@@ -888,8 +985,8 @@
           "type": "station",
           "asset": "objeto_libro",
           "markerAsset": "marker_objeto_manual",
-          "x": 300,
-          "y": 110,
+          "x": 250,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_manual",
@@ -909,61 +1006,11 @@
       ],
       "decor": [
         {
-          "id": "fogata_escuela",
-          "kind": "fogata",
-          "asset": "decor_fogata",
-          "interactable": true,
-          "stateDefault": "off",
-          "stateOn": "on",
-          "stateOff": "off",
-          "prompt": "Encender fogata",
-          "x": 140,
-          "y": 240,
-          "w": 48,
-          "h": 40,
-          "solid": {
-            "x": 14,
-            "y": 26,
-            "w": 20,
-            "h": 8
-          }
-        },
-        {
-          "id": "mesa_escuela",
-          "kind": "furniture",
-          "asset": "mueble_mesa",
-          "x": 230,
-          "y": 230,
-          "w": 48,
-          "h": 32,
-          "solid": {
-            "x": 6,
-            "y": 20,
-            "w": 36,
-            "h": 8
-          }
-        },
-        {
-          "id": "silla_escuela",
-          "kind": "furniture",
-          "asset": "mueble_silla",
-          "x": 200,
-          "y": 260,
-          "w": 36,
-          "h": 38,
-          "solid": {
-            "x": 4,
-            "y": 22,
-            "w": 28,
-            "h": 12
-          }
-        },
-        {
-          "id": "estante_escuela",
+          "id": "estante_escuela_1",
           "kind": "furniture",
           "asset": "mueble_estante",
-          "x": 320,
-          "y": 170,
+          "x": 140,
+          "y": 70,
           "w": 52,
           "h": 48,
           "solid": {
@@ -974,16 +1021,126 @@
           }
         },
         {
-          "id": "lampara_escuela",
+          "id": "estante_escuela_2",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 200,
+          "y": 70,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "estante_escuela_3",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 260,
+          "y": 70,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "mesa_escuela_1",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 120,
+          "y": 140,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "silla_escuela_1",
+          "kind": "furniture",
+          "asset": "mueble_silla",
+          "x": 85,
+          "y": 136,
+          "w": 36,
+          "h": 38,
+          "solid": {
+            "x": 4,
+            "y": 22,
+            "w": 28,
+            "h": 12
+          }
+        },
+        {
+          "id": "lampara_escuela_1",
           "kind": "lamp",
           "asset": "decor_lampara",
           "interactable": true,
-          "stateDefault": "off",
+          "stateDefault": "on",
           "stateOn": "on",
           "stateOff": "off",
-          "prompt": "Encender lámpara",
-          "x": 180,
-          "y": 120,
+          "prompt": "Lámpara de estudio A",
+          "x": 130,
+          "y": 134,
+          "w": 32,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
+        },
+        {
+          "id": "mesa_escuela_2",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 250,
+          "y": 140,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "silla_escuela_2",
+          "kind": "furniture",
+          "asset": "mueble_silla",
+          "x": 215,
+          "y": 136,
+          "w": 36,
+          "h": 38,
+          "solid": {
+            "x": 4,
+            "y": 22,
+            "w": 28,
+            "h": 12
+          }
+        },
+        {
+          "id": "lampara_escuela_2",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "on",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Lámpara de estudio B",
+          "x": 260,
+          "y": 134,
           "w": 32,
           "h": 36,
           "solid": {
@@ -1001,14 +1158,14 @@
       "cols": 12,
       "map": [
         "WWWWWWWWWWWW",
-        "WFFFFFFFFWWW",
-        "WFFFCFFFFFCW",
-        "WFFFFFFFFWWW",
-        "WFFFFFCFFFFW",
-        "WFFFFFFFFWWW",
-        "WFFFFFFFCFFW",
-        "WFFFFFFFFWWW",
-        "WFFCFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
+        "WFFFFFFFFFFW",
         "WWWWWWWWWWWW"
       ],
       "flags": {},
@@ -1022,9 +1179,9 @@
           "type": "portal",
           "asset": "puerta_interior",
           "toZone": "exterior",
-          "spawnX": 672,
-          "spawnY": 350,
-          "x": 96,
+          "spawnX": 480,
+          "spawnY": 428,
+          "x": 64,
           "y": 64,
           "w": 48,
           "h": 56,
@@ -1041,8 +1198,8 @@
           "type": "station",
           "asset": "objeto_carrito",
           "markerAsset": "marker_objeto_carro",
-          "x": 200,
-          "y": 200,
+          "x": 130,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_carro",
@@ -1064,8 +1221,8 @@
           "type": "station",
           "asset": "objeto_vehiculo",
           "markerAsset": "marker_objeto_carreta",
-          "x": 300,
-          "y": 110,
+          "x": 250,
+          "y": 210,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_carreta",
@@ -1085,61 +1242,11 @@
       ],
       "decor": [
         {
-          "id": "fogata_taller",
-          "kind": "fogata",
-          "asset": "decor_fogata",
-          "interactable": true,
-          "stateDefault": "off",
-          "stateOn": "on",
-          "stateOff": "off",
-          "prompt": "Encender fogata",
-          "x": 140,
-          "y": 240,
-          "w": 48,
-          "h": 40,
-          "solid": {
-            "x": 14,
-            "y": 26,
-            "w": 20,
-            "h": 8
-          }
-        },
-        {
-          "id": "mesa_taller",
-          "kind": "furniture",
-          "asset": "mueble_mesa",
-          "x": 250,
-          "y": 230,
-          "w": 48,
-          "h": 32,
-          "solid": {
-            "x": 6,
-            "y": 20,
-            "w": 36,
-            "h": 8
-          }
-        },
-        {
-          "id": "cama_taller",
-          "kind": "furniture",
-          "asset": "mueble_cama",
-          "x": 320,
-          "y": 180,
-          "w": 48,
-          "h": 36,
-          "solid": {
-            "x": 4,
-            "y": 26,
-            "w": 40,
-            "h": 10
-          }
-        },
-        {
           "id": "estante_taller",
           "kind": "furniture",
           "asset": "mueble_estante",
-          "x": 150,
-          "y": 120,
+          "x": 140,
+          "y": 70,
           "w": 52,
           "h": 48,
           "solid": {
@@ -1150,6 +1257,59 @@
           }
         },
         {
+          "id": "mesa_taller",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 140,
+          "y": 140,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "lampara_taller_banco",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "on",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Lámpara del banco de trabajo",
+          "x": 150,
+          "y": 134,
+          "w": 32,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
+        },
+        {
+          "id": "caja_taller_int",
+          "kind": "crate",
+          "asset": "wooden_crate",
+          "x": 230,
+          "y": 76,
+          "w": 40,
+          "h": 32
+        },
+        {
+          "id": "madera_taller_int",
+          "kind": "wood",
+          "asset": "wood_pile",
+          "x": 280,
+          "y": 76,
+          "w": 48,
+          "h": 32
+        },
+        {
           "id": "cofre_taller",
           "kind": "chest",
           "asset": "mueble_cofre",
@@ -1158,8 +1318,9 @@
           "stateOn": "open",
           "stateOff": "closed",
           "prompt": "Abrir cofre",
-          "x": 180,
-          "y": 150,
+          "openMessage": "¡Abriste el arcón de piezas del Taller! Encontraste engranajes de alta precisión y diagramas de clases POO.",
+          "x": 270,
+          "y": 136,
           "w": 48,
           "h": 36,
           "solid": {
@@ -1170,16 +1331,16 @@
           }
         },
         {
-          "id": "lampara_taller",
+          "id": "lampara_taller_arcon",
           "kind": "lamp",
           "asset": "decor_lampara",
           "interactable": true,
-          "stateDefault": "off",
+          "stateDefault": "on",
           "stateOn": "on",
           "stateOff": "off",
-          "prompt": "Encender lámpara",
-          "x": 330,
-          "y": 120,
+          "prompt": "Farol del arcón",
+          "x": 290,
+          "y": 100,
           "w": 32,
           "h": 36,
           "solid": {
