@@ -92,7 +92,7 @@
         "type": "station",
         "asset": "objeto_rectangulo",
         "markerAsset": "marker_objeto_medida",
-        "x": 640,
+        "x": 584,
         "y": 90,
         "w": 56,
         "h": 56,
@@ -117,8 +117,8 @@
         "toZone": "posada",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 64,
-        "y": 210,
+        "x": 260,
+        "y": 196,
         "w": 56,
         "h": 56,
         "stateMap": {
@@ -141,8 +141,8 @@
         "toZone": "banco",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 672,
-        "y": 210,
+        "x": 404,
+        "y": 196,
         "w": 56,
         "h": 56,
         "stateMap": {
@@ -165,8 +165,8 @@
         "toZone": "escuela",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 64,
-        "y": 330,
+        "x": 260,
+        "y": 356,
         "w": 56,
         "h": 56,
         "stateMap": {
@@ -189,8 +189,8 @@
         "toZone": "taller",
         "spawnX": 160,
         "spawnY": 96,
-        "x": 672,
-        "y": 330,
+        "x": 404,
+        "y": 356,
         "w": 56,
         "h": 56,
         "stateMap": {
@@ -205,64 +205,261 @@
           "h": 12
         },
         "sortOffset": 52
-      },
-      {
-        "id": "fogata_central",
-        "type": "fogata",
-        "asset": "campfire",
-        "x": 352,
-        "y": 300,
-        "w": 48,
-        "h": 40,
-        "solid": {
-          "x": 8,
-          "y": 26,
-          "w": 32,
-          "h": 10
-        },
-        "sortOffset": 36
       }
     ],
     "decor": [
       {
+        "id": "fogata_plaza",
+        "kind": "fogata",
+        "asset": "decor_fogata",
+        "interactable": true,
+        "stateDefault": "off",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Encender fogata",
+        "x": 332,
+        "y": 300,
+        "w": 48,
+        "h": 40,
+        "solid": {
+          "x": 14,
+          "y": 26,
+          "w": 20,
+          "h": 8
+        }
+      },
+      {
+        "id": "fogata_camp1",
+        "kind": "fogata",
+        "asset": "decor_fogata",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Fogata",
+        "x": 120,
+        "y": 230,
+        "w": 48,
+        "h": 40,
+        "solid": {
+          "x": 14,
+          "y": 26,
+          "w": 20,
+          "h": 8
+        }
+      },
+      {
+        "id": "fogata_camp2",
+        "kind": "fogata",
+        "asset": "decor_fogata",
+        "interactable": true,
+        "stateDefault": "on",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Fogata",
+        "x": 520,
+        "y": 230,
+        "w": 48,
+        "h": 40,
+        "solid": {
+          "x": 14,
+          "y": 26,
+          "w": 20,
+          "h": 8
+        }
+      },
+      {
+        "id": "flor1",
         "kind": "flowers",
         "asset": "flowers_mixed",
-        "x": 60,
-        "y": 430,
+        "x": 80,
+        "y": 150,
         "w": 48,
         "h": 20
       },
       {
+        "id": "flor2",
         "kind": "flowers",
         "asset": "flowers_mixed",
-        "x": 700,
-        "y": 60,
+        "x": 620,
+        "y": 150,
         "w": 48,
         "h": 20
       },
       {
+        "id": "flor3",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 80,
+        "y": 360,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "flor4",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 620,
+        "y": 360,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "flor5",
+        "kind": "flowers",
+        "asset": "flowers_mixed",
+        "x": 330,
+        "y": 420,
+        "w": 48,
+        "h": 20
+      },
+      {
+        "id": "pasto1",
         "kind": "grass",
         "asset": "grass_tufts",
         "x": 150,
-        "y": 60,
+        "y": 50,
         "w": 48,
         "h": 16
       },
       {
+        "id": "pasto2",
         "kind": "grass",
         "asset": "grass_tufts",
-        "x": 580,
-        "y": 440,
+        "x": 560,
+        "y": 50,
         "w": 48,
         "h": 16
       },
       {
+        "id": "pasto3",
         "kind": "grass",
         "asset": "grass_tufts",
         "x": 300,
         "y": 150,
         "w": 48,
         "h": 16
+      },
+      {
+        "id": "pasto4",
+        "kind": "grass",
+        "asset": "grass_tufts",
+        "x": 420,
+        "y": 470,
+        "w": 48,
+        "h": 16
+      },
+      {
+        "id": "cofre_camp",
+        "kind": "chest",
+        "asset": "mueble_cofre",
+        "interactable": true,
+        "stateDefault": "closed",
+        "stateOn": "open",
+        "stateOff": "closed",
+        "prompt": "Abrir cofre",
+        "x": 420,
+        "y": 286,
+        "w": 48,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 18,
+          "w": 32,
+          "h": 16
+        }
+      },
+      {
+        "id": "lampara_plaza",
+        "kind": "lamp",
+        "asset": "decor_lampara",
+        "interactable": true,
+        "stateDefault": "off",
+        "stateOn": "on",
+        "stateOff": "off",
+        "prompt": "Encender lámpara",
+        "x": 250,
+        "y": 286,
+        "w": 32,
+        "h": 36,
+        "solid": {
+          "x": 8,
+          "y": 20,
+          "w": 16,
+          "h": 12
+        }
+      },
+      {
+        "id": "bush1",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 70,
+        "y": 100,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush2",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 640,
+        "y": 100,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush3",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 70,
+        "y": 420,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "bush4",
+        "kind": "bush",
+        "asset": "bush_flowers",
+        "x": 640,
+        "y": 420,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "madera1",
+        "kind": "wood",
+        "asset": "wood_pile",
+        "x": 190,
+        "y": 110,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "madera2",
+        "kind": "wood",
+        "asset": "wood_pile",
+        "x": 520,
+        "y": 420,
+        "w": 48,
+        "h": 32
+      },
+      {
+        "id": "caja1",
+        "kind": "crate",
+        "asset": "wooden_crate",
+        "x": 490,
+        "y": 250,
+        "w": 40,
+        "h": 32
+      },
+      {
+        "id": "caja2",
+        "kind": "crate",
+        "asset": "wooden_crate",
+        "x": 180,
+        "y": 330,
+        "w": 40,
+        "h": 32
       }
     ],
     "doors": []
@@ -292,18 +489,18 @@
         {
           "id": "portal_posada_salida",
           "type": "portal",
-          "asset": "tent_blue",
+          "asset": "puerta_interior",
           "toZone": "exterior",
           "spawnX": 352,
           "spawnY": 96,
           "x": 96,
           "y": 64,
-          "w": 56,
+          "w": 48,
           "h": 56,
           "solid": {
             "x": 8,
             "y": 40,
-            "w": 40,
+            "w": 32,
             "h": 12
           },
           "sortOffset": 52
@@ -313,8 +510,8 @@
           "type": "station",
           "asset": "objeto_cuenta",
           "markerAsset": "marker_objeto_caja",
-          "x": 160,
-          "y": 170,
+          "x": 320,
+          "y": 230,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_caja",
@@ -336,8 +533,8 @@
           "type": "station",
           "asset": "objeto_empleado",
           "markerAsset": "marker_objeto_nomina",
-          "x": 256,
-          "y": 250,
+          "x": 200,
+          "y": 230,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_nomina",
@@ -359,8 +556,8 @@
           "type": "station",
           "asset": "objeto_fecha",
           "markerAsset": "marker_objeto_ficha",
-          "x": 320,
-          "y": 150,
+          "x": 240,
+          "y": 110,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_ficha",
@@ -378,7 +575,117 @@
           "sortOffset": 52
         }
       ],
-      "decor": [],
+      "decor": [
+        {
+          "id": "fogata_posada",
+          "kind": "fogata",
+          "asset": "decor_fogata",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender fogata",
+          "x": 120,
+          "y": 240,
+          "w": 48,
+          "h": 40,
+          "solid": {
+            "x": 14,
+            "y": 26,
+            "w": 20,
+            "h": 8
+          }
+        },
+        {
+          "id": "mesa_posada",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 200,
+          "y": 180,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "silla_posada",
+          "kind": "furniture",
+          "asset": "mueble_silla",
+          "x": 160,
+          "y": 210,
+          "w": 36,
+          "h": 38,
+          "solid": {
+            "x": 4,
+            "y": 22,
+            "w": 28,
+            "h": 12
+          }
+        },
+        {
+          "id": "cama_posada",
+          "kind": "furniture",
+          "asset": "mueble_cama",
+          "x": 280,
+          "y": 150,
+          "w": 48,
+          "h": 36,
+          "solid": {
+            "x": 4,
+            "y": 26,
+            "w": 40,
+            "h": 10
+          }
+        },
+        {
+          "id": "lampara_posada",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender lámpara",
+          "x": 320,
+          "y": 180,
+          "w": 32,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
+        },
+        {
+          "id": "estante_posada",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 180,
+          "y": 100,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "tapete_posada",
+          "kind": "rug",
+          "asset": "mueble_tapete",
+          "x": 220,
+          "y": 260,
+          "w": 32,
+          "h": 22
+        }
+      ],
       "doors": []
     },
     "banco": {
@@ -405,18 +712,18 @@
         {
           "id": "portal_banco_salida",
           "type": "portal",
-          "asset": "tent_blue",
+          "asset": "puerta_interior",
           "toZone": "exterior",
           "spawnX": 672,
           "spawnY": 96,
           "x": 96,
           "y": 64,
-          "w": 56,
+          "w": 48,
           "h": 56,
           "solid": {
             "x": 8,
             "y": 40,
-            "w": 40,
+            "w": 32,
             "h": 12
           },
           "sortOffset": 52
@@ -427,7 +734,7 @@
           "asset": "objeto_producto",
           "markerAsset": "marker_objeto_almacen",
           "x": 200,
-          "y": 220,
+          "y": 200,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_almacen",
@@ -445,7 +752,72 @@
           "sortOffset": 52
         }
       ],
-      "decor": [],
+      "decor": [
+        {
+          "id": "fogata_banco",
+          "kind": "fogata",
+          "asset": "decor_fogata",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender fogata",
+          "x": 150,
+          "y": 240,
+          "w": 48,
+          "h": 40,
+          "solid": {
+            "x": 14,
+            "y": 26,
+            "w": 20,
+            "h": 8
+          }
+        },
+        {
+          "id": "estante_banco",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 300,
+          "y": 140,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "cofre_banco",
+          "kind": "chest",
+          "asset": "mueble_cofre",
+          "interactable": true,
+          "stateDefault": "closed",
+          "stateOn": "open",
+          "stateOff": "closed",
+          "prompt": "Abrir cofre",
+          "x": 280,
+          "y": 230,
+          "w": 48,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 18,
+            "w": 32,
+            "h": 16
+          }
+        },
+        {
+          "id": "tapete_banco",
+          "kind": "rug",
+          "asset": "mueble_tapete",
+          "x": 180,
+          "y": 260,
+          "w": 32,
+          "h": 22
+        }
+      ],
       "doors": []
     },
     "escuela": {
@@ -472,18 +844,18 @@
         {
           "id": "portal_escuela_salida",
           "type": "portal",
-          "asset": "tent_blue",
+          "asset": "puerta_interior",
           "toZone": "exterior",
           "spawnX": 64,
           "spawnY": 350,
           "x": 96,
           "y": 64,
-          "w": 56,
+          "w": 48,
           "h": 56,
           "solid": {
             "x": 8,
             "y": 40,
-            "w": 40,
+            "w": 32,
             "h": 12
           },
           "sortOffset": 52
@@ -493,8 +865,8 @@
           "type": "station",
           "asset": "objeto_estudiante",
           "markerAsset": "marker_objeto_escuela",
-          "x": 180,
-          "y": 220,
+          "x": 200,
+          "y": 200,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_escuela",
@@ -516,8 +888,8 @@
           "type": "station",
           "asset": "objeto_libro",
           "markerAsset": "marker_objeto_manual",
-          "x": 288,
-          "y": 150,
+          "x": 300,
+          "y": 110,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_manual",
@@ -535,7 +907,93 @@
           "sortOffset": 52
         }
       ],
-      "decor": [],
+      "decor": [
+        {
+          "id": "fogata_escuela",
+          "kind": "fogata",
+          "asset": "decor_fogata",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender fogata",
+          "x": 140,
+          "y": 240,
+          "w": 48,
+          "h": 40,
+          "solid": {
+            "x": 14,
+            "y": 26,
+            "w": 20,
+            "h": 8
+          }
+        },
+        {
+          "id": "mesa_escuela",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 230,
+          "y": 230,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "silla_escuela",
+          "kind": "furniture",
+          "asset": "mueble_silla",
+          "x": 200,
+          "y": 260,
+          "w": 36,
+          "h": 38,
+          "solid": {
+            "x": 4,
+            "y": 22,
+            "w": 28,
+            "h": 12
+          }
+        },
+        {
+          "id": "estante_escuela",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 320,
+          "y": 170,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "lampara_escuela",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender lámpara",
+          "x": 180,
+          "y": 120,
+          "w": 32,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
+        }
+      ],
       "doors": []
     },
     "taller": {
@@ -562,18 +1020,18 @@
         {
           "id": "portal_taller_salida",
           "type": "portal",
-          "asset": "tent_blue",
+          "asset": "puerta_interior",
           "toZone": "exterior",
           "spawnX": 672,
           "spawnY": 350,
           "x": 96,
           "y": 64,
-          "w": 56,
+          "w": 48,
           "h": 56,
           "solid": {
             "x": 8,
             "y": 40,
-            "w": 40,
+            "w": 32,
             "h": 12
           },
           "sortOffset": 52
@@ -583,8 +1041,8 @@
           "type": "station",
           "asset": "objeto_carrito",
           "markerAsset": "marker_objeto_carro",
-          "x": 180,
-          "y": 220,
+          "x": 200,
+          "y": 200,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_carro",
@@ -606,8 +1064,8 @@
           "type": "station",
           "asset": "objeto_vehiculo",
           "markerAsset": "marker_objeto_carreta",
-          "x": 288,
-          "y": 150,
+          "x": 300,
+          "y": 110,
           "w": 56,
           "h": 56,
           "missionNode": "objeto_carreta",
@@ -625,7 +1083,113 @@
           "sortOffset": 52
         }
       ],
-      "decor": [],
+      "decor": [
+        {
+          "id": "fogata_taller",
+          "kind": "fogata",
+          "asset": "decor_fogata",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender fogata",
+          "x": 140,
+          "y": 240,
+          "w": 48,
+          "h": 40,
+          "solid": {
+            "x": 14,
+            "y": 26,
+            "w": 20,
+            "h": 8
+          }
+        },
+        {
+          "id": "mesa_taller",
+          "kind": "furniture",
+          "asset": "mueble_mesa",
+          "x": 250,
+          "y": 230,
+          "w": 48,
+          "h": 32,
+          "solid": {
+            "x": 6,
+            "y": 20,
+            "w": 36,
+            "h": 8
+          }
+        },
+        {
+          "id": "cama_taller",
+          "kind": "furniture",
+          "asset": "mueble_cama",
+          "x": 320,
+          "y": 180,
+          "w": 48,
+          "h": 36,
+          "solid": {
+            "x": 4,
+            "y": 26,
+            "w": 40,
+            "h": 10
+          }
+        },
+        {
+          "id": "estante_taller",
+          "kind": "furniture",
+          "asset": "mueble_estante",
+          "x": 150,
+          "y": 120,
+          "w": 52,
+          "h": 48,
+          "solid": {
+            "x": 6,
+            "y": 6,
+            "w": 40,
+            "h": 40
+          }
+        },
+        {
+          "id": "cofre_taller",
+          "kind": "chest",
+          "asset": "mueble_cofre",
+          "interactable": true,
+          "stateDefault": "closed",
+          "stateOn": "open",
+          "stateOff": "closed",
+          "prompt": "Abrir cofre",
+          "x": 180,
+          "y": 150,
+          "w": 48,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 18,
+            "w": 32,
+            "h": 16
+          }
+        },
+        {
+          "id": "lampara_taller",
+          "kind": "lamp",
+          "asset": "decor_lampara",
+          "interactable": true,
+          "stateDefault": "off",
+          "stateOn": "on",
+          "stateOff": "off",
+          "prompt": "Encender lámpara",
+          "x": 330,
+          "y": 120,
+          "w": 32,
+          "h": 36,
+          "solid": {
+            "x": 8,
+            "y": 20,
+            "w": 16,
+            "h": 12
+          }
+        }
+      ],
       "doors": []
     }
   },
