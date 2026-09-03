@@ -28802,6 +28802,1102 @@
      ]
     }
    }
+  },
+  "puerta_interior": {
+   "id": "puerta_interior",
+   "name": "Puerta interior",
+   "category": "environment",
+   "notes": "Puerta de madera para salir del interior.",
+   "size": {
+    "w": 48,
+    "h": 56
+   },
+   "anchor": {
+    "x": 24.0,
+    "y": 54
+   },
+   "hitbox": {
+    "x": 16.0,
+    "y": 42,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 54
+   },
+   "collision": "base_only",
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 24.0,
+       "y": 52,
+       "rx": 22.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 4,
+       "w": 40,
+       "h": 52,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 8,
+       "w": 32,
+       "h": 44,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 10,
+       "y": 10,
+       "w": 28,
+       "h": 6,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 10,
+       "y": 20,
+       "w": 28,
+       "h": 6,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 10,
+       "y": 30,
+       "w": 28,
+       "h": 6,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 34,
+       "y": 26,
+       "w": 4,
+       "h": 5,
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 2,
+       "y": 0,
+       "w": 44,
+       "h": 4,
+       "color": "#4a2f1a",
+       "alpha": 1
+      }
+     ]
+    }
+   }
+  },
+  "mueble_mesa": {
+   "id": "mueble_mesa",
+   "name": "Mesa de madera",
+   "category": "environment",
+   "notes": "Mesa con vajilla de la posada.",
+   "size": {
+    "w": 48,
+    "h": 32
+   },
+   "anchor": {
+    "x": 24.0,
+    "y": 30
+   },
+   "hitbox": {
+    "x": 16.0,
+    "y": 18,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 30
+   },
+   "collision": "base_only",
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 24.0,
+       "y": 28,
+       "rx": 22.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 20,
+       "w": 36,
+       "h": 6,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 12,
+       "w": 4,
+       "h": 20,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 36,
+       "y": 12,
+       "w": 4,
+       "h": 20,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 26,
+       "w": 5,
+       "h": 4,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 39,
+       "y": 26,
+       "w": 5,
+       "h": 4,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 12,
+       "y": 8,
+       "w": 24,
+       "h": 4,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 14,
+       "y": 6,
+       "w": 6,
+       "h": 4,
+       "color": "#f2e3c4",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 26,
+       "y": 6,
+       "w": 6,
+       "h": 4,
+       "color": "#f2e3c4",
+       "alpha": 1
+      }
+     ]
+    }
+   }
+  },
+  "mueble_silla": {
+   "id": "mueble_silla",
+   "name": "Silla de madera",
+   "category": "environment",
+   "notes": "Silla simple de campamento.",
+   "size": {
+    "w": 36,
+    "h": 38
+   },
+   "anchor": {
+    "x": 18.0,
+    "y": 36
+   },
+   "hitbox": {
+    "x": 10.0,
+    "y": 24,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 36
+   },
+   "collision": "base_only",
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 18.0,
+       "y": 34,
+       "rx": 16.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 8,
+       "w": 4,
+       "h": 26,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 28,
+       "y": 8,
+       "w": 4,
+       "h": 26,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 22,
+       "w": 32,
+       "h": 5,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 27,
+       "w": 4,
+       "h": 10,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 28,
+       "y": 27,
+       "w": 4,
+       "h": 10,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 8,
+       "w": 24,
+       "h": 3,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 10,
+       "y": 8,
+       "w": 2,
+       "h": 14,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 18,
+       "y": 8,
+       "w": 2,
+       "h": 14,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 26,
+       "y": 8,
+       "w": 2,
+       "h": 14,
+       "color": "#6b4626",
+       "alpha": 1
+      }
+     ]
+    }
+   }
+  },
+  "mueble_cama": {
+   "id": "mueble_cama",
+   "name": "Cama de campamento",
+   "category": "environment",
+   "notes": "Cama con manta y almohada.",
+   "size": {
+    "w": 48,
+    "h": 36
+   },
+   "anchor": {
+    "x": 24.0,
+    "y": 34
+   },
+   "hitbox": {
+    "x": 16.0,
+    "y": 22,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 34
+   },
+   "collision": "base_only",
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 24.0,
+       "y": 32,
+       "rx": 22.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 26,
+       "w": 40,
+       "h": 10,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 16,
+       "w": 40,
+       "h": 12,
+       "color": "#f2e3c4",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 14,
+       "w": 24,
+       "h": 4,
+       "color": "#e05a4e",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 12,
+       "w": 10,
+       "h": 6,
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 8,
+       "w": 4,
+       "h": 30,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 4,
+       "y": 8,
+       "w": 40,
+       "h": 3,
+       "color": "#a06b3d",
+       "alpha": 1
+      }
+     ]
+    }
+   }
+  },
+  "mueble_estante": {
+   "id": "mueble_estante",
+   "name": "Estante",
+   "category": "environment",
+   "notes": "Estante con provisiones.",
+   "size": {
+    "w": 52,
+    "h": 48
+   },
+   "anchor": {
+    "x": 26.0,
+    "y": 46
+   },
+   "hitbox": {
+    "x": 18.0,
+    "y": 34,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 46
+   },
+   "collision": "base_only",
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 26.0,
+       "y": 44,
+       "rx": 24.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 6,
+       "w": 5,
+       "h": 40,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 41,
+       "y": 6,
+       "w": 5,
+       "h": 40,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 6,
+       "w": 40,
+       "h": 4,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 20,
+       "w": 40,
+       "h": 4,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 6,
+       "y": 34,
+       "w": 40,
+       "h": 4,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 12,
+       "y": 10,
+       "w": 8,
+       "h": 10,
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 24,
+       "y": 10,
+       "w": 8,
+       "h": 10,
+       "color": "#4dd0e1",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 12,
+       "y": 24,
+       "w": 10,
+       "h": 10,
+       "color": "#e05a4e",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 26,
+       "y": 24,
+       "w": 10,
+       "h": 10,
+       "color": "#57c86f",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 14,
+       "y": 38,
+       "w": 8,
+       "h": 6,
+       "color": "#f2e3c4",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 26,
+       "y": 38,
+       "w": 8,
+       "h": 6,
+       "color": "#7d8b96",
+       "alpha": 1
+      }
+     ]
+    }
+   }
+  },
+  "mueble_cofre": {
+   "id": "mueble_cofre",
+   "name": "Cofre",
+   "category": "environment",
+   "notes": "Cofre de madera con cerradura.",
+   "size": {
+    "w": 48,
+    "h": 36
+   },
+   "anchor": {
+    "x": 24.0,
+    "y": 34
+   },
+   "hitbox": {
+    "x": 16.0,
+    "y": 22,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 34
+   },
+   "collision": "base_only",
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 24.0,
+       "y": 32,
+       "rx": 22.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 10,
+       "y": 18,
+       "w": 28,
+       "h": 16,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 14,
+       "w": 32,
+       "h": 7,
+       "color": "#a06b3d",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 22,
+       "y": 16,
+       "w": 5,
+       "h": 4,
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 22,
+       "y": 10,
+       "w": 5,
+       "h": 5,
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "line",
+       "x1": 12,
+       "y1": 34,
+       "x2": 36,
+       "y2": 34,
+       "color": "#6b4626",
+       "width": 2
+      }
+     ]
+    }
+   }
+  },
+  "mueble_tapete": {
+   "id": "mueble_tapete",
+   "name": "Tapete",
+   "category": "environment",
+   "notes": "Tapete tejido.",
+   "size": {
+    "w": 32,
+    "h": 22
+   },
+   "anchor": {
+    "x": 16.0,
+    "y": 20
+   },
+   "hitbox": {
+    "x": 8.0,
+    "y": 8,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 20
+   },
+   "collision": false,
+   "interactable": false,
+   "states": {
+    "default": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 16.0,
+       "y": 18,
+       "rx": 14.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 12,
+       "rx": 13,
+       "ry": 10,
+       "color": "#e05a4e",
+       "alpha": 0.85
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 12,
+       "rx": 9,
+       "ry": 7,
+       "color": "#ffd166",
+       "alpha": 0.7
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 12,
+       "rx": 5,
+       "ry": 4,
+       "color": "#f2e3c4",
+       "alpha": 0.6
+      }
+     ]
+    }
+   }
+  },
+  "decor_lampara": {
+   "id": "decor_lampara",
+   "name": "Lámpara de vela",
+   "category": "environment",
+   "notes": "Lámpara interactiva: F enciende la llama.",
+   "size": {
+    "w": 32,
+    "h": 36
+   },
+   "anchor": {
+    "x": 16.0,
+    "y": 34
+   },
+   "hitbox": {
+    "x": 8.0,
+    "y": 22,
+    "w": 16,
+    "h": 10
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 34
+   },
+   "collision": false,
+   "interactable": true,
+   "states": {
+    "off": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 16.0,
+       "y": 32,
+       "rx": 14.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 14,
+       "y": 18,
+       "w": 4,
+       "h": 14,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 30,
+       "w": 16,
+       "h": 5,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 15,
+       "y": 8,
+       "w": 2,
+       "h": 10,
+       "color": "#7d8b96",
+       "alpha": 1
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 7,
+       "rx": 3,
+       "ry": 3,
+       "color": "#4d5964",
+       "alpha": 1
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 7,
+       "rx": 2,
+       "ry": 2,
+       "color": "#7d8b96",
+       "alpha": 1
+      }
+     ]
+    },
+    "on": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 16.0,
+       "y": 32,
+       "rx": 14.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 14,
+       "y": 18,
+       "w": 4,
+       "h": 14,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 8,
+       "y": 30,
+       "w": 16,
+       "h": 5,
+       "color": "#8a5a33",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 15,
+       "y": 8,
+       "w": 2,
+       "h": 10,
+       "color": "#7d8b96",
+       "alpha": 1
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 8,
+       "rx": 3,
+       "ry": 3,
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 8,
+       "rx": 2,
+       "ry": 2,
+       "color": "#ffe99b",
+       "alpha": 1
+      },
+      {
+       "type": "ellipse",
+       "x": 16,
+       "y": 6,
+       "rx": 2,
+       "ry": 1,
+       "color": "#ffd166",
+       "alpha": 1
+      }
+     ]
+    }
+   }
+  },
+  "decor_fogata": {
+   "id": "decor_fogata",
+   "name": "Fogata",
+   "category": "environment",
+   "notes": "Fogata interactiva: F la enciende y apaga.",
+   "size": {
+    "w": 48,
+    "h": 40
+   },
+   "anchor": {
+    "x": 24,
+    "y": 38
+   },
+   "hitbox": {
+    "x": 14,
+    "y": 26,
+    "w": 20,
+    "h": 8
+   },
+   "depth": {
+    "mode": "y_sort",
+    "footY": 38
+   },
+   "collision": "base_only",
+   "interactable": true,
+   "stateLabels": {
+    "off": "Apagada",
+    "on": "Encendida"
+   },
+   "states": {
+    "off": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 24.0,
+       "y": 36,
+       "rx": 22.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 14,
+       "y": 26,
+       "w": 20,
+       "h": 6,
+       "color": "#6f747a",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 12,
+       "y": 22,
+       "w": 8,
+       "h": 8,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 22,
+       "y": 22,
+       "w": 8,
+       "h": 8,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 32,
+       "y": 22,
+       "w": 8,
+       "h": 8,
+       "color": "#6b4626",
+       "alpha": 1
+      }
+     ]
+    },
+    "on": {
+     "draw": [
+      {
+       "type": "ellipse",
+       "x": 24.0,
+       "y": 36,
+       "rx": 22.0,
+       "ry": 3,
+       "color": "#2a241e",
+       "alpha": 0.22
+      },
+      {
+       "type": "rect",
+       "x": 14,
+       "y": 26,
+       "w": 20,
+       "h": 6,
+       "color": "#6f747a",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 12,
+       "y": 22,
+       "w": 8,
+       "h": 8,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 22,
+       "y": 22,
+       "w": 8,
+       "h": 8,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "rect",
+       "x": 32,
+       "y": 22,
+       "w": 8,
+       "h": 8,
+       "color": "#6b4626",
+       "alpha": 1
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         22
+        ],
+        [
+         22,
+         10
+        ],
+        [
+         26,
+         20
+        ]
+       ],
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         20,
+         22
+        ],
+        [
+         26,
+         8
+        ],
+        [
+         30,
+         20
+        ]
+       ],
+       "color": "#ff9d24",
+       "alpha": 1
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         25,
+         22
+        ],
+        [
+         30,
+         12
+        ],
+        [
+         34,
+         22
+        ]
+       ],
+       "color": "#ffd166",
+       "alpha": 1
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         28,
+         22
+        ],
+        [
+         33,
+         9
+        ],
+        [
+         37,
+         22
+        ]
+       ],
+       "color": "#ffb84d",
+       "alpha": 1
+      },
+      {
+       "type": "ellipse",
+       "x": 24,
+       "y": 14,
+       "rx": 16,
+       "ry": 12,
+       "color": "#ff9d24",
+       "alpha": 0.18
+      }
+     ]
+    }
+   }
   }
  },
  "effects": {
@@ -29177,7 +30273,16 @@
    "marker_objeto_carro",
    "marker_objeto_carreta",
    "marker_objeto_manual",
-   "marker_objeto_ficha"
+   "marker_objeto_ficha",
+   "puerta_interior",
+   "mueble_mesa",
+   "mueble_silla",
+   "mueble_cama",
+   "mueble_estante",
+   "mueble_cofre",
+   "mueble_tapete",
+   "decor_lampara",
+   "decor_fogata"
   ]
  }
 }
