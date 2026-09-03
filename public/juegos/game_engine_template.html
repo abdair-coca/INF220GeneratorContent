@@ -554,6 +554,8 @@ class InputManager {
     return kb || touch;
   }
 
+  wantsInteractDecor() { return this.pressed("KeyF"); }
+
   wantsClose() { return this.pressed("Escape"); }
 }
 
@@ -970,10 +972,24 @@ class World {
     const data = zoneData || ZONE;
     this.rows=data.rows; this.cols=data.cols; this.tiles=data.map.map(r=>r.split("")); this.flags={...data.flags};
     this.npcs=data.npcs.map(n=>({...n,dialogue:n.dialogue.slice(),visualState:n.initialState||"down"})); this.interactables=data.interactables.map(i=>({...i,solid:{...i.solid},stateMap:i.stateMap?{...i.stateMap}:null}));
-    this.decor=data.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null})); this.doors=data.doors.map(d=>({...d}));
+    this.decor=data.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null,state:d.state!=null?d.state:(d.stateDefault||"default")})); this.doors=data.doors.map(d=>({...d}));
     this.weather = data.weather || null;
     return this;
   }
+  toggleDecor(id) {
+    const d = this.decor.find(x => x.id === id);
+    if (!d || !d.interactable) return null;
+    d.state = (d.state || d.stateDefault || "default") === (d.stateOn || "on") ? (d.stateOff || "off") : (d.stateOn || "on");
+    d.changedAt = performance.now();
+    return d.state;
+  }
+  setDecorState(id, state) {
+    const d = this.decor.find(x => x.id === id);
+    if (!d) return;
+    d.state = state;
+    d.changedAt = performance.now();
+  }
+  litDecor(id) { const d = this.decor.find(x => x.id === id); return !!(d && (d.state === d.stateOn || d.lit)); }
   findPortal(zoneId) {
     return this.interactables.find(i => i.type === "portal" && i.toZone === zoneId) || null;
   }
@@ -1087,7 +1103,14 @@ class Renderer {
      for (const d of world.decor) {
        if (d.kind === "flowers") ASSET_RENDERER.drawAsset(ctx, "flowers_mixed", "default", d.x + d.w / 2, d.y + d.h, camera, now);
        else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
-       else if (d.asset) ASSET_RENDERER.drawAsset(ctx, d.asset, d.state || "default", d.x + d.w / 2, d.y + d.h, camera, now);
+       else if (d.asset) {
+         const st = d.state || "default";
+         ASSET_RENDERER.drawAsset(ctx, d.asset, st, d.x + d.w / 2, d.y + d.h, camera, now);
+         if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+           if (Math.random() < 0.12) this._emitFromEffect("smoke", d.x + d.w / 2, d.y + d.h - 8);
+           if (Math.random() < 0.08) this._emitFromEffect("sparks", d.x + d.w / 2, d.y + d.h - 12);
+         }
+       }
      }
 if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
       if (world.weather && (world.weather.mode === "storm" || world.weather.mode === "frost") && challengeSystem && challengeSystem.lesson.storm) {
@@ -1172,6 +1195,18 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
     ctx.save(); rect(ctx, sx - 17, sy - 19, 34, 21, C.ink); rect(ctx, sx - 15, sy - 17, 30, 17, C.gold1); rect(ctx, sx - 13, sy - 15, 26, 13, C.gold2);
     ctx.fillStyle = C.ink; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("E", sx, sy - 8);
     rect(ctx, sx - 3, sy + 1, 6, 4, C.ink); rect(ctx, sx - 2, sy + 1, 4, 3, C.gold1); ctx.restore();
+  }
+
+  renderDecorPrompt(ctx, x, y, camera, label) {
+    const time = performance.now() / 1000, bounce = Math.round(Math.sin(time * 7) * 2), sx = Math.round(x - camera.x), sy = Math.round(y - camera.y - 6 + bounce);
+    const txt = label || "Interactuar";
+    ctx.save();
+    const w = 14 + txt.length * 6 + 10;
+    rect(ctx, sx - w / 2, sy - 17, w, 19, C.ink);
+    rect(ctx, sx - w / 2 + 2, sy - 15, w - 4, 15, "#5c7a5a");
+    ctx.fillStyle = "#fff4d8"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("F · " + txt, sx, sy - 7);
+    ctx.restore();
   }
 
   renderGuide(ctx, world, camera, activeTargetId, canvasW, canvasH) {
@@ -1656,6 +1691,16 @@ class InteractionSystem {
     for (const door of this.world.doors) { const dx = door.tileCol * 32 + 16, dy = door.tileRow * 32 + 16; const d = Math.hypot(c.x - dx, c.y - dy); if (d < bestDist && !this.world.flags.senderoAbierto) { best = { kind: "door", ref: door }; bestDist = d; } }
     return best;
   }
+  findNearbyDecor(player) {
+    const c = player.center(); let best = null, bestDist = this.range;
+    for (const d of this.world.decor) {
+      if (!d.interactable) continue;
+      const dx = d.x + (d.w || 32) / 2, dy = d.y + (d.h || 32) / 2;
+      const dist = Math.hypot(c.x - dx, c.y - dy);
+      if (dist < bestDist) { best = { kind: "decor", ref: d }; bestDist = dist; }
+    }
+    return best;
+  }
 }
 
 Object.assign(NS, { PythonEngine, PythonValidator, WorldActions, DialogueSystem, InteractionSystem });
@@ -2110,6 +2155,7 @@ class Game {
     this.ui = new UIManager(); this.dialogue = new DialogueSystem(this.ui);
     this.lesson = null; this.challengeSystem = null; this.statistics = null; this.nearby = null;
     this.introDone = false; this.missionComplete = false; this._lastTs = 0;
+    this.nearby = null; this.nearbyDecor = null; this._lastPortal = null;
     this._bindUiCallbacks(); this._bindMobileControls(); this._bindResize();
   }
 
@@ -2156,15 +2202,20 @@ class Game {
   }
   enterZone(zoneId, spawnX, spawnY) {
     if (!ZONES[zoneId]) return;
+    const prevZone = this.world.zoneId;
     this.world.load(ZONES[zoneId]);
     this.world.zoneId = zoneId;
-    if (spawnX != null && spawnY != null) {
-      const safe = this._findWalkableSpawn(this.world, spawnX, spawnY);
-      this.player.x = safe.x; this.player.y = safe.y;
-    } else {
-      const safe = this._findWalkableSpawn(this.world, this.player.x, this.player.y);
-      this.player.x = safe.x; this.player.y = safe.y;
+    let px = (spawnX != null) ? spawnX : this.player.x;
+    let py = (spawnY != null) ? spawnY : this.player.y;
+    if (zoneId === "exterior" && prevZone !== "exterior" && this._lastPortal) {
+      const origin = ZONES.exterior.interactables.find(i => i.id === this._lastPortal.portalId);
+      if (origin) {
+        px = origin.x + (origin.w || 32) / 2;
+        py = origin.y + (origin.h || 32) + 4;
+      }
     }
+    const safe = this._findWalkableSpawn(this.world, px, py);
+    this.player.x = safe.x; this.player.y = safe.y;
     this.camera.x = this.camera.y = 0;
     this.worldActions = new WorldActions(this.world, this.particles, this.audio);
     this.interaction = new InteractionSystem(this.world);
@@ -2207,6 +2258,8 @@ class Game {
 
       this.nearby = this.interaction.findNearby(this.player);
       if (this.input.wantsInteract()) this._handleInteract();
+      this.nearbyDecor = this.interaction.findNearbyDecor(this.player);
+      if (this.input.wantsInteractDecor()) this._handleInteractDecor();
     } else {
       if (this.dialogue.active && this.input.wantsInteract()) this.dialogue.advance();
       if (this.input.wantsClose()) this._closeTopModal();
@@ -2232,6 +2285,11 @@ class Game {
       const y = r.y !== undefined ? r.y - 2 : r.tileRow * TILE - 6;
       this.renderer.renderInteractPrompt(this.ctx, x, y, this.camera);
     }
+    if (this.nearbyDecor && !this._isModalOpen()) {
+      const d = this.nearbyDecor.ref;
+      const dx = d.x + (d.w || 32) / 2, dy = d.y - 2;
+      this.renderer.renderDecorPrompt(this.ctx, dx, dy, this.camera, d.prompt || "");
+    }
   }
 
   _handleInteract() {
@@ -2242,7 +2300,13 @@ class Game {
       const it = this.nearby.ref;
        if (it.type === "portal") {
          if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
-         if (it.toZone) { this.enterZone(it.toZone, it.spawnX, it.spawnY); this.audio.play("open"); }
+         if (it.toZone) {
+           if (it.toZone !== "exterior") {
+             this._lastPortal = { portalId: it.id, x: it.x, y: it.y };
+           }
+           this.enterZone(it.toZone, it.spawnX, it.spawnY);
+           this.audio.play("open");
+         }
          return;
        }
        if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
@@ -2254,6 +2318,28 @@ class Game {
           if (!free && it.id !== ch.target) { this.ui.toast("Estación bloqueada. Sigue el orden indicado."); return; }
          this._syncWorldState(); this.ui.setObjective(this.lesson.objectives[ch.id] || ch.objective); this.ui.showEditor(ch, (this.lesson.ui && this.lesson.ui.editorLabel) || "CONSOLA DE CAMPO");
        }
+    }
+  }
+
+  _handleInteractDecor() {
+    if (!this.nearbyDecor) return;
+    if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
+    const d = this.nearbyDecor.ref;
+    const next = this.world.toggleDecor(d.id);
+    if (next === null) return;
+    const px = d.x + (d.w || 32) / 2, py = d.y + (d.h || 32) / 2;
+    if (d.kind === "campfire" || d.kind === "fogata") {
+      if (next === (d.stateOn || "on")) {
+        this.audio.play("success");
+        this.particles.spawnEmoji(px, py - 14, "🔥");
+        this.particles.spawnBurst(px, py, "#ff6b6b", 14);
+      } else {
+        this.audio.play("error");
+        this.particles.spawnText(px, py - 20, "Se apagó", "#b7c4cc");
+      }
+    } else {
+      this.audio.play("success");
+      this.particles.spawnBurst(px, py - 8, "#57c86f", 8);
     }
   }
 
