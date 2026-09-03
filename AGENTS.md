@@ -97,8 +97,12 @@ problemas, con la tecla **F** (no E).
 - Para dar vida al mundo: decorar los mapas (flores, arbustos, maderas,
   cajas, fogatas, lámparas) además de los altares de retos. Las casas deben
   quedar **cercanas entre sí** y tener **mobiliario interior** (mesa, silla,
-  cama, estante, cofre, tapete, lámpara, fogata) — assets en
-  `el_refugio_visual_assets_v1.json`.
+  cama, estante, cofre, tapete, lámpara, fogata).
+- **REGLA OBLIGATORIA DE COMPONENTES**: Todos los items, decoraciones y muebles
+  se **DEBEN sacar exclusivamente de la galería de componentes**
+  (`public/juegos/visual/el_refugio_assets_gallery.html` /
+  `public/juegos/visual/el_refugio_visual_assets_v1.json`). Prohibido inventar
+  ids de assets que no existan en la galería.
 
 ### Validadores POO (class_cases)
 
@@ -292,12 +296,19 @@ interactables/decor con `asset`) + `lesson` (challenges con `validator`,
 `requirements` para `structure`, `successAction`) + `book_pages`.
 Detalle completo en `docs/generador_game.md`.
 
-### Kit visual
+### Kit visual y Galería de Componentes
 
 `public/juegos/visual/el_refugio_visual_assets_v1.json` define todos los assets
-data-driven (estados, frames, hitbox, luz, partículas, oclusión). El motor los
-renderiza con `JuegoArtAssetRenderer`. El asset `npc_guardabosques` se deriva de
-`npc_alizon` por recolor (script de una sola vez).
+data-driven (estados, frames animados, hitbox, colisión, luz, partículas, oclusión).
+El motor los renderiza con `JuegoArtAssetRenderer`.
+
+**Catálogo visual interactivo**: `public/juegos/visual/el_refugio_assets_gallery.html`.
+
+> **REGLA MANDATORIA DE ASSETS**:
+> **Todos los elementos que se coloquen en un juego (`decor`, `interactables`, `portals`, `stations`, `npcs`) se DEBEN extraer estrictamente de esta galería de componentes.**
+> - Antes de diseñar o agregar elementos a cualquier `juego_*.json`, abrir o consultar `el_refugio_assets_gallery.html` / `el_refugio_visual_assets_v1.json` para verificar el `id` exacto del asset, sus estados disponibles (`states` / `extraStates`), tamaños, hitboxes y animaciones.
+> - Está **PROHIBIDO** inventar nombres o IDs de assets que no existan en el kit.
+> - Si se requiere un nuevo componente o animación, debe incorporarse primero al kit visual (`el_refugio_visual_assets_v1.json`), sincronizarse con la galería y luego utilizarse en el juego.
 
 ### JSON schema
 
