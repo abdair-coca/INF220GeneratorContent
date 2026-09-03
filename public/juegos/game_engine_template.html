@@ -851,8 +851,8 @@ function rect(ctx, x, y, w, h, color) {
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 }
 function shadow(ctx, x, y, w) {
-  ctx.save(); ctx.globalAlpha = .22; ctx.fillStyle = "#2a241e";
-  ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), Math.round(w), 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.globalAlpha = .30; ctx.fillStyle = "#0a0814";
+  ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), Math.round(w), Math.max(3, Math.round(w * 0.28)), 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 }
 function pixelFlower(ctx, x, y, color) {
   rect(ctx,x+3,y,2,2,color); rect(ctx,x,y+3,2,2,color); rect(ctx,x+6,y+3,2,2,color); rect(ctx,x+3,y+6,2,2,color); rect(ctx,x+3,y+3,2,2,"#ffd25d");
@@ -1103,14 +1103,7 @@ class Renderer {
      for (const d of world.decor) {
        if (d.kind === "flowers") ASSET_RENDERER.drawAsset(ctx, "flowers_mixed", "default", d.x + d.w / 2, d.y + d.h, camera, now);
        else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
-       else if (d.asset) {
-         const st = d.state || "default";
-         ASSET_RENDERER.drawAsset(ctx, d.asset, st, d.x + d.w / 2, d.y + d.h, camera, now);
-         if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
-           if (Math.random() < 0.12) this._emitFromEffect("smoke", d.x + d.w / 2, d.y + d.h - 8);
-           if (Math.random() < 0.08) this._emitFromEffect("sparks", d.x + d.w / 2, d.y + d.h - 12);
-         }
-       }
+       else if (d.kind === "rug" || d.asset === "mueble_tapete") ASSET_RENDERER.drawAsset(ctx, d.asset || "mueble_tapete", "default", d.x + d.w / 2, d.y + d.h, camera, now);
      }
 if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
       if (world.weather && (world.weather.mode === "storm" || world.weather.mode === "frost") && challengeSystem && challengeSystem.lesson.storm) {
@@ -1123,7 +1116,10 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
 
   renderDepthScene(world, player, camera, challengeSystem) {
     const ctx = this.ctx, now = performance.now(), items = [];
-    for (const d of world.decor) if (d.kind === "bush") items.push({ type: "decor", ref: d, y: d.y + d.h, asset: d.asset || "bush_flowers" });
+    for (const d of world.decor) {
+      if (d.kind === "flowers" || d.kind === "grass" || d.kind === "rug" || d.asset === "mueble_tapete") continue;
+      items.push({ type: "decor", ref: d, y: d.y + (d.sortOffset || d.h || 32), asset: d.asset || "bush_flowers" });
+    }
     for (const n of world.npcs) items.push({ type: "npc", ref: n, y: n.y + n.h, asset: n.asset || "npc_alizon" });
     for (const it of world.interactables) items.push({ type: "interactable", ref: it, y: it.y + (it.sortOffset || it.h || 32), asset: it.asset || it.type });
     items.push({ type: "player", ref: player, y: player.y + player.h, asset: "player_viajero" });
@@ -1131,11 +1127,18 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
     for (const item of items) {
       if (item.type === "decor") {
         const d = item.ref;
-        ASSET_RENDERER.drawAsset(ctx, item.asset, "default", d.x + d.w / 2, d.y + d.h, camera, now);
+        const st = d.state || d.stateDefault || "default";
+        shadow(ctx, d.x + d.w / 2 - camera.x, d.y + d.h - 1 - camera.y, Math.max(6, d.w * 0.35));
+        ASSET_RENDERER.drawAsset(ctx, item.asset, st, d.x + d.w / 2, d.y + d.h, camera, now);
+        if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+          if (Math.random() < 0.12) this._emitFromEffect("smoke", d.x + d.w / 2, d.y + d.h - 8);
+          if (Math.random() < 0.08) this._emitFromEffect("sparks", d.x + d.w / 2, d.y + d.h - 12);
+        }
         continue;
       }
       if (item.type === "player") {
         const p = item.ref;
+        shadow(ctx, p.x + p.w / 2 - camera.x, p.y + p.h - 1 - camera.y, 11);
         const st = (p.dir === "left" || p.dir === "right") ? "side" : p.dir;
         const bob = (p.moving && p.frame % 2) ? -1 : 0;
         ASSET_RENDERER.drawAsset(ctx, item.asset, st, p.x + p.w / 2, p.y + p.h + bob, camera, now, { flipX: p.dir === "left" });
@@ -1143,12 +1146,14 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
       }
       if (item.type === "npc") {
          const n = item.ref, bob = Math.sin((now + n.x * 3) / 560) * .5;
+         shadow(ctx, n.x + n.w / 2 - camera.x, n.y + n.h - 1 - camera.y, 11);
          ASSET_RENDERER.drawAsset(ctx, item.asset, n.visualState || "down", n.x + n.w / 2, n.y + n.h + bob, camera, now);
         continue;
       }
        const it = item.ref, age = it.changedAt ? Math.min(1, (now - it.changedAt) / 430) : 1;
        const pop = (it.changedAt && age < 1) ? .72 + age * .28 : 1;
         const status = challengeSystem && it.missionNode ? challengeSystem.status(it.missionNode) : null;
+        if (it.type !== "portal") { shadow(ctx, it.x + (it.w || 32) / 2 - camera.x, it.y + (it.h || 32) - 3 - camera.y, Math.max(10, (it.w || 32) * 0.38)); }
         ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it, challengeSystem), it.x + (it.w || 32) / 2, it.y + (it.h || 32), camera, now, { alpha: pop });
         if (status === "pending" && challengeSystem.lesson.progression && challengeSystem.lesson.progression.strict) {
           this._drawBlockedIndicator(ctx, it.x + (it.w || 32) / 2 - camera.x, it.y + 10 - camera.y);
@@ -1179,6 +1184,112 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
   renderEntities(world, camera) {}
   renderPlayer(player, camera) {}
 
+  renderLighting(world, player, camera, canvasW, canvasH, challengeSystem) {
+    if (!this.lightCanvas) {
+      this.lightCanvas = document.createElement("canvas");
+      this.lightCtx = this.lightCanvas.getContext("2d");
+    }
+    if (this.lightCanvas.width !== canvasW || this.lightCanvas.height !== canvasH) {
+      this.lightCanvas.width = canvasW;
+      this.lightCanvas.height = canvasH;
+    }
+    const lctx = this.lightCtx, now = performance.now();
+    lctx.clearRect(0, 0, canvasW, canvasH);
+
+    const isExterior = (world.zoneId === "exterior" || !world.zoneId);
+    lctx.globalCompositeOperation = "source-over";
+    lctx.fillStyle = isExterior ? "rgba(6, 9, 24, 0.88)" : "rgba(10, 13, 26, 0.72)";
+    lctx.fillRect(0, 0, canvasW, canvasH);
+
+    lctx.globalCompositeOperation = "destination-out";
+    const cutLight = (cx, cy, r, strength = 1.0) => {
+      if (r <= 0) return;
+      const g = lctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, `rgba(0, 0, 0, ${Math.min(1, strength)})`);
+      g.addColorStop(0.35, `rgba(0, 0, 0, ${Math.min(1, strength * 0.92)})`);
+      g.addColorStop(0.7, `rgba(0, 0, 0, ${strength * 0.45})`);
+      g.addColorStop(1, "rgba(0, 0, 0, 0)");
+      lctx.fillStyle = g;
+      lctx.beginPath();
+      lctx.arc(cx, cy, r, 0, Math.PI * 2);
+      lctx.fill();
+    };
+
+    // 1. Player aura
+    const px = player.x + player.w / 2 - camera.x;
+    const py = player.y + player.h / 2 - camera.y;
+    cutLight(px, py, 64, 0.76);
+
+    // 2. Decor lights (campfires and lamps)
+    for (const d of world.decor) {
+      const dx = d.x + (d.w || 32) / 2 - camera.x;
+      const dy = d.y + (d.h || 32) / 2 - camera.y;
+      const st = d.state || d.stateDefault || "off";
+      if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+        const flicker = Math.sin(now / 140) * 7 + Math.cos(now / 85) * 4;
+        cutLight(dx, dy + 2, 160 + flicker, 1.0);
+      } else if (d.kind === "lamp" && st === (d.stateOn || "on")) {
+        cutLight(dx, dy - 2, 125, 0.96);
+      }
+    }
+
+    // 3. Interactable fogatas, portals, stations
+    for (const it of world.interactables) {
+      const ix = it.x + (it.w || 32) / 2 - camera.x;
+      const iy = it.y + (it.h || 32) / 2 - camera.y;
+      if (it.type === "fogata" && it.lit) {
+        const flicker = Math.sin(now / 140) * 7 + Math.cos(now / 85) * 4;
+        cutLight(ix, iy, 160 + flicker, 1.0);
+      }
+      if (it.type === "portal") {
+        cutLight(ix, iy + 14, 52, 0.65);
+      }
+      if (it.missionNode && challengeSystem && challengeSystem.status(it.missionNode) === "completed") {
+        cutLight(ix, iy, 75, 0.70);
+      }
+    }
+
+    // 4. Guide NPC Alizon
+    for (const npc of world.npcs) {
+      const nx = npc.x + 16 - camera.x;
+      const ny = npc.y + 16 - camera.y;
+      cutLight(nx, ny, 50, 0.60);
+    }
+
+    // Warm color glow pass on top of cutouts
+    lctx.globalCompositeOperation = "source-over";
+    const addColorGlow = (cx, cy, r, innerColor, outerColor) => {
+      const g = lctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, innerColor);
+      g.addColorStop(0.5, outerColor);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      lctx.fillStyle = g;
+      lctx.beginPath();
+      lctx.arc(cx, cy, r, 0, Math.PI * 2);
+      lctx.fill();
+    };
+
+    for (const d of world.decor) {
+      const dx = d.x + (d.w || 32) / 2 - camera.x;
+      const dy = d.y + (d.h || 32) / 2 - camera.y;
+      const st = d.state || d.stateDefault || "off";
+      if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+        addColorGlow(dx, dy + 2, 170, "rgba(255, 170, 50, 0.24)", "rgba(255, 100, 20, 0.06)");
+      } else if (d.kind === "lamp" && st === (d.stateOn || "on")) {
+        addColorGlow(dx, dy - 2, 130, "rgba(255, 220, 110, 0.22)", "rgba(255, 180, 50, 0.05)");
+      }
+    }
+    for (const it of world.interactables) {
+      if (it.missionNode && challengeSystem && challengeSystem.status(it.missionNode) === "completed") {
+        const ix = it.x + (it.w || 32) / 2 - camera.x;
+        const iy = it.y + (it.h || 32) / 2 - camera.y;
+        addColorGlow(ix, iy, 80, "rgba(77, 208, 225, 0.22)", "rgba(24, 214, 160, 0.06)");
+      }
+    }
+
+    this.ctx.drawImage(this.lightCanvas, 0, 0);
+  }
+
   renderCanopy(world, camera) {
     const ctx = this.ctx, cw = ctx.canvas.width, ch = ctx.canvas.height, now = performance.now();
     const sc = Math.max(0, Math.floor(camera.x / TILE)), ec = Math.min(world.cols, Math.ceil((camera.x + cw) / TILE) + 1);
@@ -1205,7 +1316,7 @@ if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx,
     rect(ctx, sx - w / 2, sy - 17, w, 19, C.ink);
     rect(ctx, sx - w / 2 + 2, sy - 15, w - 4, 15, "#5c7a5a");
     ctx.fillStyle = "#fff4d8"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText("F · " + txt, sx, sy - 7);
+    ctx.fillText("E · " + txt, sx, sy - 7);
     ctx.restore();
   }
 
@@ -2271,6 +2382,7 @@ class Game {
      this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height, this.challengeSystem);
      this.renderer.renderDepthScene(this.world, this.player, this.camera, this.challengeSystem);
       this.renderer.renderCanopy(this.world, this.camera);
+      this.renderer.renderLighting(this.world, this.player, this.camera, this.canvas.width, this.canvas.height, this.challengeSystem);
 
     // Renderizado del Sistema de Guía
       const targetId = this._getActiveTargetId();
@@ -2288,12 +2400,19 @@ class Game {
     if (this.nearbyDecor && !this._isModalOpen()) {
       const d = this.nearbyDecor.ref;
       const dx = d.x + (d.w || 32) / 2, dy = d.y - 2;
-      this.renderer.renderDecorPrompt(this.ctx, dx, dy, this.camera, d.prompt || "");
+      let promptLabel = d.prompt || "";
+      if (d.kind === "chest") {
+        promptLabel = (d.state === (d.stateOn || "open")) ? "Cerrar cofre" : "Abrir cofre";
+      }
+      this.renderer.renderDecorPrompt(this.ctx, dx, dy, this.camera, promptLabel);
     }
   }
 
   _handleInteract() {
-    if (!this.nearby) return;
+    if (!this.nearby) {
+      if (this.nearbyDecor) this._handleInteractDecor();
+      return;
+    }
     if (this.nearby.kind === "npc") { const npc = this.nearby.ref; this.dialogue.start(npc.name, npc.dialogue); return; }
     if (this.nearby.kind === "door") { this.ui.toast("El sendero está bloqueado."); return; }
     if (this.nearby.kind === "interactable") {
@@ -2333,9 +2452,31 @@ class Game {
         this.audio.play("success");
         this.particles.spawnEmoji(px, py - 14, "🔥");
         this.particles.spawnBurst(px, py, "#ff6b6b", 14);
+        this.ui.toast("Encendiste la fogata. El fuego ilumina el sector.");
       } else {
         this.audio.play("error");
-        this.particles.spawnText(px, py - 20, "Se apagó", "#b7c4cc");
+        this.particles.spawnText(px, py - 20, "Apagada", "#b7c4cc");
+      }
+    } else if (d.kind === "lamp") {
+      if (next === (d.stateOn || "on")) {
+        this.audio.play("open");
+        this.particles.spawnEmoji(px, py - 14, "💡");
+        this.particles.spawnBurst(px, py, "#ffd166", 10);
+        this.ui.toast("Encendiste el farol.");
+      } else {
+        this.audio.play("click");
+        this.particles.spawnText(px, py - 20, "Apagado", "#b7c4cc");
+      }
+    } else if (d.kind === "chest") {
+      if (next === (d.stateOn || "open")) {
+        this.audio.play("success");
+        this.particles.spawnEmoji(px, py - 18, "✨");
+        this.particles.spawnBurst(px, py - 8, "#ffd166", 18);
+        this.particles.spawnBurst(px, py - 12, "#ffffff", 8);
+        this.ui.toast(d.openMessage || "¡Abriste el cofre! Contiene notas y gemas de arquitectura.");
+      } else {
+        this.audio.play("open");
+        this.particles.spawnText(px, py - 20, "Cerrado", "#b7c4cc");
       }
     } else {
       this.audio.play("success");
@@ -2376,8 +2517,8 @@ class Game {
     base.addEventListener("touchmove", (e) => { e.preventDefault(); move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
     base.addEventListener("touchend", (e) => { e.preventDefault(); end(); }, { passive: false });
     base.addEventListener("mousedown", (e) => start(e.clientX, e.clientY)); window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY)); window.addEventListener("mouseup", () => end());
-    interactBtn.addEventListener("touchstart", (e) => { e.preventDefault(); this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); }, { passive: false });
-    interactBtn.addEventListener("click", () => { this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); });
+    interactBtn.addEventListener("touchstart", (e) => { e.preventDefault(); this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); else if (!this.nearby && this.nearbyDecor) this._handleInteractDecor(); }, { passive: false });
+    interactBtn.addEventListener("click", () => { this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); else if (!this.nearby && this.nearbyDecor) this._handleInteractDecor(); });
   }
 
   _bindResize() {
