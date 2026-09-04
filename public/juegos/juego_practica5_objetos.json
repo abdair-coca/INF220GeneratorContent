@@ -67,48 +67,48 @@
       {
         "id": "altar_alma",
         "type": "station",
-        "asset": "objeto_persona",
-        "markerAsset": "marker_objeto_alma",
+        "asset": "station_sensor_pillar",
+        "markerAsset": "marker_station_sensor",
         "x": 104,
         "y": 90,
-        "w": 56,
-        "h": 56,
+        "w": 48,
+        "h": 80,
         "missionNode": "objeto_alma",
         "stateMap": {
-          "pending": "pendiente",
-          "active": "pendiente",
-          "completed": "reconstruido"
+          "pending": "inactive",
+          "active": "scanning",
+          "completed": "diagnosed"
         },
         "solid": {
-          "x": 8,
-          "y": 40,
-          "w": 40,
-          "h": 12
+          "x": 6,
+          "y": 60,
+          "w": 36,
+          "h": 14
         },
-        "sortOffset": 52
+        "sortOffset": 72
       },
       {
         "id": "altar_medida",
         "type": "station",
-        "asset": "objeto_rectangulo",
-        "markerAsset": "marker_objeto_medida",
+        "asset": "station_stability_monitor",
+        "markerAsset": "marker_station_stability",
         "x": 600,
         "y": 90,
-        "w": 56,
-        "h": 56,
+        "w": 80,
+        "h": 72,
         "missionNode": "objeto_medida",
         "stateMap": {
-          "pending": "pendiente",
-          "active": "pendiente",
-          "completed": "reconstruido"
+          "pending": "alert",
+          "active": "analyzing",
+          "completed": "stable"
         },
         "solid": {
-          "x": 8,
-          "y": 40,
-          "w": 40,
-          "h": 12
+          "x": 10,
+          "y": 50,
+          "w": 60,
+          "h": 16
         },
-        "sortOffset": 52
+        "sortOffset": 64
       },
       {
         "id": "portal_posada",
@@ -518,71 +518,71 @@
         {
           "id": "altar_caja",
           "type": "station",
-          "asset": "objeto_cuenta",
-          "markerAsset": "marker_objeto_caja",
+          "asset": "station_energy_console",
+          "markerAsset": "marker_station_energy",
           "x": 80,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 72,
+          "h": 64,
           "missionNode": "objeto_caja",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "broken",
+            "active": "repairing",
+            "completed": "online"
           },
           "solid": {
             "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "y": 44,
+            "w": 56,
+            "h": 14
           },
-          "sortOffset": 52
+          "sortOffset": 56
         },
         {
           "id": "altar_nomina",
           "type": "station",
-          "asset": "objeto_empleado",
-          "markerAsset": "marker_objeto_nomina",
+          "asset": "station_reverse_beacon",
+          "markerAsset": "marker_station_reverse",
           "x": 180,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 64,
+          "h": 88,
           "missionNode": "objeto_nomina",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "locked",
+            "active": "decoding",
+            "completed": "decoded"
           },
           "solid": {
-            "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "x": 14,
+            "y": 66,
+            "w": 36,
+            "h": 16
           },
-          "sortOffset": 52
+          "sortOffset": 80
         },
         {
           "id": "altar_ficha",
           "type": "station",
-          "asset": "objeto_fecha",
-          "markerAsset": "marker_objeto_ficha",
+          "asset": "station_frequency_beacon",
+          "markerAsset": "marker_station_frequency",
           "x": 280,
           "y": 210,
           "w": 56,
-          "h": 56,
+          "h": 88,
           "missionNode": "objeto_ficha",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "off",
+            "active": "searching",
+            "completed": "active"
           },
           "solid": {
-            "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "x": 12,
+            "y": 66,
+            "w": 32,
+            "h": 16
           },
-          "sortOffset": 52
+          "sortOffset": 80
         }
       ],
       "decor": [
@@ -762,25 +762,25 @@
         {
           "id": "altar_almacen",
           "type": "station",
-          "asset": "objeto_producto",
-          "markerAsset": "marker_objeto_almacen",
+          "asset": "station_resource_depot",
+          "markerAsset": "marker_station_resource",
           "x": 190,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 96,
+          "h": 72,
           "missionNode": "objeto_almacen",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "mixed",
+            "active": "separating",
+            "completed": "classified"
           },
           "solid": {
-            "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "x": 6,
+            "y": 48,
+            "w": 84,
+            "h": 18
           },
-          "sortOffset": 52
+          "sortOffset": 64
         }
       ],
       "decor": [
@@ -960,48 +960,48 @@
         {
           "id": "altar_escuela",
           "type": "station",
-          "asset": "objeto_estudiante",
-          "markerAsset": "marker_objeto_escuela",
+          "asset": "station_signal_tower",
+          "markerAsset": "marker_station_signal",
           "x": 130,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 64,
+          "h": 96,
           "missionNode": "objeto_escuela",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "apagada",
+            "active": "transmitting",
+            "completed": "connected"
           },
           "solid": {
-            "x": 8,
-            "y": 40,
+            "x": 12,
+            "y": 74,
             "w": 40,
-            "h": 12
+            "h": 16
           },
-          "sortOffset": 52
+          "sortOffset": 88
         },
         {
           "id": "altar_manual",
           "type": "station",
-          "asset": "objeto_libro",
-          "markerAsset": "marker_objeto_manual",
+          "asset": "storm_core",
+          "markerAsset": "marker_storm_core",
           "x": 250,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 80,
+          "h": 80,
           "missionNode": "objeto_manual",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "sealed",
+            "active": "unstable",
+            "completed": "activated"
           },
           "solid": {
-            "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "x": 14,
+            "y": 58,
+            "w": 52,
+            "h": 16
           },
-          "sortOffset": 52
+          "sortOffset": 72
         }
       ],
       "decor": [
@@ -1196,48 +1196,48 @@
         {
           "id": "altar_carro",
           "type": "station",
-          "asset": "objeto_carrito",
-          "markerAsset": "marker_objeto_carro",
+          "asset": "station_supply_sorter",
+          "markerAsset": "marker_station_supply",
           "x": 130,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 80,
+          "h": 64,
           "missionNode": "objeto_carro",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "messy",
+            "active": "sorting",
+            "completed": "organized"
           },
           "solid": {
             "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "y": 42,
+            "w": 64,
+            "h": 16
           },
-          "sortOffset": 52
+          "sortOffset": 56
         },
         {
           "id": "altar_carreta",
           "type": "station",
-          "asset": "objeto_vehiculo",
-          "markerAsset": "marker_objeto_carreta",
+          "asset": "station_ration_board",
+          "markerAsset": "marker_station_ration",
           "x": 250,
           "y": 210,
-          "w": 56,
-          "h": 56,
+          "w": 80,
+          "h": 72,
           "missionNode": "objeto_carreta",
           "stateMap": {
-            "pending": "pendiente",
-            "active": "pendiente",
-            "completed": "reconstruido"
+            "pending": "empty",
+            "active": "calculating",
+            "completed": "stocked"
           },
           "solid": {
-            "x": 8,
-            "y": 40,
-            "w": 40,
-            "h": 12
+            "x": 10,
+            "y": 50,
+            "w": 60,
+            "h": 16
           },
-          "sortOffset": 52
+          "sortOffset": 64
         }
       ],
       "decor": [
@@ -1382,7 +1382,7 @@
       "objeto_almacen": "Define la clase Producto: __init__(nombre, precio, stock), vender(), reponer_stock() y valor_inventario().",
       "objeto_escuela": "Define la clase Estudiante con atributo de clase total_estudiantes y @classmethod obtener_total().",
       "objeto_manual": "Define la clase Libro: prestar(), devolver() y __str__() con estado Disponible/Prestado.",
-      "objeto_carro": "Define la clase CarritoDeCompras: agregar_producto(), eliminar_producto(), calcular_total() y vaciar_carrito().",
+      "objeto_carro": "Define la clase CarritoDeCompras: agregar_producto(precio), quitar_producto(precio), calcular_total() y vaciar_carrito().",
       "objeto_carreta": "Define la clase Vehiculo: __init__(marca, modelo, velocidad_maxima), acelerar(), frenar() y mostrar_info()."
     },
     "progression": {
@@ -1508,6 +1508,20 @@
           "objetos",
           "metodos",
           "atributos"
+        ],
+        "classDiagram": [
+          {
+            "className": "Persona",
+            "attributes": [
+              "- nombre: str",
+              "- edad: int"
+            ],
+            "methods": [
+              "+ __init__(nombre, edad)",
+              "+ saludar(): str",
+              "+ es_mayor_de_edad(): bool"
+            ]
+          }
         ]
       },
       {
@@ -1613,6 +1627,21 @@
           "metodos",
           "atributos",
           "return"
+        ],
+        "classDiagram": [
+          {
+            "className": "Rectangulo",
+            "attributes": [
+              "- base: float",
+              "- altura: float"
+            ],
+            "methods": [
+              "+ __init__(base, altura)",
+              "+ calcular_area(): float",
+              "+ calcular_perimetro(): float",
+              "+ es_cuadrado(): bool"
+            ]
+          }
         ]
       },
       {
@@ -1745,6 +1774,21 @@
           "metodos",
           "condiciones",
           "atributos"
+        ],
+        "classDiagram": [
+          {
+            "className": "CuentaBancaria",
+            "attributes": [
+              "- titular: str",
+              "- saldo: float"
+            ],
+            "methods": [
+              "+ __init__(titular, saldo_inicial)",
+              "+ depositar(monto): None",
+              "+ retirar(monto): bool",
+              "+ consultar_saldo(): float"
+            ]
+          }
         ]
       },
       {
@@ -1877,6 +1921,21 @@
           "privados",
           "metodos",
           "__str__"
+        ],
+        "classDiagram": [
+          {
+            "className": "Empleado",
+            "attributes": [
+              "- nombre: str",
+              "- __salario: float (privado)"
+            ],
+            "methods": [
+              "+ __init__(nombre, salario)",
+              "+ get_salario(): float",
+              "+ aumentar_salario(porcentaje): None",
+              "+ __str__(): str"
+            ]
+          }
         ]
       },
       {
@@ -1997,6 +2056,32 @@
           "composicion",
           "clases",
           "__str__"
+        ],
+        "classDiagram": [
+          {
+            "className": "Fecha",
+            "attributes": [
+              "- dia: int",
+              "- mes: int",
+              "- anio: int"
+            ],
+            "methods": [
+              "+ __init__(dia, mes, anio)",
+              "+ __str__(): str"
+            ]
+          },
+          {
+            "relation": "──◆",
+            "className": "Estudiante",
+            "attributes": [
+              "- nombre: str",
+              "- fecha_nacimiento: Fecha"
+            ],
+            "methods": [
+              "+ __init__(nombre, fecha_nacimiento)",
+              "+ mostrar_ficha(): str"
+            ]
+          }
         ]
       },
       {
@@ -2129,6 +2214,22 @@
           "metodos",
           "condiciones",
           "atributos"
+        ],
+        "classDiagram": [
+          {
+            "className": "Producto",
+            "attributes": [
+              "- nombre: str",
+              "- precio: float",
+              "- stock: int"
+            ],
+            "methods": [
+              "+ __init__(nombre, precio, stock)",
+              "+ vender(cantidad): bool",
+              "+ reponer_stock(cantidad): None",
+              "+ valor_inventario(): float"
+            ]
+          }
         ]
       },
       {
@@ -2189,6 +2290,21 @@
           "classmethod",
           "atributos de clase",
           "clases"
+        ],
+        "classDiagram": [
+          {
+            "className": "Estudiante",
+            "attributes": [
+              "- nombre: str",
+              "- registro_academico: str",
+              "~ total_estudiantes: int (atributo de clase)"
+            ],
+            "methods": [
+              "+ __init__(nombre, registro_academico)",
+              "+ mostrar_datos(): str",
+              "+ Estudiante.obtener_total(): int (método de clase)"
+            ]
+          }
         ]
       },
       {
@@ -2289,19 +2405,35 @@
           "metodos",
           "__str__",
           "booleanos"
+        ],
+        "classDiagram": [
+          {
+            "className": "Libro",
+            "attributes": [
+              "- titulo: str",
+              "- autor: str",
+              "- disponible: bool"
+            ],
+            "methods": [
+              "+ __init__(titulo, autor)",
+              "+ prestar(): bool",
+              "+ devolver(): None",
+              "+ __str__(): str"
+            ]
+          }
         ]
       },
       {
         "id": "objeto_carro",
         "title": "El Carro de Víveres",
         "target": "altar_carro",
-        "objective": "Define la clase CarritoDeCompras que inicia con productos vacío (lista). agregar_producto(nombre, precio) agrega un producto, eliminar_producto(nombre) retorna True si lo encontró y lo eliminó o False si no existe, calcular_total() suma el precio de todos los productos y vaciar_carrito() deja el carrito vacío.",
+        "objective": "Define la clase CarritoDeCompras con total (inicia en 0.0) y cantidad_productos (inicia en 0). agregar_producto(precio) suma el precio y aumenta la cantidad en 1, quitar_producto(precio) descuenta el precio y reduce la cantidad en 1 si hay productos y el precio no supera el total (retorna True si pudo quitarlo o False si no), calcular_total() retorna el total acumulado y vaciar_carrito() reinicia total y cantidad a cero.",
         "example": "",
         "starterCode": "",
         "hints": [
-          "productos es una lista que inicia vacía en __init__.",
-          "eliminar_producto busca por nombre y retorna True/False.",
-          "calcular_total suma los precios; con carrito vacío retorna 0."
+          "Inicia total en 0.0 y cantidad_productos en 0 dentro de __init__.",
+          "quitar_producto verifica cantidad_productos > 0 y total >= precio antes de descontar y retornar True.",
+          "calcular_total retorna el total acumulado; vaciar_carrito restablece total y cantidad a cero."
         ],
         "validator": {
           "kind": "class_cases"
@@ -2326,7 +2458,6 @@
                   "cases": [
                     {
                       "args": [
-                        "Manta",
                         25
                       ],
                       "expected": null
@@ -2338,7 +2469,6 @@
                   "cases": [
                     {
                       "args": [
-                        "Comida",
                         10
                       ],
                       "expected": null
@@ -2355,22 +2485,22 @@
                   ]
                 },
                 {
-                  "name": "eliminar_producto",
+                  "name": "quitar_producto",
                   "cases": [
                     {
                       "args": [
-                        "Comida"
+                        10
                       ],
                       "expected": true
                     }
                   ]
                 },
                 {
-                  "name": "eliminar_producto",
+                  "name": "quitar_producto",
                   "cases": [
                     {
                       "args": [
-                        "Inexistente"
+                        50
                       ],
                       "expected": false
                     }
@@ -2420,9 +2550,25 @@
         ],
         "concepts": [
           "clases",
-          "listas",
+          "objetos",
           "metodos",
-          "composicion"
+          "encapsulamiento"
+        ],
+        "classDiagram": [
+          {
+            "className": "CarritoDeCompras",
+            "attributes": [
+              "- total: float",
+              "- cantidad_productos: int"
+            ],
+            "methods": [
+              "+ __init__()",
+              "+ agregar_producto(precio: float): None",
+              "+ quitar_producto(precio: float): bool",
+              "+ calcular_total(): float",
+              "+ vaciar_carrito(): None"
+            ]
+          }
         ]
       },
       {
@@ -2541,6 +2687,23 @@
           "metodos",
           "atributos",
           "condiciones"
+        ],
+        "classDiagram": [
+          {
+            "className": "Vehiculo",
+            "attributes": [
+              "- marca: str",
+              "- modelo: str",
+              "- velocidad_actual: float",
+              "- velocidad_maxima: float"
+            ],
+            "methods": [
+              "+ __init__(marca, modelo, velocidad_maxima)",
+              "+ acelerar(incremento): None",
+              "+ frenar(decremento): None",
+              "+ mostrar_info(): str"
+            ]
+          }
         ]
       }
     ]
