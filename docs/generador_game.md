@@ -259,6 +259,44 @@ comportamiento, no solo la forma):
 > clases, `__init__`, `self`, atributos, métodos, `@classmethod`, atributos de
 > clase, name mangling y composición.
 
+### Diagramas de Clase UML (`classDiagram`)
+
+Todo reto de POO (`structure`, `class_cases`) debe incorporar su diagrama de clases UML bajo el campo `classDiagram` para que el estudiante visualice el contrato antes de programar:
+
+```json
+"classDiagram": [
+  {
+    "className": "Persona",
+    "attributes": [
+      "- nombre: str",
+      "- edad: int"
+    ],
+    "methods": [
+      "+ __init__(nombre, edad)",
+      "+ saludar(): str",
+      "+ es_mayor_de_edad(): bool"
+    ]
+  }
+]
+```
+
+- **Soporte multi-clase**: permite varias tarjetas (ej. `Fecha` y `Estudiante`) con relaciones opcionales (`"relation": "──◆"`).
+- **Visibilidad visual**: en la consola del juego se renderiza como tarjeta UML con distintivos de color:
+  - `-` (rojo): atributo o método privado / protegido.
+  - `+` (verde): método o atributo público.
+  - `~` (amarillo): atributo o método de clase (`@classmethod`).
+- **Autocompletado**: si el autor omite `classDiagram`, `game_generator.py` deriva automáticamente un esquema básico a partir de `requirements.classes`.
+- **Auditoría**: `game_generator.py --audit` marca error si algún desafío de POO carece de diagrama de clases.
+
+### Regla Pedagógica Estricta: Prohibición de Arrays y Estructuras Complejas
+
+En todos los niveles y prácticas de POO introductoria (`clases_y_objetos`, `practica_5_objetos`, `encapsulamiento`, `herencia_polimorfismo`):
+
+1. **NO usar listas, arrays, tuplas, conjuntos ni diccionarios** dentro de las clases de los ejercicios ni en sus firmas.
+2. **El enunciado/objetivo y las pistas JAMÁS deben pedir listas ni arrays**: el estudiante solo debe manejar tipos primitivos escalares (`int`, `float`, `str`, `bool`) o composición simple de instancias.
+3. **Fundamento pedagógico**: las estructuras de datos (listas, pilas, colas) corresponden formalmente al **Capítulo 4** ("El Ritmo de la Supervivencia"). Exigirlas antes rompe la curva de aprendizaje y satura cognitivamente al alumno.
+4. **Validación automática**: el generador valida el esquema y audita con expresiones regulares la ausencia de términos como `lista`, `array`, `arreglo`, `diccionario`, `tupla` en los textos del reto.
+
 ### Clima (`zone.weather` / `zones.<id>.weather`)
 
 Cada zona puede llevar su propio clima. Modos válidos: `none`, `rain`

@@ -123,6 +123,17 @@ name mangling de privados (`_Clase__atributo`), composición y `__str__`.
   [...]}` para instanciar un objeto auxiliar antes de construir el principal.
 - El generador valida el esquema, autocompleta `example`/`starterCode`/`hints`
   (POO) y los incluye en `--audit`.
+- **Diagramas de Clase UML (`classDiagram`) OBLIGATORIOS**: cada reto de POO
+  debe mostrar su diagrama de clase en la consola de código. Se define en el
+  JSON como `classDiagram: [{ className, attributes, methods, relation? }]`.
+  El motor lo renderiza con formato UML y distintivos de visibilidad por color.
+- **PROHIBICIÓN ESTRICTA DE ARRAYS Y ESTRUCTURAS COMPLEJAS EN POO BÁSICA**:
+  En los niveles y prácticas de POO inicial (Capítulos 1 a 3, Práctica 5),
+  **está totalmente prohibido usar o pedir listas, arrays, tuplas o diccionarios**.
+  Las colecciones se enseñan recién en el Capítulo 4 (Pilas, Colas, Listas).
+  El estado de las clases debe ser puramente escalar (`int`, `float`, `str`, `bool`)
+  o composición de objetos simples. El generador y `--audit` validan que el
+  enunciado, las pistas y el código no mencionen ni requieran estructuras complejas.
 
 ### Clima
 
@@ -279,6 +290,12 @@ pedagógica la pone el autor** en 3 campos:
 3. **`hints` (opcional)**: guiá el razonamiento (qué descomponer, qué límites
    validar), no pegues el código de la solución. El generador completa hasta 3
    si dejás menos.
+4. **`classDiagram` (obligatorio en POO)**: todo desafío de clases debe incluir
+   su diagrama de clase UML con atributos y firmas completas de métodos.
+5. **Sin arrays ni estructuras complejas (Capítulos 1 a 3)**: en retos de POO
+   básica, jamás pedir listas o diccionarios. Usar únicamente atributos
+   escalares (`int`, `float`, `str`, `bool`) o composición simple. El generador
+   falla si se intenta violar esta restricción.
 
 Regla práctica: si el `example` autogenerado no te aclara el ejercicio, el
 `objective` o los `cases` están mal planteados. Corré

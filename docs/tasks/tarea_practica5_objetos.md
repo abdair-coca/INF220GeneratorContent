@@ -75,10 +75,9 @@ generales:
    `get_salario(): float`; `aumentar_salario(porcentaje): None` (rechaza
    porcentajes negativos); `__str__(): str` (nombre y salario legibles).
    Probar aumentando dos veces con distintos porcentajes.
-7. **CarritoDeCompras** — `productos: list` (vacío en constructor);
-   `agregar_producto(nombre, precio): None`; `eliminar_producto(nombre): bool`;
-   `calcular_total(): float`; `vaciar_carrito(): None`. Agregar >= 4 productos,
-   eliminar uno, mostrar total antes y después.
+7. **CarritoDeCompras** — `total: float`, `cantidad_productos: int` (sin arrays ni listas);
+   `agregar_producto(precio): None`; `quitar_producto(precio): bool` (valida cantidad > 0
+   y total >= precio); `calcular_total(): float`; `vaciar_carrito(): None`. Acumulador escalar puro.
 8. **Vehículo** — `Vehiculo(marca, modelo, velocidad_maxima)`; atributos
    `marca`, `modelo`, `velocidad_actual`, `velocidad_maxima`;
    `acelerar(incremento): None` (no supera velocidad_maxima);
@@ -378,7 +377,7 @@ chars, contrato completo con casos límite), `example`, `starterCode`, `hints`
 | almacen | `vender(cantidad > stock)` → False y stock intacto; `valor_inventario` con stock 0 |
 | escuela | `obtener_total()` después de crear 3 estudiantes → 3 (y con 0 → 0) |
 | nomina | `aumentar_salario(-10)` rechazado (salario intacto); `__str__` legible; `get_salario` |
-| carro | `eliminar_producto` de uno inexistente → False; `calcular_total` con carrito vacío → 0 |
+| carro | `quitar_producto` con precio > total → False; `calcular_total` con carrito vacío → 0; descuento correcto |
 | carreta | `acelerar` no supera `velocidad_maxima`; `frenar` no baja de 0 |
 | manual | `prestar()` dos veces → segunda False; `__str__` muestra Disponible/Prestado |
 | ficha | `Fecha.__str__` formato dd/mm/aaaa; `mostrar_ficha` combina nombre y fecha |
