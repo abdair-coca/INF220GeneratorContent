@@ -312,6 +312,22 @@ html, body {
 .editor-brief { background: #181d27; border-bottom: 1px solid #343b4e; }
 .editor-brief h4 { color: #ffd166; font-size: 13px; }
 .editor-brief pre { border: 1px solid #343b4e; }
+.editor-diagram-block { margin: 8px 0; background: #11151e; border: 1px solid #343f55; border-radius: 4px; padding: 7px 9px; }
+.editor-diagram-block.hidden { display: none; }
+.editor-diagram-title { color: #8ba4d8; font-size: 10px; font-weight: bold; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.editor-diagram-title::before { content: "📊"; font-size: 11px; }
+.editor-diagram-cards { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.uml-card { background: #181e2b; border: 1.5px solid #4a5b7d; border-radius: 3px; min-width: 190px; max-width: 100%; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; color: #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.35); flex: 1; }
+.uml-header { background: #222a3d; padding: 5px 8px; text-align: center; font-weight: bold; color: #ffd166; border-bottom: 1px solid #4a5b7d; letter-spacing: 0.4px; }
+.uml-stereotype { font-size: 9px; color: #8ba4d8; font-weight: normal; display: block; margin-bottom: 1px; }
+.uml-section { padding: 4px 8px; border-bottom: 1px solid #2d384d; font-size: 11px; }
+.uml-section:last-child { border-bottom: none; }
+.uml-item { line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.uml-vis-priv { color: #ff6b6b; font-weight: bold; margin-right: 4px; }
+.uml-vis-pub { color: #18d6a0; font-weight: bold; margin-right: 4px; }
+.uml-vis-pkg { color: #ffd166; font-weight: bold; margin-right: 4px; }
+.uml-relation { align-self: center; color: #4dd0e1; font-size: 13px; font-weight: bold; padding: 0 4px; user-select: none; }
+.uml-pre { margin: 0; background: #11151e; color: #d9e2f2; font-size: 11px; white-space: pre-wrap; font-family: inherit; }
 .code-editor-wrap { height: 190px; margin: 0; border: 0; border-radius: 0; border-top: 1px solid #252c3a; border-bottom: 1px solid #252c3a; }
 #editorLineNumbers { background: #11151d; color: #526071; padding-left: 9px; padding-right: 9px; }
 #editorHighlight, #editorTextarea { padding: 10px 12px; }
@@ -389,6 +405,10 @@ html, body {
         <div class="editor-brief">
           <h4 id="editorTitle">Desafío</h4>
           <p id="editorObjective">Objetivo</p>
+          <div class="editor-diagram-block hidden" id="editorDiagramBlock">
+            <div class="editor-diagram-title">Diagrama de Clase</div>
+            <div class="editor-diagram-cards" id="editorDiagramCards"></div>
+          </div>
           <div class="editor-example-block" id="editorExampleBlock"><p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p><pre id="editorExample"></pre></div>
         </div>
         <div class="code-editor-wrap">
@@ -553,6 +573,8 @@ class InputManager {
     this.touchInteract = false;
     return kb || touch;
   }
+
+  wantsInteractDecor() { return this.pressed("KeyF"); }
 
   wantsClose() { return this.pressed("Escape"); }
 }
@@ -722,9 +744,11 @@ class WeatherSystem {
     this.drops = [];
     this.width = 0; this.height = 0; this.elapsed = 0; this.poolSize = -1;
   }
+  _active() { return this.config.mode === "rain" || this.config.mode === "frost"; }
   _isRain() { return this.config.mode === "rain"; }
+  _isFrost() { return this.config.mode === "frost"; }
   _targetSize() {
-    if (!this._isRain()) return 0;
+    if (!this._active()) return 0;
     return Math.max(1, Math.round(this.config.dropCount * this.config.density));
   }
   _reset(drop, fromTop) {
@@ -760,30 +784,40 @@ class WeatherSystem {
   }
   update(dt) {
     this.elapsed += dt;
-    if (!this._isRain()) return;
+    if (!this._active()) return;
     const gustPeriod = Math.max(0.1, this.config.gustPeriod);
     const slope = this.config.wind + this.config.gust * Math.sin(this.elapsed * Math.PI * 2 / gustPeriod);
     for (const drop of this.drops) {
-      drop.x += drop.speed * slope * dt;
+      if (this._isFrost()) {
+        drop.x += (Math.random() - 0.5) * drop.speed * 0.4 * dt;
+        drop.y += drop.speed * dt * 0.5;
+      } else {
+        drop.x += drop.speed * slope * dt;
+        drop.y += drop.speed * dt;
+      }
       drop.x = this._wrap(drop.x, this.width);
-      drop.y += drop.speed * dt;
       if (drop.y > this.height + drop.length || drop.y < -drop.length) this._reset(drop, true);
     }
   }
   render(ctx, width, height) {
-    if (!this._isRain()) return;
+    if (!this._active()) return;
     const gustPeriod = Math.max(0.1, this.config.gustPeriod);
     const slope = this.config.wind + this.config.gust * Math.sin(this.elapsed * Math.PI * 2 / gustPeriod);
     ctx.save();
     ctx.strokeStyle = this.config.color;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = this._isFrost() ? 2 : 1;
     ctx.lineCap = "square";
     for (const drop of this.drops) {
       if (drop.x < -60 || drop.x > width + 60 || drop.y < -60 || drop.y > height + 60) continue;
       ctx.globalAlpha = drop.alpha;
       ctx.beginPath();
-      ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
-      ctx.lineTo(Math.round(drop.x + slope * drop.length), Math.round(drop.y + drop.length));
+      if (this._isFrost()) {
+        ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
+        ctx.lineTo(Math.round(drop.x + 2), Math.round(drop.y + 2));
+      } else {
+        ctx.moveTo(Math.round(drop.x), Math.round(drop.y));
+        ctx.lineTo(Math.round(drop.x + slope * drop.length), Math.round(drop.y + drop.length));
+      }
       ctx.stroke();
     }
     ctx.restore();
@@ -942,7 +976,7 @@ global.JuegoArtAssetRenderer=JuegoArtAssetRenderer;
 })(window);
 
 
-const ASSET_MANIFEST = {"kit":{"name":"El Refugio Lógico — Visual Asset Kit","version":"1.2.0","format":"JuegoArtDrawCommands","tileSize":32,"description":"Assets pixel-art dibujados como comandos Canvas 2D. No son descripciones: cada asset contiene su geometría, estados, hitbox y metadata para renderizarlo directamente."},"palette":{"sand":"#d6b173","sandLight":"#e0bd82","sandDark":"#c39a5e","path":"#8c806f","pathLight":"#9b8f7c","pathDark":"#786d60","grass":"#39ad59","grassDark":"#218343","grassLight":"#57c86f","leaf0":"#125f35","leaf1":"#178545","leaf2":"#22a653","leaf3":"#43bf62","leafHi":"#74d870","trunk0":"#5b351e","trunk1":"#83502b","trunk2":"#a56b37","blue0":"#103958","blue1":"#17648b","blue2":"#258fbd","blue3":"#55b8d9","purple0":"#2d174f","purple1":"#5a2f8e","purple2":"#7c4dff","purple3":"#a476ff","skin0":"#8f572f","skin1":"#d59a62","skin2":"#f4c884","wood0":"#4f2d18","wood1":"#75431f","wood2":"#a36532","wood3":"#c48747","stone0":"#4d4a47","stone1":"#716d67","stone2":"#9c9589","stone3":"#b8ad9d","fire0":"#b83124","fire1":"#ef5b25","fire2":"#ff9d24","fire3":"#ffe15b","ink":"#17151d","white":"#fff4d8","flowerPink":"#ed6f9d","flowerWhite":"#fff8dc","flowerYellow":"#ffd75a","berry":"#e34e56","gold0":"#8f641e","gold1":"#ffd35d","gold2":"#ffe99b","water0":"#1f6f9a","water1":"#2e95c7","water2":"#67c7e8","snow":"#eaf7ff","snowShade":"#b9dbe9","metal0":"#4d5964","metal1":"#7d8b96","metal2":"#b7c4cc","red":"#d74a3a","cloth":"#d5c8a7","brown":"#6f4c2f","greenDark":"#165f34","green":"#2c8b4f"},"renderer_contract":{"supported_primitives":["rect","ellipse","polygon","line"],"coordinates":"local pixel coordinates relative to asset top-left","coordinatePolicy":"x/y/w/h/points/width are integers; alpha/rx/ry may be fractional; primitives stay within size bounds","placement":"drawAsset(ctx,id,state,worldX,worldY,camera,time)","depth":"worldY represents anchor; sort by worldY - asset.anchor.y + asset.depth.footY; fallback worldY + asset.depth.offsetY","collision":"use asset.hitbox translated from the top-left derived from anchor","state_sources":["states","extraStates"]},"assets":{"bush_flowers":{"id":"bush_flowers","name":"Arbusto con flores","category":"vegetation","size":{"w":48,"h":48},"anchor":{"x":24,"y":42},"hitbox":{"x":8,"y":27,"w":32,"h":12},"depth":{"mode":"y_sort","footY":42},"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":42,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":9,"y":17,"w":30,"h":18,"color":"#125f35","alpha":1},{"type":"rect","x":5,"y":21,"w":38,"h":13,"color":"#178545","alpha":1},{"type":"rect","x":12,"y":12,"w":24,"h":22,"color":"#22a653","alpha":1},{"type":"rect","x":15,"y":14,"w":9,"h":7,"color":"#43bf62","alpha":1},{"type":"rect","x":29,"y":20,"w":8,"h":7,"color":"#43bf62","alpha":1},{"type":"rect","x":12,"y":30,"w":26,"h":5,"color":"#178545","alpha":1},{"type":"rect","x":17,"y":16,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":14,"y":19,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":20,"y":19,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":17,"y":22,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":17,"y":19,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":34,"y":14,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":31,"y":17,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":37,"y":17,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":34,"y":20,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":34,"y":17,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":28,"y":27,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":25,"y":30,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":31,"y":30,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":28,"y":33,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":28,"y":30,"w":2,"h":2,"color":"#ffd75a","alpha":1}]}},"collision":true},"campfire":{"id":"campfire","name":"Fogata","category":"camp","size":{"w":64,"h":64},"anchor":{"x":32,"y":55},"hitbox":{"x":12,"y":40,"w":40,"h":16},"depth":{"mode":"y_sort","footY":55},"states":{"off":{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1}]},"on":{"frames":[{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":23,"y":25,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":27,"y":17,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":30,"y":12,"w":7,"h":25,"color":"#ffe15b","alpha":1}]},{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":25,"y":27,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":29,"y":19,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":32,"y":14,"w":7,"h":25,"color":"#ffe15b","alpha":1},{"type":"rect","x":39,"y":21,"w":6,"h":13,"color":"#ef5b25","alpha":1}]},{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":22,"y":28,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":26,"y":20,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":29,"y":15,"w":7,"h":25,"color":"#ffe15b","alpha":1},{"type":"rect","x":19,"y":31,"w":6,"h":10,"color":"#ff9d24","alpha":1}]}],"fps":7},"embers":{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":25,"y":40,"w":16,"h":7,"color":"#b83124","alpha":1},{"type":"rect","x":29,"y":39,"w":8,"h":3,"color":"#ff9d24","alpha":1}]}},"collision":true,"interactable":true,"light":{"state":"on","radius":70,"color":"#ffd35d","alpha":0.16},"particles":{"state":"on","emitters":["smoke","sparks"]}},"flowers_mixed":{"id":"flowers_mixed","name":"Flores silvestres","category":"decor","size":{"w":40,"h":40},"anchor":{"x":20,"y":34},"hitbox":null,"depth":{"mode":"y_sort","footY":34},"states":{"default":{"draw":[{"type":"rect","x":12,"y":19,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":16,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":18,"y":19,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":18,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":24,"y":21,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":27,"y":18,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":30,"y":21,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":27,"y":20,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":5,"y":13,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":2,"y":16,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":8,"y":16,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":5,"y":19,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":5,"y":16,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":18,"y":4,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":15,"y":7,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":21,"y":7,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":18,"y":10,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":18,"y":7,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":32,"y":12,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":29,"y":15,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":35,"y":15,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":32,"y":18,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":32,"y":15,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":23,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":8,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":14,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":29,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":28,"y":25,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":25,"y":28,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":31,"y":28,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":28,"y":31,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":28,"y":28,"w":2,"h":2,"color":"#ffd75a","alpha":1}]}},"collision":false},"grass_tufts":{"id":"grass_tufts","name":"Hierba","category":"decor","size":{"w":44,"h":28},"anchor":{"x":22,"y":24},"hitbox":null,"depth":{"mode":"y_sort","footY":24},"states":{"default":{"draw":[{"type":"rect","x":9,"y":11,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":12,"y":8,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":11,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":12,"y":10,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":22,"y":15,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":25,"y":12,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":28,"y":15,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":25,"y":14,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":31,"y":8,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":34,"y":5,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":37,"y":8,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":34,"y":7,"w":2,"h":4,"color":"#57c86f","alpha":1}]}},"collision":false},"npc_alizon":{"id":"npc_alizon","name":"Alizon","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#258fbd","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#103958","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true,"stateLabels":{"worried":"Preocupada","working":"Trabajando","celebrating":"Celebrando","sheltering":"Resguardada"},"extraStates":{"worried":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":21,"x2":28,"y2":20,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,23],[33,23],[31,36],[17,36]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":28,"x2":7,"y2":35,"color":"#103958","width":4},{"type":"line","x1":30,"y1":28,"x2":39,"y2":35,"color":"#103958","width":4},{"type":"rect","x":16,"y":35,"w":7,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":35,"w":7,"h":8,"color":"#5b351e","alpha":1}]},"working":{"frames":[{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":28,"x2":5,"y2":22,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":33,"y1":28,"x2":43,"y2":22,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":27,"x2":5,"y2":31,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":33,"y1":27,"x2":43,"y2":31,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]}],"fps":6},"celebrating":{"frames":[{"draw":[{"type":"ellipse","x":24,"y":47,"rx":12,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":5,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":12,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":21,"x2":28,"y2":21,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,24],[33,24],[31,36],[17,36]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":29,"x2":5,"y2":18,"color":"#103958","width":4},{"type":"line","x1":33,"y1":29,"x2":43,"y2":18,"color":"#103958","width":4},{"type":"rect","x":17,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":6,"y":12,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":39,"y":10,"w":3,"h":3,"color":"#ffd35d","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":44,"rx":12,"ry":3,"color":"#2a241e","alpha":0.16},{"type":"rect","x":13,"y":2,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":9,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":18,"x2":28,"y2":18,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,21],[33,21],[31,33],[17,33]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":26,"x2":4,"y2":15,"color":"#103958","width":4},{"type":"line","x1":33,"y1":26,"x2":44,"y2":15,"color":"#103958","width":4},{"type":"rect","x":17,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":7,"y":9,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":38,"y":7,"w":3,"h":3,"color":"#ffd35d","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":47,"rx":12,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":5,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":12,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":21,"x2":28,"y2":21,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,24],[33,24],[31,36],[17,36]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":29,"x2":5,"y2":18,"color":"#103958","width":4},{"type":"line","x1":33,"y1":29,"x2":43,"y2":18,"color":"#103958","width":4},{"type":"rect","x":17,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":6,"y":12,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":39,"y":10,"w":3,"h":3,"color":"#ffd35d","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":44,"rx":12,"ry":3,"color":"#2a241e","alpha":0.16},{"type":"rect","x":13,"y":2,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":9,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":18,"x2":28,"y2":18,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,21],[33,21],[31,33],[17,33]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":26,"x2":4,"y2":15,"color":"#103958","width":4},{"type":"line","x1":33,"y1":26,"x2":44,"y2":15,"color":"#103958","width":4},{"type":"rect","x":17,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":7,"y":9,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":38,"y":7,"w":3,"h":3,"color":"#ffd35d","alpha":1}]}],"fps":6},"sheltering":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":13,"ry":4,"color":"#2a241e","alpha":0.28},{"type":"rect","x":15,"y":4,"w":18,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[14,23],[34,23],[32,38],[16,38]],"color":"#258fbd","alpha":1},{"type":"polygon","points":[[5,20],[24,6],[43,20],[39,23],[9,23]],"color":"#17648b","alpha":1},{"type":"line","x1":24,"y1":6,"x2":24,"y2":38,"color":"#d5c8a7","width":2},{"type":"line","x1":16,"y1":38,"x2":22,"y2":45,"color":"#103958","width":4},{"type":"line","x1":32,"y1":38,"x2":27,"y2":45,"color":"#103958","width":4},{"type":"rect","x":16,"y":38,"w":7,"h":6,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":38,"w":7,"h":6,"color":"#5b351e","alpha":1}]}},"fsm":["Idle","Following","Gathering","Cooking","Helping","Talking"]},"npc_guardabosques":{"id":"npc_guardabosques","name":"El Guardabosques","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#1e4b2a","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#1e4b2a","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#326f3e","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#1e4b2a","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#326f3e","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#1e4b2a","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#1e4b2a","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#326f3e","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true,"fsm":["Idle","Following","Gathering","Cooking","Helping","Talking"]},"player_viajero":{"id":"player_viajero","name":"El Viajero","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#17151d","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#7c4dff","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#a476ff","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#17151d","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#7c4dff","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#a476ff","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#17151d","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#17151d","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#7c4dff","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"animated":true},"tent_blue":{"id":"tent_blue","name":"Tienda azul","category":"camp","size":{"w":96,"h":88},"anchor":{"x":48,"y":78},"hitbox":{"x":17,"y":65,"w":62,"h":16},"depth":{"mode":"y_sort","footY":78},"states":{"materials":{"draw":[{"type":"ellipse","x":48,"y":77,"rx":30,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":18,"y":71,"w":60,"h":4,"color":"#75431f","alpha":1},{"type":"rect","x":24,"y":63,"w":4,"h":10,"color":"#a36532","alpha":1},{"type":"rect","x":68,"y":63,"w":4,"h":10,"color":"#a36532","alpha":1},{"type":"rect","x":31,"y":61,"w":34,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":35,"y":58,"w":26,"h":3,"color":"#55b8d9","alpha":1},{"type":"rect","x":14,"y":68,"w":10,"h":6,"color":"#d5c8a7","alpha":1},{"type":"rect","x":73,"y":68,"w":9,"h":6,"color":"#9c9589","alpha":1}]},"built":{"draw":[{"type":"ellipse","x":48,"y":76,"rx":38,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":46,"y":2,"w":3,"h":14,"color":"#4f2d18","alpha":1},{"type":"rect","x":49,"y":3,"w":17,"h":3,"color":"#103958","alpha":1},{"type":"rect","x":50,"y":4,"w":14,"h":2,"color":"#258fbd","alpha":1},{"type":"rect","x":17,"y":69,"w":62,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":44,"y":19,"w":8,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":40,"y":25,"w":16,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":36,"y":31,"w":24,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":32,"y":37,"w":32,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":28,"y":43,"w":40,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":24,"y":49,"w":48,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":20,"y":55,"w":56,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":21,"y":53,"w":54,"h":19,"color":"#17648b","alpha":1},{"type":"rect","x":26,"y":44,"w":44,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":34,"y":45,"w":28,"h":28,"color":"#17151d","alpha":1},{"type":"rect","x":37,"y":48,"w":22,"h":24,"color":"#103958","alpha":1},{"type":"rect","x":41,"y":51,"w":14,"h":21,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":73,"w":4,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":76,"y":73,"w":4,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":11,"y":77,"w":10,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":75,"y":77,"w":10,"h":3,"color":"#ffd35d","alpha":1}]}},"collision":"base_only","occlusion":{"splitAtY":59},"interactable":true},"tree_oak":{"id":"tree_oak","name":"Árbol frondoso","category":"vegetation","size":{"w":64,"h":64},"anchor":{"x":32,"y":60},"hitbox":{"x":25,"y":49,"w":14,"h":12},"depth":{"mode":"y_sort","footY":60},"states":{"default":{"draw":[{"type":"ellipse","x":32,"y":60,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":27,"y":39,"w":10,"h":25,"color":"#5b351e","alpha":1},{"type":"rect","x":29,"y":39,"w":6,"h":24,"color":"#a56b37","alpha":1},{"type":"rect","x":25,"y":58,"w":14,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":13,"y":10,"w":38,"h":7,"color":"#125f35","alpha":1},{"type":"rect","x":7,"y":17,"w":50,"h":25,"color":"#125f35","alpha":1},{"type":"rect","x":12,"y":10,"w":40,"h":34,"color":"#178545","alpha":1},{"type":"rect","x":6,"y":23,"w":11,"h":14,"color":"#22a653","alpha":1},{"type":"rect","x":45,"y":18,"w":11,"h":15,"color":"#22a653","alpha":1},{"type":"rect","x":20,"y":6,"w":25,"h":12,"color":"#22a653","alpha":1},{"type":"rect","x":18,"y":14,"w":12,"h":9,"color":"#43bf62","alpha":1},{"type":"rect","x":37,"y":23,"w":12,"h":9,"color":"#43bf62","alpha":1},{"type":"rect","x":24,"y":30,"w":10,"h":6,"color":"#74d870","alpha":1},{"type":"rect","x":12,"y":41,"w":41,"h":5,"color":"#125f35","alpha":1}]}},"collision":"trunk_only","occlusion":{"canopyFromY":10,"splitAtY":45}},"wood_pile":{"id":"wood_pile","name":"Pila de troncos","category":"storage","size":{"w":64,"h":56},"anchor":{"x":32,"y":50},"hitbox":{"x":8,"y":36,"w":48,"h":14},"depth":{"mode":"y_sort","footY":50},"states":{"1":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"2":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"3":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"4":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":18,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":19,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":20,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":18,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":19,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":20,"w":3,"h":4,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true},"wooden_crate":{"id":"wooden_crate","name":"Caja de madera","category":"storage","size":{"w":48,"h":48},"anchor":{"x":24,"y":42},"hitbox":{"x":7,"y":24,"w":34,"h":18},"depth":{"mode":"y_sort","footY":42},"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":42,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":6,"y":14,"w":36,"h":29,"color":"#4f2d18","alpha":1},{"type":"rect","x":9,"y":17,"w":30,"h":23,"color":"#a36532","alpha":1},{"type":"rect","x":12,"y":20,"w":24,"h":17,"color":"#75431f","alpha":1},{"type":"line","x1":10,"y1":17,"x2":38,"y2":40,"color":"#c48747","width":3,"alpha":1},{"type":"line","x1":38,"y1":17,"x2":10,"y2":40,"color":"#c48747","width":3,"alpha":1},{"type":"rect","x":8,"y":12,"w":32,"h":5,"color":"#c48747","alpha":1}]}},"collision":true},"workbench":{"id":"workbench","name":"Mesa de trabajo","category":"camp","size":{"w":96,"h":88},"anchor":{"x":48,"y":78},"hitbox":{"x":13,"y":57,"w":68,"h":21},"depth":{"mode":"y_sort","footY":78},"states":{"default":{"draw":[{"type":"ellipse","x":48,"y":74,"rx":38,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":17,"y":27,"w":5,"h":45,"color":"#4f2d18","alpha":1},{"type":"rect","x":69,"y":27,"w":5,"h":45,"color":"#4f2d18","alpha":1},{"type":"rect","x":17,"y":27,"w":57,"h":5,"color":"#a36532","alpha":1},{"type":"rect","x":24,"y":35,"w":4,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":28,"y":38,"w":5,"h":8,"color":"#17151d","alpha":1},{"type":"rect","x":29,"y":40,"w":3,"h":5,"color":"#ffd35d","alpha":1},{"type":"rect","x":12,"y":59,"w":70,"h":7,"color":"#4f2d18","alpha":1},{"type":"rect","x":14,"y":53,"w":66,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":20,"y":56,"w":32,"h":5,"color":"#258fbd","alpha":1},{"type":"rect","x":20,"y":61,"w":32,"h":5,"color":"#17648b","alpha":1},{"type":"rect","x":20,"y":66,"w":5,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":70,"y":66,"w":5,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":57,"y":42,"w":23,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":59,"y":44,"w":19,"h":10,"color":"#c48747","alpha":1},{"type":"rect","x":66,"y":36,"w":7,"h":10,"color":"#b8ad9d","alpha":1},{"type":"rect","x":43,"y":68,"w":18,"h":5,"color":"#a36532","alpha":1},{"type":"rect","x":46,"y":73,"w":12,"h":10,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":42,"w":10,"h":8,"color":"#fff4d8","alpha":1},{"type":"rect","x":36,"y":44,"w":6,"h":2,"color":"#17648b","alpha":1}]}},"collision":true,"interactable":true}},"effects":{"smoke":{"type":"particle","shape":"rect","size":[2,4],"colors":["#8b8b88","#b5b4ae"],"lifetime":[0.8,1.5],"velocity":{"x":[-5,5],"y":[-18,-9]},"wind":true},"sparks":{"type":"particle","shape":"rect","size":[2,2],"colors":["#ff9d24","#ffe15b"],"lifetime":[0.25,0.6],"velocity":{"x":[-16,16],"y":[-28,-12]},"wind":true},"rain":{"type":"particle","shape":"line","colors":["#67c7e8"],"lifetime":[0.4,0.8],"velocity":{"x":[-18,-8],"y":[150,220]}},"snow":{"type":"particle","shape":"rect","size":[2,2],"colors":["#eaf7ff"],"lifetime":[1.2,2.5],"velocity":{"x":[-12,12],"y":[18,35]},"wind":true},"wood_chips":{"type":"particle","shape":"rect","size":[2,3],"colors":["#a36532","#c48747"],"lifetime":[0.25,0.5],"velocity":{"x":[-40,40],"y":[-35,-10]}}}};
+const ASSET_MANIFEST = {"kit":{"name":"El Refugio Lógico — Visual Asset Kit","version":"1.3.0","format":"JuegoArtDrawCommands","tileSize":32,"description":"Assets pixel-art dibujados como comandos Canvas 2D. No son descripciones: cada asset contiene su geometría, estados, hitbox y metadata para renderizarlo directamente."},"palette":{"sand":"#d6b173","sandLight":"#e0bd82","sandDark":"#c39a5e","path":"#8c806f","pathLight":"#9b8f7c","pathDark":"#786d60","grass":"#39ad59","grassDark":"#218343","grassLight":"#57c86f","leaf0":"#125f35","leaf1":"#178545","leaf2":"#22a653","leaf3":"#43bf62","leafHi":"#74d870","trunk0":"#5b351e","trunk1":"#83502b","trunk2":"#a56b37","blue0":"#103958","blue1":"#17648b","blue2":"#258fbd","blue3":"#55b8d9","purple0":"#2d174f","purple1":"#5a2f8e","purple2":"#7c4dff","purple3":"#a476ff","skin0":"#8f572f","skin1":"#d59a62","skin2":"#f4c884","wood0":"#4f2d18","wood1":"#75431f","wood2":"#a36532","wood3":"#c48747","stone0":"#4d4a47","stone1":"#716d67","stone2":"#9c9589","stone3":"#b8ad9d","fire0":"#b83124","fire1":"#ef5b25","fire2":"#ff9d24","fire3":"#ffe15b","ink":"#17151d","white":"#fff4d8","flowerPink":"#ed6f9d","flowerWhite":"#fff8dc","flowerYellow":"#ffd75a","berry":"#e34e56","gold0":"#8f641e","gold1":"#ffd35d","gold2":"#ffe99b","water0":"#1f6f9a","water1":"#2e95c7","water2":"#67c7e8","snow":"#eaf7ff","snowShade":"#b9dbe9","metal0":"#4d5964","metal1":"#7d8b96","metal2":"#b7c4cc","red":"#d74a3a","cloth":"#d5c8a7","brown":"#6f4c2f","greenDark":"#165f34","green":"#2c8b4f"},"renderer_contract":{"supported_primitives":["rect","ellipse","polygon","line"],"coordinates":"local pixel coordinates relative to asset top-left","coordinatePolicy":"x/y/w/h/points/width are integers; alpha/rx/ry may be fractional; primitives stay within size bounds","placement":"drawAsset(ctx,id,state,worldX,worldY,camera,time)","depth":"worldY represents anchor; sort by worldY - asset.anchor.y + asset.depth.footY; fallback worldY + asset.depth.offsetY","collision":"use asset.hitbox translated from the top-left derived from anchor","state_sources":["states","extraStates"]},"assets":{"bush_flowers":{"id":"bush_flowers","name":"Arbusto con flores","category":"vegetation","size":{"w":48,"h":48},"anchor":{"x":24,"y":42},"hitbox":{"x":8,"y":27,"w":32,"h":12},"depth":{"mode":"y_sort","footY":42},"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":42,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":9,"y":17,"w":30,"h":18,"color":"#125f35","alpha":1},{"type":"rect","x":5,"y":21,"w":38,"h":13,"color":"#178545","alpha":1},{"type":"rect","x":12,"y":12,"w":24,"h":22,"color":"#22a653","alpha":1},{"type":"rect","x":15,"y":14,"w":9,"h":7,"color":"#43bf62","alpha":1},{"type":"rect","x":29,"y":20,"w":8,"h":7,"color":"#43bf62","alpha":1},{"type":"rect","x":12,"y":30,"w":26,"h":5,"color":"#178545","alpha":1},{"type":"rect","x":17,"y":16,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":14,"y":19,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":20,"y":19,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":17,"y":22,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":17,"y":19,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":34,"y":14,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":31,"y":17,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":37,"y":17,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":34,"y":20,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":34,"y":17,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":28,"y":27,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":25,"y":30,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":31,"y":30,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":28,"y":33,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":28,"y":30,"w":2,"h":2,"color":"#ffd75a","alpha":1}]}},"collision":true},"campfire":{"id":"campfire","name":"Fogata","category":"camp","size":{"w":64,"h":64},"anchor":{"x":32,"y":55},"hitbox":{"x":12,"y":40,"w":40,"h":16},"depth":{"mode":"y_sort","footY":55},"states":{"off":{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1}]},"on":{"frames":[{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":23,"y":25,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":27,"y":17,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":30,"y":12,"w":7,"h":25,"color":"#ffe15b","alpha":1}]},{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":25,"y":27,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":29,"y":19,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":32,"y":14,"w":7,"h":25,"color":"#ffe15b","alpha":1},{"type":"rect","x":39,"y":21,"w":6,"h":13,"color":"#ef5b25","alpha":1}]},{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":22,"y":28,"w":18,"h":18,"color":"#ef5b25","alpha":1},{"type":"rect","x":26,"y":20,"w":12,"h":25,"color":"#ff9d24","alpha":1},{"type":"rect","x":29,"y":15,"w":7,"h":25,"color":"#ffe15b","alpha":1},{"type":"rect","x":19,"y":31,"w":6,"h":10,"color":"#ff9d24","alpha":1}]}],"fps":7},"embers":{"draw":[{"type":"ellipse","x":32,"y":53,"rx":21,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":12,"y":43,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":17,"y":35,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":19,"y":36,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":27,"y":32,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":29,"y":33,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":38,"y":34,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":40,"y":35,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":46,"y":40,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":48,"y":41,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":45,"y":49,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":47,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":35,"y":53,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":37,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":23,"y":53,"w":12,"h":9,"color":"#716d67","alpha":1},{"type":"rect","x":25,"y":54,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":12,"y":49,"w":12,"h":9,"color":"#9c9589","alpha":1},{"type":"rect","x":14,"y":50,"w":6,"h":2,"color":"#b8ad9d","alpha":1},{"type":"rect","x":21,"y":45,"w":24,"h":5,"color":"#4f2d18","alpha":1},{"type":"rect","x":24,"y":40,"w":6,"h":16,"color":"#a36532","alpha":1},{"type":"rect","x":37,"y":40,"w":6,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":25,"y":40,"w":16,"h":7,"color":"#b83124","alpha":1},{"type":"rect","x":29,"y":39,"w":8,"h":3,"color":"#ff9d24","alpha":1}]}},"collision":true,"interactable":true,"light":{"state":"on","radius":70,"color":"#ffd35d","alpha":0.16},"particles":{"state":"on","emitters":["smoke","sparks"]}},"flowers_mixed":{"id":"flowers_mixed","name":"Flores silvestres","category":"decor","size":{"w":40,"h":40},"anchor":{"x":20,"y":34},"hitbox":null,"depth":{"mode":"y_sort","footY":34},"states":{"default":{"draw":[{"type":"rect","x":12,"y":19,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":16,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":18,"y":19,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":18,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":24,"y":21,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":27,"y":18,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":30,"y":21,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":27,"y":20,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":5,"y":13,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":2,"y":16,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":8,"y":16,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":5,"y":19,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":5,"y":16,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":18,"y":4,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":15,"y":7,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":21,"y":7,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":18,"y":10,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":18,"y":7,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":32,"y":12,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":29,"y":15,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":35,"y":15,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":32,"y":18,"w":2,"h":2,"color":"#fff8dc","alpha":1},{"type":"rect","x":32,"y":15,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":23,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":8,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":14,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":29,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":11,"y":26,"w":2,"h":2,"color":"#ffd75a","alpha":1},{"type":"rect","x":28,"y":25,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":25,"y":28,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":31,"y":28,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":28,"y":31,"w":2,"h":2,"color":"#ed6f9d","alpha":1},{"type":"rect","x":28,"y":28,"w":2,"h":2,"color":"#ffd75a","alpha":1}]}},"collision":false},"grass_tufts":{"id":"grass_tufts","name":"Hierba","category":"decor","size":{"w":44,"h":28},"anchor":{"x":22,"y":24},"hitbox":null,"depth":{"mode":"y_sort","footY":24},"states":{"default":{"draw":[{"type":"rect","x":9,"y":11,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":12,"y":8,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":15,"y":11,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":12,"y":10,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":22,"y":15,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":25,"y":12,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":28,"y":15,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":25,"y":14,"w":2,"h":4,"color":"#57c86f","alpha":1},{"type":"rect","x":31,"y":8,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":34,"y":5,"w":2,"h":8,"color":"#218343","alpha":1},{"type":"rect","x":37,"y":8,"w":2,"h":5,"color":"#218343","alpha":1},{"type":"rect","x":34,"y":7,"w":2,"h":4,"color":"#57c86f","alpha":1}]}},"collision":false},"npc_alizon":{"id":"npc_alizon","name":"Alizon","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#258fbd","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#103958","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#103958","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true,"stateLabels":{"worried":"Preocupada","working":"Trabajando","celebrating":"Celebrando","sheltering":"Resguardada"},"extraStates":{"worried":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":21,"x2":28,"y2":20,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,23],[33,23],[31,36],[17,36]],"color":"#258fbd","alpha":1},{"type":"line","x1":18,"y1":28,"x2":7,"y2":35,"color":"#103958","width":4},{"type":"line","x1":30,"y1":28,"x2":39,"y2":35,"color":"#103958","width":4},{"type":"rect","x":16,"y":35,"w":7,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":35,"w":7,"h":8,"color":"#5b351e","alpha":1}]},"working":{"frames":[{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":28,"x2":5,"y2":22,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":33,"y1":28,"x2":43,"y2":22,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":27,"x2":5,"y2":31,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[15,23],[33,23],[31,35],[17,35]],"color":"#258fbd","alpha":1},{"type":"line","x1":33,"y1":27,"x2":43,"y2":31,"color":"#a36532","width":3},{"type":"rect","x":13,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":31,"y":27,"w":5,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":16,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":34,"w":6,"h":9,"color":"#5b351e","alpha":1}]}],"fps":6},"celebrating":{"frames":[{"draw":[{"type":"ellipse","x":24,"y":47,"rx":12,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":5,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":12,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":21,"x2":28,"y2":21,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,24],[33,24],[31,36],[17,36]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":29,"x2":5,"y2":18,"color":"#103958","width":4},{"type":"line","x1":33,"y1":29,"x2":43,"y2":18,"color":"#103958","width":4},{"type":"rect","x":17,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":6,"y":12,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":39,"y":10,"w":3,"h":3,"color":"#ffd35d","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":44,"rx":12,"ry":3,"color":"#2a241e","alpha":0.16},{"type":"rect","x":13,"y":2,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":9,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":18,"x2":28,"y2":18,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,21],[33,21],[31,33],[17,33]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":26,"x2":4,"y2":15,"color":"#103958","width":4},{"type":"line","x1":33,"y1":26,"x2":44,"y2":15,"color":"#103958","width":4},{"type":"rect","x":17,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":7,"y":9,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":38,"y":7,"w":3,"h":3,"color":"#ffd35d","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":47,"rx":12,"ry":3,"color":"#2a241e","alpha":0.2},{"type":"rect","x":13,"y":5,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":12,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":16,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":21,"x2":28,"y2":21,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,24],[33,24],[31,36],[17,36]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":29,"x2":5,"y2":18,"color":"#103958","width":4},{"type":"line","x1":33,"y1":29,"x2":43,"y2":18,"color":"#103958","width":4},{"type":"rect","x":17,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":36,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":6,"y":12,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":39,"y":10,"w":3,"h":3,"color":"#ffd35d","alpha":1}]},{"draw":[{"type":"ellipse","x":24,"y":44,"rx":12,"ry":3,"color":"#2a241e","alpha":0.16},{"type":"rect","x":13,"y":2,"w":20,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":9,"w":18,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":13,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"line","x1":20,"y1":18,"x2":28,"y2":18,"color":"#d74a3a","width":2},{"type":"polygon","points":[[15,21],[33,21],[31,33],[17,33]],"color":"#258fbd","alpha":1},{"type":"line","x1":15,"y1":26,"x2":4,"y2":15,"color":"#103958","width":4},{"type":"line","x1":33,"y1":26,"x2":44,"y2":15,"color":"#103958","width":4},{"type":"rect","x":17,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":8,"color":"#5b351e","alpha":1},{"type":"rect","x":7,"y":9,"w":3,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":38,"y":7,"w":3,"h":3,"color":"#ffd35d","alpha":1}]}],"fps":6},"sheltering":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":13,"ry":4,"color":"#2a241e","alpha":0.28},{"type":"rect","x":15,"y":4,"w":18,"h":7,"color":"#103958","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"polygon","points":[[14,23],[34,23],[32,38],[16,38]],"color":"#258fbd","alpha":1},{"type":"polygon","points":[[5,20],[24,6],[43,20],[39,23],[9,23]],"color":"#17648b","alpha":1},{"type":"line","x1":24,"y1":6,"x2":24,"y2":38,"color":"#d5c8a7","width":2},{"type":"line","x1":16,"y1":38,"x2":22,"y2":45,"color":"#103958","width":4},{"type":"line","x1":32,"y1":38,"x2":27,"y2":45,"color":"#103958","width":4},{"type":"rect","x":16,"y":38,"w":7,"h":6,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":38,"w":7,"h":6,"color":"#5b351e","alpha":1}]}},"fsm":["Idle","Following","Gathering","Cooking","Helping","Talking"]},"npc_guardabosques":{"id":"npc_guardabosques","name":"El Guardabosques","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#1e4b2a","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#1e4b2a","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#326f3e","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#1e4b2a","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#326f3e","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#fff4d8","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#1e4b2a","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#1e4b2a","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#326f3e","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#1e4b2a","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true,"fsm":["Idle","Following","Gathering","Cooking","Helping","Talking"]},"player_viajero":{"id":"player_viajero","name":"El Viajero","category":"characters","size":{"w":48,"h":52},"anchor":{"x":24,"y":46},"hitbox":{"x":12,"y":31,"w":24,"h":15},"depth":{"mode":"y_sort","footY":46},"states":{"down":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":7,"color":"#17151d","alpha":1},{"type":"rect","x":12,"y":10,"w":22,"h":7,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":11,"w":16,"h":12,"color":"#f4c884","alpha":1},{"type":"rect","x":17,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":28,"y":15,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":23,"w":18,"h":11,"color":"#7c4dff","alpha":1},{"type":"rect","x":13,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":31,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":19,"y":25,"w":10,"h":3,"color":"#a476ff","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"up":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":13,"y":4,"w":20,"h":12,"color":"#17151d","alpha":1},{"type":"rect","x":15,"y":14,"w":16,"h":8,"color":"#17151d","alpha":1},{"type":"rect","x":14,"y":22,"w":20,"h":12,"color":"#7c4dff","alpha":1},{"type":"rect","x":17,"y":23,"w":14,"h":4,"color":"#a476ff","alpha":1},{"type":"rect","x":16,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":28,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]},"side":{"draw":[{"type":"ellipse","x":24,"y":46,"rx":11,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":16,"y":4,"w":14,"h":5,"color":"#17151d","alpha":1},{"type":"rect","x":14,"y":9,"w":18,"h":10,"color":"#17151d","alpha":1},{"type":"rect","x":17,"y":11,"w":13,"h":11,"color":"#f4c884","alpha":1},{"type":"rect","x":28,"y":14,"w":3,"h":3,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":22,"w":16,"h":11,"color":"#7c4dff","alpha":1},{"type":"rect","x":15,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":28,"y":26,"w":5,"h":8,"color":"#2d174f","alpha":1},{"type":"rect","x":17,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1},{"type":"rect","x":27,"y":33,"w":6,"h":9,"color":"#5b351e","alpha":1}]}},"collision":true,"animated":true},"tent_blue":{"id":"tent_blue","name":"Tienda azul","category":"camp","size":{"w":96,"h":88},"anchor":{"x":48,"y":78},"hitbox":{"x":17,"y":65,"w":62,"h":16},"depth":{"mode":"y_sort","footY":78},"states":{"materials":{"draw":[{"type":"ellipse","x":48,"y":77,"rx":30,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":18,"y":71,"w":60,"h":4,"color":"#75431f","alpha":1},{"type":"rect","x":24,"y":63,"w":4,"h":10,"color":"#a36532","alpha":1},{"type":"rect","x":68,"y":63,"w":4,"h":10,"color":"#a36532","alpha":1},{"type":"rect","x":31,"y":61,"w":34,"h":8,"color":"#17648b","alpha":1},{"type":"rect","x":35,"y":58,"w":26,"h":3,"color":"#55b8d9","alpha":1},{"type":"rect","x":14,"y":68,"w":10,"h":6,"color":"#d5c8a7","alpha":1},{"type":"rect","x":73,"y":68,"w":9,"h":6,"color":"#9c9589","alpha":1}]},"built":{"draw":[{"type":"ellipse","x":48,"y":76,"rx":38,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":46,"y":2,"w":3,"h":14,"color":"#4f2d18","alpha":1},{"type":"rect","x":49,"y":3,"w":17,"h":3,"color":"#103958","alpha":1},{"type":"rect","x":50,"y":4,"w":14,"h":2,"color":"#258fbd","alpha":1},{"type":"rect","x":17,"y":69,"w":62,"h":8,"color":"#103958","alpha":1},{"type":"rect","x":44,"y":19,"w":8,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":40,"y":25,"w":16,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":36,"y":31,"w":24,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":32,"y":37,"w":32,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":28,"y":43,"w":40,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":24,"y":49,"w":48,"h":6,"color":"#17648b","alpha":1},{"type":"rect","x":20,"y":55,"w":56,"h":6,"color":"#258fbd","alpha":1},{"type":"rect","x":21,"y":53,"w":54,"h":19,"color":"#17648b","alpha":1},{"type":"rect","x":26,"y":44,"w":44,"h":11,"color":"#258fbd","alpha":1},{"type":"rect","x":34,"y":45,"w":28,"h":28,"color":"#17151d","alpha":1},{"type":"rect","x":37,"y":48,"w":22,"h":24,"color":"#103958","alpha":1},{"type":"rect","x":41,"y":51,"w":14,"h":21,"color":"#17151d","alpha":1},{"type":"rect","x":16,"y":73,"w":4,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":76,"y":73,"w":4,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":11,"y":77,"w":10,"h":3,"color":"#ffd35d","alpha":1},{"type":"rect","x":75,"y":77,"w":10,"h":3,"color":"#ffd35d","alpha":1}]}},"collision":"base_only","occlusion":{"splitAtY":59},"interactable":true},"tree_oak":{"id":"tree_oak","name":"Árbol frondoso","category":"vegetation","size":{"w":64,"h":64},"anchor":{"x":32,"y":60},"hitbox":{"x":25,"y":49,"w":14,"h":12},"depth":{"mode":"y_sort","footY":60},"states":{"default":{"draw":[{"type":"ellipse","x":32,"y":60,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":27,"y":39,"w":10,"h":25,"color":"#5b351e","alpha":1},{"type":"rect","x":29,"y":39,"w":6,"h":24,"color":"#a56b37","alpha":1},{"type":"rect","x":25,"y":58,"w":14,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":13,"y":10,"w":38,"h":7,"color":"#125f35","alpha":1},{"type":"rect","x":7,"y":17,"w":50,"h":25,"color":"#125f35","alpha":1},{"type":"rect","x":12,"y":10,"w":40,"h":34,"color":"#178545","alpha":1},{"type":"rect","x":6,"y":23,"w":11,"h":14,"color":"#22a653","alpha":1},{"type":"rect","x":45,"y":18,"w":11,"h":15,"color":"#22a653","alpha":1},{"type":"rect","x":20,"y":6,"w":25,"h":12,"color":"#22a653","alpha":1},{"type":"rect","x":18,"y":14,"w":12,"h":9,"color":"#43bf62","alpha":1},{"type":"rect","x":37,"y":23,"w":12,"h":9,"color":"#43bf62","alpha":1},{"type":"rect","x":24,"y":30,"w":10,"h":6,"color":"#74d870","alpha":1},{"type":"rect","x":12,"y":41,"w":41,"h":5,"color":"#125f35","alpha":1}]}},"collision":"trunk_only","occlusion":{"canopyFromY":10,"splitAtY":45}},"wood_pile":{"id":"wood_pile","name":"Pila de troncos","category":"storage","size":{"w":64,"h":56},"anchor":{"x":32,"y":50},"hitbox":{"x":8,"y":36,"w":48,"h":14},"depth":{"mode":"y_sort","footY":50},"states":{"1":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"2":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"3":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1}]},"4":{"draw":[{"type":"ellipse","x":32,"y":50,"rx":25,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":10,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":42,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":43,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":44,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":10,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":12,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":20,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":25,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":27,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":35,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":40,"y":34,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":42,"y":35,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":50,"y":36,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":26,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":27,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":28,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":17,"y":18,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":19,"y":19,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":27,"y":20,"w":3,"h":4,"color":"#5b351e","alpha":1},{"type":"rect","x":32,"y":18,"w":14,"h":8,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":19,"w":10,"h":4,"color":"#c48747","alpha":1},{"type":"rect","x":42,"y":20,"w":3,"h":4,"color":"#5b351e","alpha":1}]}},"collision":true,"interactable":true},"wooden_crate":{"id":"wooden_crate","name":"Caja de madera","category":"storage","size":{"w":48,"h":48},"anchor":{"x":24,"y":42},"hitbox":{"x":7,"y":24,"w":34,"h":18},"depth":{"mode":"y_sort","footY":42},"states":{"default":{"draw":[{"type":"ellipse","x":24,"y":42,"rx":18,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":6,"y":14,"w":36,"h":29,"color":"#4f2d18","alpha":1},{"type":"rect","x":9,"y":17,"w":30,"h":23,"color":"#a36532","alpha":1},{"type":"rect","x":12,"y":20,"w":24,"h":17,"color":"#75431f","alpha":1},{"type":"line","x1":10,"y1":17,"x2":38,"y2":40,"color":"#c48747","width":3,"alpha":1},{"type":"line","x1":38,"y1":17,"x2":10,"y2":40,"color":"#c48747","width":3,"alpha":1},{"type":"rect","x":8,"y":12,"w":32,"h":5,"color":"#c48747","alpha":1}]}},"collision":true},"workbench":{"id":"workbench","name":"Mesa de trabajo","category":"camp","size":{"w":96,"h":88},"anchor":{"x":48,"y":78},"hitbox":{"x":13,"y":57,"w":68,"h":21},"depth":{"mode":"y_sort","footY":78},"states":{"default":{"draw":[{"type":"ellipse","x":48,"y":74,"rx":38,"ry":4,"color":"#2a241e","alpha":0.22},{"type":"rect","x":17,"y":27,"w":5,"h":45,"color":"#4f2d18","alpha":1},{"type":"rect","x":69,"y":27,"w":5,"h":45,"color":"#4f2d18","alpha":1},{"type":"rect","x":17,"y":27,"w":57,"h":5,"color":"#a36532","alpha":1},{"type":"rect","x":24,"y":35,"w":4,"h":16,"color":"#75431f","alpha":1},{"type":"rect","x":28,"y":38,"w":5,"h":8,"color":"#17151d","alpha":1},{"type":"rect","x":29,"y":40,"w":3,"h":5,"color":"#ffd35d","alpha":1},{"type":"rect","x":12,"y":59,"w":70,"h":7,"color":"#4f2d18","alpha":1},{"type":"rect","x":14,"y":53,"w":66,"h":8,"color":"#a36532","alpha":1},{"type":"rect","x":20,"y":56,"w":32,"h":5,"color":"#258fbd","alpha":1},{"type":"rect","x":20,"y":61,"w":32,"h":5,"color":"#17648b","alpha":1},{"type":"rect","x":20,"y":66,"w":5,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":70,"y":66,"w":5,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":57,"y":42,"w":23,"h":14,"color":"#75431f","alpha":1},{"type":"rect","x":59,"y":44,"w":19,"h":10,"color":"#c48747","alpha":1},{"type":"rect","x":66,"y":36,"w":7,"h":10,"color":"#b8ad9d","alpha":1},{"type":"rect","x":43,"y":68,"w":18,"h":5,"color":"#a36532","alpha":1},{"type":"rect","x":46,"y":73,"w":12,"h":10,"color":"#75431f","alpha":1},{"type":"rect","x":34,"y":42,"w":10,"h":8,"color":"#fff4d8","alpha":1},{"type":"rect","x":36,"y":44,"w":6,"h":2,"color":"#17648b","alpha":1}]}},"collision":true,"interactable":true}},"effects":{"smoke":{"type":"particle","shape":"rect","size":[2,4],"colors":["#8b8b88","#b5b4ae"],"lifetime":[0.8,1.5],"velocity":{"x":[-5,5],"y":[-18,-9]},"wind":true},"sparks":{"type":"particle","shape":"rect","size":[2,2],"colors":["#ff9d24","#ffe15b"],"lifetime":[0.25,0.6],"velocity":{"x":[-16,16],"y":[-28,-12]},"wind":true},"rain":{"type":"particle","shape":"line","colors":["#67c7e8"],"lifetime":[0.4,0.8],"velocity":{"x":[-18,-8],"y":[150,220]}},"snow":{"type":"particle","shape":"rect","size":[2,2],"colors":["#eaf7ff"],"lifetime":[1.2,2.5],"velocity":{"x":[-12,12],"y":[18,35]},"wind":true},"wood_chips":{"type":"particle","shape":"rect","size":[2,3],"colors":["#a36532","#c48747"],"lifetime":[0.25,0.5],"velocity":{"x":[-40,40],"y":[-35,-10]}}}};
 const ASSET_RENDERER = new window.JuegoArtAssetRenderer(ASSET_MANIFEST);
 
 const TREE_TRUNK_TOP = TILE - 8;
@@ -976,8 +1010,8 @@ function rect(ctx, x, y, w, h, color) {
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 }
 function shadow(ctx, x, y, w) {
-  ctx.save(); ctx.globalAlpha = .22; ctx.fillStyle = "#2a241e";
-  ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), Math.round(w), 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.globalAlpha = .30; ctx.fillStyle = "#0a0814";
+  ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), Math.round(w), Math.max(3, Math.round(w * 0.28)), 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 }
 function pixelFlower(ctx, x, y, color) {
   rect(ctx,x+3,y,2,2,color); rect(ctx,x,y+3,2,2,color); rect(ctx,x+6,y+3,2,2,color); rect(ctx,x+3,y+6,2,2,color); rect(ctx,x+3,y+3,2,2,"#ffd25d");
@@ -1082,15 +1116,52 @@ function drawPerson(ctx,entity,cam,style,dir="down",frame=0,isPlayer=false) {
 const TILE_DEF = {
   G: { walkable: true, base: C.grass }, g: { walkable: true, base: C.grassDark },
   P: { walkable: true, base: C.sand }, H: { walkable: true, base: C.path },
-  T: { walkable: false, base: C.grassDark }, D: { walkable: false, base: C.sand }
+  T: { walkable: false, base: C.grassDark }, D: { walkable: false, base: C.sand },
+  W: { walkable: false, base: "#7a5230" }, F: { walkable: true, base: "#b78a5a" }, C: { walkable: false, base: "#9c6b3f" }
 };
 
 const ZONE = { "rows": 18, "cols": 26, "map": ["TTTTTTTTTTTTTTTTTTTTTTTTTT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TPPPPPPPPPPPPPPPPPPPPPPPPT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGDGGGGGGGGGGGGT", "TTTTTTTTTTTTTTTTTTTTTTTTTT"], "flags": { "fogataLit": false, "tiendaArmada": false, "campamentoListo": false, "senderoAbierto": false }, "npcs": [{ "id": "alizon", "x": 256, "y": 224, "w": 26, "h": 28, "sprite": "alizon", "asset": "npc_alizon", "name": "Alizon", "style": "blue", "dialogue": ["¡Qué claro tan enorme! Aquí tendremos sitio de sobra para el campamento.", "El Guardabosques dice que lo primero es planear: un buen dibujo de flujo nos dice qué hacer antes de hacer nada.", "Después toca fabricar. Cada pieza del refugio se construye con una función: una receta que recibe algo y devuelve un resultado.", "Y cuando el bosque nos haga decidir... ahí entra la lógica de las condiciones. Yo preparo la madera, tú escribes los planos."] }, { "id": "sabio", "x": 192, "y": 160, "w": 26, "h": 28, "sprite": "guardabosques", "asset": "npc_guardabosques", "name": "El Guardabosques", "style": "green", "dialogue": ["Bienvenido, viajero. Este es tu primer día en El Gran Backend. Aquí no hay botones mágicos: todo se construye con lógica.", "Lo primero que haremos es PLANEAR. En el Libro tienes los diagramas de flujo: el plano mental de cualquier tarea. Estúdialos antes de escribir una sola línea.", "Con el plano claro, fabricamos las piezas. Una función es como una receta: recibe ingredientes (parámetros) y devuelve un resultado (return).", "Y cuando el bosque nos obligue a decidir, usaremos la lógica de las condiciones: si esto, entonces aquello.", "Empecemos por el calor. Acércate al hogar de piedras."] }], "interactables": [{ "id": "fogata01", "type": "fogata", "asset": "campfire", "x": 128, "y": 128, "w": 32, "h": 32, "missionNode": "challenge1", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda01", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 128, "w": 32, "h": 32, "missionNode": "challenge2", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "fogata02", "type": "fogata", "asset": "campfire", "x": 128, "y": 384, "w": 32, "h": 32, "missionNode": "challenge3", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda02", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 384, "w": 32, "h": 32, "missionNode": "challenge4", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "campamento01", "type": "campamento", "asset": "workbench", "x": 448, "y": 256, "w": 32, "h": 32, "missionNode": "challenge5", "solid": { "x": -20, "y": 14, "w": 72, "h": 25 }, "sortOffset": 39 }], "decor": [{ "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 }, { "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 3 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 96, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 480, "y": 96, "w": 34, "h": 30, "seed": 2 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 320, "y": 512, "w": 34, "h": 30, "seed": 3 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 512, "y": 512, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 416, "w": 24, "h": 18, "seed": 2 }, { "kind": "grass", "asset": "grass_tufts", "x": 192, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 256, "y": 416, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 416, "w": 14, "h": 12 }], "doors": [{ "id": "sendero", "x": 384, "y": 512, "tileRow": 16, "tileCol": 12 }] };
+const ZONES = (typeof {
+  "exterior": { "rows": 18, "cols": 26, "map": ["TTTTTTTTTTTTTTTTTTTTTTTTTT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TPPPPPPPPPPPPPPPPPPPPPPPPT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGDGGGGGGGGGGGGT", "TTTTTTTTTTTTTTTTTTTTTTTTTT"], "flags": { "fogataLit": false, "tiendaArmada": false, "campamentoListo": false, "senderoAbierto": false }, "npcs": [{ "id": "alizon", "x": 256, "y": 224, "w": 26, "h": 28, "sprite": "alizon", "asset": "npc_alizon", "name": "Alizon", "style": "blue", "dialogue": ["¡Qué claro tan enorme! Aquí tendremos sitio de sobra para el campamento.", "El Guardabosques dice que lo primero es planear: un buen dibujo de flujo nos dice qué hacer antes de hacer nada.", "Después toca fabricar. Cada pieza del refugio se construye con una función: una receta que recibe algo y devuelve un resultado.", "Y cuando el bosque nos haga decidir... ahí entra la lógica de las condiciones. Yo preparo la madera, tú escribes los planos."] }, { "id": "sabio", "x": 192, "y": 160, "w": 26, "h": 28, "sprite": "guardabosques", "asset": "npc_guardabosques", "name": "El Guardabosques", "style": "green", "dialogue": ["Bienvenido, viajero. Este es tu primer día en El Gran Backend. Aquí no hay botones mágicos: todo se construye con lógica.", "Lo primero que haremos es PLANEAR. En el Libro tienes los diagramas de flujo: el plano mental de cualquier tarea. Estúdialos antes de escribir una sola línea.", "Con el plano claro, fabricamos las piezas. Una función es como una receta: recibe ingredientes (parámetros) y devuelve un resultado (return).", "Y cuando el bosque nos obligue a decidir, usaremos la lógica de las condiciones: si esto, entonces aquello.", "Empecemos por el calor. Acércate al hogar de piedras."] }], "interactables": [{ "id": "fogata01", "type": "fogata", "asset": "campfire", "x": 128, "y": 128, "w": 32, "h": 32, "missionNode": "challenge1", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda01", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 128, "w": 32, "h": 32, "missionNode": "challenge2", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "fogata02", "type": "fogata", "asset": "campfire", "x": 128, "y": 384, "w": 32, "h": 32, "missionNode": "challenge3", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda02", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 384, "w": 32, "h": 32, "missionNode": "challenge4", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "campamento01", "type": "campamento", "asset": "workbench", "x": 448, "y": 256, "w": 32, "h": 32, "missionNode": "challenge5", "solid": { "x": -20, "y": 14, "w": 72, "h": 25 }, "sortOffset": 39 }], "decor": [{ "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 }, { "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 3 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 96, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 480, "y": 96, "w": 34, "h": 30, "seed": 2 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 320, "y": 512, "w": 34, "h": 30, "seed": 3 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 512, "y": 512, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 416, "w": 24, "h": 18, "seed": 2 }, { "kind": "grass", "asset": "grass_tufts", "x": 192, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 256, "y": 416, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 416, "w": 14, "h": 12 }], "doors": [{ "id": "sendero", "x": 384, "y": 512, "tileRow": 16, "tileCol": 12 }] }
+} !== "undefined") ? {
+  "exterior": { "rows": 18, "cols": 26, "map": ["TTTTTTTTTTTTTTTTTTTTTTTTTT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TPPPPPPPPPPPPPPPPPPPPPPPPT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGPGGGGGGGGGGGGT", "TGGGGGGGGGGGDGGGGGGGGGGGGT", "TTTTTTTTTTTTTTTTTTTTTTTTTT"], "flags": { "fogataLit": false, "tiendaArmada": false, "campamentoListo": false, "senderoAbierto": false }, "npcs": [{ "id": "alizon", "x": 256, "y": 224, "w": 26, "h": 28, "sprite": "alizon", "asset": "npc_alizon", "name": "Alizon", "style": "blue", "dialogue": ["¡Qué claro tan enorme! Aquí tendremos sitio de sobra para el campamento.", "El Guardabosques dice que lo primero es planear: un buen dibujo de flujo nos dice qué hacer antes de hacer nada.", "Después toca fabricar. Cada pieza del refugio se construye con una función: una receta que recibe algo y devuelve un resultado.", "Y cuando el bosque nos haga decidir... ahí entra la lógica de las condiciones. Yo preparo la madera, tú escribes los planos."] }, { "id": "sabio", "x": 192, "y": 160, "w": 26, "h": 28, "sprite": "guardabosques", "asset": "npc_guardabosques", "name": "El Guardabosques", "style": "green", "dialogue": ["Bienvenido, viajero. Este es tu primer día en El Gran Backend. Aquí no hay botones mágicos: todo se construye con lógica.", "Lo primero que haremos es PLANEAR. En el Libro tienes los diagramas de flujo: el plano mental de cualquier tarea. Estúdialos antes de escribir una sola línea.", "Con el plano claro, fabricamos las piezas. Una función es como una receta: recibe ingredientes (parámetros) y devuelve un resultado (return).", "Y cuando el bosque nos obligue a decidir, usaremos la lógica de las condiciones: si esto, entonces aquello.", "Empecemos por el calor. Acércate al hogar de piedras."] }], "interactables": [{ "id": "fogata01", "type": "fogata", "asset": "campfire", "x": 128, "y": 128, "w": 32, "h": 32, "missionNode": "challenge1", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda01", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 128, "w": 32, "h": 32, "missionNode": "challenge2", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "fogata02", "type": "fogata", "asset": "campfire", "x": 128, "y": 384, "w": 32, "h": 32, "missionNode": "challenge3", "solid": { "x": 5, "y": 20, "w": 22, "h": 12 }, "sortOffset": 30 }, { "id": "tienda02", "type": "tienda", "asset": "tent_blue", "x": 640, "y": 384, "w": 32, "h": 32, "missionNode": "challenge4", "solid": { "x": -18, "y": 21, "w": 68, "h": 18 }, "sortOffset": 39 }, { "id": "campamento01", "type": "campamento", "asset": "workbench", "x": 448, "y": 256, "w": 32, "h": 32, "missionNode": "challenge5", "solid": { "x": -20, "y": 14, "w": 72, "h": 25 }, "sortOffset": 39 }], "decor": [{ "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 96, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 2 }, { "kind": "bush", "asset": "bush_flowers", "x": 96, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 3 }, { "kind": "bush", "asset": "bush_flowers", "x": 710, "y": 480, "w": 40, "h": 34, "solid": { "x": 5, "y": 20, "w": 30, "h": 13 }, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 96, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 480, "y": 96, "w": 34, "h": 30, "seed": 2 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 320, "y": 512, "w": 34, "h": 30, "seed": 3 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 512, "y": 512, "w": 34, "h": 30, "seed": 1 }, { "kind": "flowers", "asset": "flowers_mixed", "x": 352, "y": 416, "w": 24, "h": 18, "seed": 2 }, { "kind": "grass", "asset": "grass_tufts", "x": 192, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 224, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 256, "y": 416, "w": 14, "h": 12 }, { "kind": "grass", "asset": "grass_tufts", "x": 600, "y": 416, "w": 14, "h": 12 }], "doors": [{ "id": "sendero", "x": 384, "y": 512, "tileRow": 16, "tileCol": 12 }] }
+} : { exterior: ZONE };
 class World {
-  constructor() {
-    this.rows=ZONE.rows; this.cols=ZONE.cols; this.tiles=ZONE.map.map(r=>r.split("")); this.flags={...ZONE.flags};
-     this.npcs=ZONE.npcs.map(n=>({...n,dialogue:n.dialogue.slice(),visualState:n.initialState||"down"})); this.interactables=ZONE.interactables.map(i=>({...i,solid:{...i.solid},stateMap:i.stateMap?{...i.stateMap}:null}));
-    this.decor=ZONE.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null})); this.doors=ZONE.doors.map(d=>({...d}));
+  constructor(zoneId) {
+    this.zoneId = zoneId || "exterior";
+    this.load(ZONES[this.zoneId] || ZONE);
+  }
+  load(zoneData) {
+    const data = zoneData || ZONE;
+    this.rows=data.rows; this.cols=data.cols; this.tiles=data.map.map(r=>r.split("")); this.flags={...data.flags};
+    this.npcs=data.npcs.map(n=>({...n,dialogue:n.dialogue.slice(),visualState:n.initialState||"down"})); this.interactables=data.interactables.map(i=>({...i,solid:{...i.solid},stateMap:i.stateMap?{...i.stateMap}:null}));
+    this.decor=data.decor.map(d=>({...d,solid:d.solid?{...d.solid}:null,state:d.state!=null?d.state:(d.stateDefault||"default")})); this.doors=data.doors.map(d=>({...d}));
+    this.weather = data.weather || null;
+    return this;
+  }
+  toggleDecor(id) {
+    const d = this.decor.find(x => x.id === id);
+    if (!d || !d.interactable) return null;
+    d.state = (d.state || d.stateDefault || "default") === (d.stateOn || "on") ? (d.stateOff || "off") : (d.stateOn || "on");
+    d.changedAt = performance.now();
+    return d.state;
+  }
+  setDecorState(id, state) {
+    const d = this.decor.find(x => x.id === id);
+    if (!d) return;
+    d.state = state;
+    d.changedAt = performance.now();
+  }
+  litDecor(id) { const d = this.decor.find(x => x.id === id); return !!(d && (d.state === d.stateOn || d.lit)); }
+  findPortal(zoneId) {
+    return this.interactables.find(i => i.type === "portal" && i.toZone === zoneId) || null;
+  }
+  static zoneForMission(missionNodeId) {
+    for (const zid of Object.keys(ZONES)) {
+      const z = ZONES[zid];
+      if (z && (z.interactables || []).some(i => i.missionNode === missionNodeId)) return zid;
+    }
+    return "exterior";
   }
   tileAt(col,row){ if(row<0||row>=this.rows||col<0||col>=this.cols)return "T"; return this.tiles[row][col]; }
   _pointInSolid(px,py,o){ if(!o.solid)return false; const r=o.solid; return px>=o.x+r.x&&px<o.x+r.x+r.w&&py>=o.y+r.y&&py<o.y+r.y+r.h; }
@@ -1137,6 +1208,11 @@ class Renderer {
     this.weather = weather || new WeatherSystem(ZONE.weather || {});
   }
 
+  setWeather(config) {
+    this.weather = new WeatherSystem(config || {});
+    this.weather.resize(this.ctx.canvas.width || 0, this.ctx.canvas.height || 0);
+  }
+
   _stateFor(it, challengeSystem) {
     if (it.stateMap && challengeSystem) return it.stateMap[challengeSystem.status(it.missionNode)] || it.stateMap.pending;
     if (it.type === "fogata") return it.lit ? "on" : "off";
@@ -1178,25 +1254,35 @@ class Renderer {
         else rect(ctx, sx + 6 + (seed % 5) * 4, sy + 8 + (seed % 2) * 12, 2, 4, C.grassLight);
       } else if (t === "T") {
         ASSET_RENDERER.drawAsset(ctx, "tree_oak", "default", col * TILE + 32, row * TILE + 32, camera, now, { clipY: 45, clipH: 19 });
+      } else if (t === "W") {
+        rect(ctx, sx, sy, TILE, TILE, "#6b4626"); rect(ctx, sx, sy + 26, TILE, 6, "#5c3a21");
+      } else if (t === "C") {
+        rect(ctx, sx + 3, sy + 8, TILE - 6, TILE - 8, "#8a5a33"); rect(ctx, sx + 3, sy + 8, TILE - 6, 5, "#a06b3d");
+      } else if (t === "F") {
+        if (seed % 4 === 0) rect(ctx, sx + 5 + (seed % 3) * 8, sy + 6 + (seed % 2) * 12, 4, 2, "#a97c4e");
       }
       if (t === "D" && !world.flags.senderoAbierto) drawDoor(ctx, sx, sy, false);
     }
      for (const d of world.decor) {
        if (d.kind === "flowers") ASSET_RENDERER.drawAsset(ctx, "flowers_mixed", "default", d.x + d.w / 2, d.y + d.h, camera, now);
        else if (d.kind === "grass") ASSET_RENDERER.drawAsset(ctx, "grass_tufts", "default", d.x + d.w / 2, d.y + d.h, camera, now);
-       else if (d.asset) ASSET_RENDERER.drawAsset(ctx, d.asset, d.state || "default", d.x + d.w / 2, d.y + d.h, camera, now);
+       else if (d.kind === "rug" || d.asset === "mueble_tapete") ASSET_RENDERER.drawAsset(ctx, d.asset || "mueble_tapete", "default", d.x + d.w / 2, d.y + d.h, camera, now);
      }
-     if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
-      if (ZONE.weather && ZONE.weather.mode === "storm" && challengeSystem && challengeSystem.lesson.storm) {
+if (world.flags.campamentoListo) { ctx.save(); ctx.globalAlpha = .035; rect(ctx, 0, 0, canvasW, canvasH, C.gold1); ctx.restore(); }
+      if (world.weather && (world.weather.mode === "storm" || world.weather.mode === "frost") && challengeSystem && challengeSystem.lesson.storm) {
        const phase = challengeSystem.stormPhase();
        const alpha = { solved_0_2:.22, solved_3_5:.16, solved_6_8:.10, solved_9:.04, solved_10:0 }[phase] || 0;
-       if (alpha) { ctx.save(); ctx.globalAlpha = alpha; rect(ctx, 0, 0, canvasW, canvasH, "#24154b"); ctx.restore(); }
-     }
+       const tint = world.weather.overlayColor || (world.weather.mode === "frost" ? "#8fb8c9" : "#24154b");
+       if (alpha) { ctx.save(); ctx.globalAlpha = alpha; rect(ctx, 0, 0, canvasW, canvasH, tint); ctx.restore(); }
+      }
   }
 
   renderDepthScene(world, player, camera, challengeSystem) {
     const ctx = this.ctx, now = performance.now(), items = [];
-    for (const d of world.decor) if (d.kind === "bush") items.push({ type: "decor", ref: d, y: d.y + d.h, asset: d.asset || "bush_flowers" });
+    for (const d of world.decor) {
+      if (d.kind === "flowers" || d.kind === "grass" || d.kind === "rug" || d.asset === "mueble_tapete") continue;
+      items.push({ type: "decor", ref: d, y: d.y + (d.sortOffset || d.h || 32), asset: d.asset || "bush_flowers" });
+    }
     for (const n of world.npcs) items.push({ type: "npc", ref: n, y: n.y + n.h, asset: n.asset || "npc_alizon" });
     for (const it of world.interactables) items.push({ type: "interactable", ref: it, y: it.y + (it.sortOffset || it.h || 32), asset: it.asset || it.type });
     items.push({ type: "player", ref: player, y: player.y + player.h, asset: "player_viajero" });
@@ -1204,11 +1290,18 @@ class Renderer {
     for (const item of items) {
       if (item.type === "decor") {
         const d = item.ref;
-        ASSET_RENDERER.drawAsset(ctx, item.asset, "default", d.x + d.w / 2, d.y + d.h, camera, now);
+        const st = d.state || d.stateDefault || "default";
+        shadow(ctx, d.x + d.w / 2 - camera.x, d.y + d.h - 1 - camera.y, Math.max(6, d.w * 0.35));
+        ASSET_RENDERER.drawAsset(ctx, item.asset, st, d.x + d.w / 2, d.y + d.h, camera, now);
+        if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+          if (Math.random() < 0.12) this._emitFromEffect("smoke", d.x + d.w / 2, d.y + d.h - 8);
+          if (Math.random() < 0.08) this._emitFromEffect("sparks", d.x + d.w / 2, d.y + d.h - 12);
+        }
         continue;
       }
       if (item.type === "player") {
         const p = item.ref;
+        shadow(ctx, p.x + p.w / 2 - camera.x, p.y + p.h - 1 - camera.y, 11);
         const st = (p.dir === "left" || p.dir === "right") ? "side" : p.dir;
         const bob = (p.moving && p.frame % 2) ? -1 : 0;
         ASSET_RENDERER.drawAsset(ctx, item.asset, st, p.x + p.w / 2, p.y + p.h + bob, camera, now, { flipX: p.dir === "left" });
@@ -1216,12 +1309,14 @@ class Renderer {
       }
       if (item.type === "npc") {
          const n = item.ref, bob = Math.sin((now + n.x * 3) / 560) * .5;
+         shadow(ctx, n.x + n.w / 2 - camera.x, n.y + n.h - 1 - camera.y, 11);
          ASSET_RENDERER.drawAsset(ctx, item.asset, n.visualState || "down", n.x + n.w / 2, n.y + n.h + bob, camera, now);
         continue;
       }
        const it = item.ref, age = it.changedAt ? Math.min(1, (now - it.changedAt) / 430) : 1;
        const pop = (it.changedAt && age < 1) ? .72 + age * .28 : 1;
         const status = challengeSystem && it.missionNode ? challengeSystem.status(it.missionNode) : null;
+        if (it.type !== "portal") { shadow(ctx, it.x + (it.w || 32) / 2 - camera.x, it.y + (it.h || 32) - 3 - camera.y, Math.max(10, (it.w || 32) * 0.38)); }
         ASSET_RENDERER.drawAsset(ctx, item.asset, this._stateFor(it, challengeSystem), it.x + (it.w || 32) / 2, it.y + (it.h || 32), camera, now, { alpha: pop });
         if (status === "pending" && challengeSystem.lesson.progression && challengeSystem.lesson.progression.strict) {
           this._drawBlockedIndicator(ctx, it.x + (it.w || 32) / 2 - camera.x, it.y + 10 - camera.y);
@@ -1252,6 +1347,112 @@ class Renderer {
   renderEntities(world, camera) {}
   renderPlayer(player, camera) {}
 
+  renderLighting(world, player, camera, canvasW, canvasH, challengeSystem) {
+    if (!this.lightCanvas) {
+      this.lightCanvas = document.createElement("canvas");
+      this.lightCtx = this.lightCanvas.getContext("2d");
+    }
+    if (this.lightCanvas.width !== canvasW || this.lightCanvas.height !== canvasH) {
+      this.lightCanvas.width = canvasW;
+      this.lightCanvas.height = canvasH;
+    }
+    const lctx = this.lightCtx, now = performance.now();
+    lctx.clearRect(0, 0, canvasW, canvasH);
+
+    const isExterior = (world.zoneId === "exterior" || !world.zoneId);
+    lctx.globalCompositeOperation = "source-over";
+    lctx.fillStyle = isExterior ? "rgba(6, 9, 24, 0.88)" : "rgba(10, 13, 26, 0.72)";
+    lctx.fillRect(0, 0, canvasW, canvasH);
+
+    lctx.globalCompositeOperation = "destination-out";
+    const cutLight = (cx, cy, r, strength = 1.0) => {
+      if (r <= 0) return;
+      const g = lctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, `rgba(0, 0, 0, ${Math.min(1, strength)})`);
+      g.addColorStop(0.35, `rgba(0, 0, 0, ${Math.min(1, strength * 0.92)})`);
+      g.addColorStop(0.7, `rgba(0, 0, 0, ${strength * 0.45})`);
+      g.addColorStop(1, "rgba(0, 0, 0, 0)");
+      lctx.fillStyle = g;
+      lctx.beginPath();
+      lctx.arc(cx, cy, r, 0, Math.PI * 2);
+      lctx.fill();
+    };
+
+    // 1. Player aura
+    const px = player.x + player.w / 2 - camera.x;
+    const py = player.y + player.h / 2 - camera.y;
+    cutLight(px, py, 64, 0.76);
+
+    // 2. Decor lights (campfires and lamps)
+    for (const d of world.decor) {
+      const dx = d.x + (d.w || 32) / 2 - camera.x;
+      const dy = d.y + (d.h || 32) / 2 - camera.y;
+      const st = d.state || d.stateDefault || "off";
+      if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+        const flicker = Math.sin(now / 140) * 7 + Math.cos(now / 85) * 4;
+        cutLight(dx, dy + 2, 160 + flicker, 1.0);
+      } else if (d.kind === "lamp" && st === (d.stateOn || "on")) {
+        cutLight(dx, dy - 2, 125, 0.96);
+      }
+    }
+
+    // 3. Interactable fogatas, portals, stations
+    for (const it of world.interactables) {
+      const ix = it.x + (it.w || 32) / 2 - camera.x;
+      const iy = it.y + (it.h || 32) / 2 - camera.y;
+      if (it.type === "fogata" && it.lit) {
+        const flicker = Math.sin(now / 140) * 7 + Math.cos(now / 85) * 4;
+        cutLight(ix, iy, 160 + flicker, 1.0);
+      }
+      if (it.type === "portal") {
+        cutLight(ix, iy + 14, 52, 0.65);
+      }
+      if (it.missionNode && challengeSystem && challengeSystem.status(it.missionNode) === "completed") {
+        cutLight(ix, iy, 75, 0.70);
+      }
+    }
+
+    // 4. Guide NPC Alizon
+    for (const npc of world.npcs) {
+      const nx = npc.x + 16 - camera.x;
+      const ny = npc.y + 16 - camera.y;
+      cutLight(nx, ny, 50, 0.60);
+    }
+
+    // Warm color glow pass on top of cutouts
+    lctx.globalCompositeOperation = "source-over";
+    const addColorGlow = (cx, cy, r, innerColor, outerColor) => {
+      const g = lctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, innerColor);
+      g.addColorStop(0.5, outerColor);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      lctx.fillStyle = g;
+      lctx.beginPath();
+      lctx.arc(cx, cy, r, 0, Math.PI * 2);
+      lctx.fill();
+    };
+
+    for (const d of world.decor) {
+      const dx = d.x + (d.w || 32) / 2 - camera.x;
+      const dy = d.y + (d.h || 32) / 2 - camera.y;
+      const st = d.state || d.stateDefault || "off";
+      if ((d.kind === "fogata" || d.kind === "campfire") && st === (d.stateOn || "on")) {
+        addColorGlow(dx, dy + 2, 170, "rgba(255, 170, 50, 0.24)", "rgba(255, 100, 20, 0.06)");
+      } else if (d.kind === "lamp" && st === (d.stateOn || "on")) {
+        addColorGlow(dx, dy - 2, 130, "rgba(255, 220, 110, 0.22)", "rgba(255, 180, 50, 0.05)");
+      }
+    }
+    for (const it of world.interactables) {
+      if (it.missionNode && challengeSystem && challengeSystem.status(it.missionNode) === "completed") {
+        const ix = it.x + (it.w || 32) / 2 - camera.x;
+        const iy = it.y + (it.h || 32) / 2 - camera.y;
+        addColorGlow(ix, iy, 80, "rgba(77, 208, 225, 0.22)", "rgba(24, 214, 160, 0.06)");
+      }
+    }
+
+    this.ctx.drawImage(this.lightCanvas, 0, 0);
+  }
+
   renderCanopy(world, camera) {
     const ctx = this.ctx, cw = ctx.canvas.width, ch = ctx.canvas.height, now = performance.now();
     const sc = Math.max(0, Math.floor(camera.x / TILE)), ec = Math.min(world.cols, Math.ceil((camera.x + cw) / TILE) + 1);
@@ -1270,8 +1471,29 @@ class Renderer {
     rect(ctx, sx - 3, sy + 1, 6, 4, C.ink); rect(ctx, sx - 2, sy + 1, 4, 3, C.gold1); ctx.restore();
   }
 
+  renderDecorPrompt(ctx, x, y, camera, label) {
+    const time = performance.now() / 1000, bounce = Math.round(Math.sin(time * 7) * 2), sx = Math.round(x - camera.x), sy = Math.round(y - camera.y - 6 + bounce);
+    const txt = label || "Interactuar";
+    ctx.save();
+    const w = 14 + txt.length * 6 + 10;
+    rect(ctx, sx - w / 2, sy - 17, w, 19, C.ink);
+    rect(ctx, sx - w / 2 + 2, sy - 15, w - 4, 15, "#5c7a5a");
+    ctx.fillStyle = "#fff4d8"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("E · " + txt, sx, sy - 7);
+    ctx.restore();
+  }
+
   renderGuide(ctx, world, camera, activeTargetId, canvasW, canvasH) {
-    if (!activeTargetId) return; let target = world.interactables.find(i => i.id === activeTargetId) || world.npcs.find(n => n.id === activeTargetId); if (!target) return;
+    if (!activeTargetId) return;
+    let target = world.interactables.find(i => i.id === activeTargetId) || world.npcs.find(n => n.id === activeTargetId);
+    if (!target) {
+      const zoneId = World.zoneForMission(activeTargetId);
+      if (zoneId && zoneId !== world.zoneId) {
+        const portal = world.findPortal(zoneId);
+        if (portal) target = portal;
+      }
+      if (!target) return;
+    }
     const tx = (target.x + (target.w || 32) / 2) - camera.x, ty = (target.y - 8) - camera.y, time = performance.now() / 1000;
     if (tx >= 12 && tx <= canvasW - 12 && ty >= 12 && ty <= canvasH - 12) {
       const b = Math.round(Math.sin(time * 6) * 3); ctx.save(); rect(ctx, tx - 4, ty - 18 + b, 8, 8, C.gold0); rect(ctx, tx - 3, ty - 17 + b, 6, 6, C.gold1); rect(ctx, tx - 2, ty - 14 + b, 4, 8, C.gold1); ctx.restore();
@@ -1287,7 +1509,13 @@ class Renderer {
     ctx.fillStyle = "rgba(17,21,29,.92)"; ctx.fillRect(0, 0, w, h);
     ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 4; ctx.strokeRect(2, 2, w - 4, h - 4);
     ctx.fillStyle = "#fff4d8"; ctx.font = "bold 16px monospace"; ctx.fillText("RADAR · ESTACIONES", 14, 22);
-    const items = world.interactables.filter(it => it.missionNode && it.markerAsset);
+    const items = [];
+    for (const zid of Object.keys(ZONES)) {
+      const z = ZONES[zid];
+      for (const it of (z && z.interactables) || []) {
+        if (it.missionNode && it.markerAsset) items.push({ ...it, _zone: zid });
+      }
+    }
     items.forEach((it, index) => {
       const col = index % 5, row = Math.floor(index / 5), x = 38 + col * 84, y = 58 + row * 76;
       const status = challengeSystem ? challengeSystem.status(it.missionNode) : "pending";
@@ -1300,7 +1528,7 @@ class Renderer {
 }
 
 
-Object.assign(NS,{World,CollisionSystem,Player,Renderer,TILE_DEF,SPR,drawSpriteRows,TREE_TRUNK_TOP,CANOPY_H});
+Object.assign(NS,{World,CollisionSystem,Player,Renderer,TILE_DEF,SPR,drawSpriteRows,TREE_TRUNK_TOP,CANOPY_H,ZONE,ZONES});
 })();
 (function () {
 "use strict";
@@ -1488,6 +1716,31 @@ class PythonEngine {
         const child = (node, error) => { const childIndent = this._safeNextIndent(lines, i + 1, indent); if (childIndent == null) throw { type: "IndentationError", message: error || "Bloque sin instrucciones indentadas." }; const parsed = parseBlock(i + 1, childIndent); node.body = parsed.nodes; return parsed.index; };
         let m = line.match(/^def\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*:\s*$/);
         if (m) { const params = m[2].trim() ? m[2].split(",").map(p => p.trim()) : []; if (params.some(p => !/^[A-Za-z_]\w*$/.test(p))) throw { type: "SyntaxError", message: "Nombre de parámetro inválido." }; const node = { type: "def", name: m[1], params, body: [] }; i = child(node, "Función sin cuerpo indentado."); nodes.push(node); continue; }
+        m = line.match(/^class\s+([A-Za-z_]\w*)\s*(?:\(([^)]*)\))?\s*:\s*$/);
+        if (m) { const node = { type: "class", name: m[1], bases: (m[2] || "").split(",").map(x => x.trim()).filter(Boolean), body: [] }; i = child(node, "Clase sin cuerpo indentado."); nodes.push(node); continue; }
+        m = line.match(/^@(\w+)\s*$/);
+        if (m) {
+          const deco = m[1];
+          const nextRaw = lines[i + 1], nextLevel = nextRaw ? this._safeIndent(nextRaw) : -1;
+          if (nextRaw && nextLevel === level) {
+            const dm = nextRaw.trim().match(/^def\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*:\s*$/);
+            if (dm) {
+              const params = dm[2].trim() ? dm[2].split(",").map(p => p.trim()) : [];
+              const node = { type: "def", name: dm[1], params, decorators: [deco], body: [] };
+              i = i + 1;
+              const childIndent = this._safeNextIndent(lines, i + 1, level);
+              if (childIndent == null) throw { type: "IndentationError", message: "Función decorada sin cuerpo indentado." };
+              const parsed = parseBlock(i + 1, childIndent);
+              node.body = parsed.nodes; i = parsed.index;
+              nodes.push(node); continue;
+            }
+          }
+          const childIndent = this._safeNextIndent(lines, i + 1, indent);
+          if (childIndent == null) throw { type: "IndentationError", message: "Decorador sin bloque indentado." };
+          const parsed = parseBlock(i + 1, childIndent);
+          if (parsed.nodes.length && parsed.nodes[0].type === "def") { parsed.nodes[0].decorators = (parsed.nodes[0].decorators || []).concat(deco); }
+          nodes.push(...parsed.nodes); i = parsed.index; continue;
+        }
         m = line.match(/^if\s+(.+)\s*:\s*$/);
         if (m) {
           const node = { type: "if", branches: [], elseBody: [] }, first = { test: m[1], body: [] }; const childIndent = this._safeNextIndent(lines, i + 1, indent); if (childIndent == null) throw { type: "IndentationError", message: "Condición sin cuerpo indentado." }; let parsed = parseBlock(i + 1, childIndent); first.body = parsed.nodes; node.branches.push(first); i = parsed.index;
@@ -1496,7 +1749,7 @@ class PythonEngine {
         }
         m = line.match(/^for\s+([A-Za-z_]\w*)\s+in\s+(.+)\s*:\s*$/); if (m) { const node = { type: "for", name: m[1], expr: m[2], body: [] }; i = child(node); nodes.push(node); continue; }
         m = line.match(/^while\s+(.+)\s*:\s*$/); if (m) { const node = { type: "while", test: m[1], body: [] }; i = child(node); nodes.push(node); continue; }
-        if (/^(def|if|elif|else|for|while)\b/.test(line)) throw { type: "SyntaxError", message: "Cabecera de bloque inválida." };
+        if (/^(def|if|elif|else|for|while|class)\b/.test(line)) throw { type: "SyntaxError", message: "Cabecera de bloque inválida." };
         nodes.push({ type: "line", line }); i++;
       }
       return { nodes, index: i };
@@ -1508,9 +1761,9 @@ class PythonEngine {
     return parsed.nodes;
   }
   _safeTick() { this.steps++; if (this.steps > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "El código superó el límite seguro de 1000 pasos.", hint: "Revisa la condición de tu bucle y asegúrate de que avance." }; }
-  _safeLookup(name, env) { if (Object.prototype.hasOwnProperty.call(env, name)) return env[name]; if (Object.prototype.hasOwnProperty.call(this.globals || {}, name)) return this.globals[name]; if (["True", "False", "None"].includes(name)) return name === "True" ? true : name === "False" ? false : null; if (this.functions[name] || ["print", "len", "range", "int", "float", "str", "abs", "max", "min", "sum", "round", "divmod", "bool", "list", "sorted"].includes(name)) return { __callable: name }; throw { type: "NameError", message: "Variable '" + name + "' no existe." }; }
-  _safeAssign(target, value, env) { const simple = target.match(/^([A-Za-z_]\w*)$/); if (simple) { env[simple[1]] = value; return; } const indexed = target.match(/^([A-Za-z_]\w*)\[(.+)\]$/); if (!indexed) throw { type: "SyntaxError", message: "Destino de asignación inválido." }; const list = this._safeLookup(indexed[1], env), index = this._safeExpr(indexed[2], env); if (!Array.isArray(list) || !Number.isInteger(index)) throw { type: "TypeError", message: "Solo se puede asignar a un índice de lista." }; list[index] = value; }
-   _safeExecBlock(nodes, env, inFunction, inLoop) { for (const node of nodes) { if (node.type === "def") continue; const flow = this._safeExecNode(node, env, inFunction, inLoop); if (flow) return flow; } return null; }
+  _safeLookup(name, env) { if (Object.prototype.hasOwnProperty.call(env, name)) return env[name]; if (Object.prototype.hasOwnProperty.call(this.globals || {}, name)) return this.globals[name]; if (["True", "False", "None"].includes(name)) return name === "True" ? true : name === "False" ? false : null; if (this.functions[name] || ["print", "len", "range", "int", "float", "str", "abs", "max", "min", "sum", "round", "divmod", "bool", "list", "sorted"].includes(name)) return { __callable: name }; if (this.classes && this.classes[name]) return { __class__: name }; throw { type: "NameError", message: "Variable '" + name + "' no existe." }; }
+  _safeAssign(target, value, env) { const simple = target.match(/^([A-Za-z_]\w*)$/); if (simple) { env[simple[1]] = value; return; } const attr = target.match(/^([A-Za-z_]\w*)\s*\.\s*([A-Za-z_]\w*)$/); if (attr) { const obj = this._safeLookup(attr[1], env); if (obj && obj.__class__ && !obj.__attrs__) { const clsRef = this.classes[obj.__class__]; if (clsRef) { clsRef.classAttrs[attr[2]] = value; return; } } if (!(obj && this._isInstance(obj))) throw { type: "AttributeError", message: "No se puede asignar un atributo a un valor que no es una instancia." }; obj.__attrs__[this._mangleAttr(obj, attr[2])] = value; return; } const indexed = target.match(/^([A-Za-z_]\w*)\[(.+)\]$/); if (!indexed) throw { type: "SyntaxError", message: "Destino de asignación inválido." }; const list = this._safeLookup(indexed[1], env), index = this._safeExpr(indexed[2], env); if (!Array.isArray(list) || !Number.isInteger(index)) throw { type: "TypeError", message: "Solo se puede asignar a un índice de lista." }; list[index] = value; }
+   _safeExecBlock(nodes, env, inFunction, inLoop) { for (const node of nodes) { if (node.type === "def" || node.type === "class") continue; const flow = this._safeExecNode(node, env, inFunction, inLoop); if (flow) return flow; } return null; }
    _safeExecNode(node, env, inFunction, inLoop) {
     this._safeTick();
      if (node.type === "line") return this._safeLine(node.line, env, inFunction, inLoop);
@@ -1522,8 +1775,8 @@ class PythonEngine {
     if (/^(import|from|input|eval|exec|open|__import__)\b/.test(line)) throw { type: "SecurityError", message: "Esta operación no está disponible en el refugio.", hint: "Usa parámetros, variables, bucles y funciones." };
      if (line === "break") { if (!inLoop) throw { type: "SyntaxError", message: "break debe estar dentro de un bucle." }; return { type: "break" }; }
     const ret = line.match(/^return(?:\s+(.+))?$/); if (ret) { if (!inFunction) throw { type: "SyntaxError", message: "return está fuera de una función." }; return { type: "return", value: ret[1] == null ? null : this._safeExpr(ret[1], env) }; }
-    const aug = line.match(/^(.+?)\s*(\+=|-=|\*=)\s*(.+)$/); if (aug) { const old = this._safeExpr(aug[1], env), right = this._safeExpr(aug[3], env), op = aug[2][0]; this._safeAssign(aug[1].trim(), op === "+" ? old + right : op === "-" ? old - right : old * right, env); return null; }
-    const assign = line.match(/^([A-Za-z_]\w*(?:\[[^\]]+\])?)\s*=\s*(?![=])(.+)$/); if (assign) { this._safeAssign(assign[1], this._safeExpr(assign[2], env), env); return null; }
+    const aug = line.match(/^([A-Za-z_]\w*(?:\s*\.\s*[A-Za-z_]\w*)?(?:\[[^\]]+\])?)\s*(\+=|-=|\*=)\s*(.+)$/); if (aug) { const old = this._safeExpr(aug[1], env), right = this._safeExpr(aug[3], env), op = aug[2][0]; this._safeAssign(aug[1].trim(), op === "+" ? old + right : op === "-" ? old - right : old * right, env); return null; }
+    const assign = line.match(/^([A-Za-z_]\w*(?:\s*\.\s*[A-Za-z_]\w*)?(?:\[[^\]]+\])?)\s*=\s*(?![=])(.+)$/); if (assign) { this._safeAssign(assign[1], this._safeExpr(assign[2], env), env); return null; }
     this._safeExpr(line, env); return null;
   }
   _safeCall(name, args) {
@@ -1532,7 +1785,7 @@ class PythonEngine {
     if (name === "range") { if (args.length < 1 || args.length > 3) throw { type: "TypeError", message: "range() recibe entre 1 y 3 argumentos." }; const start = args.length === 1 ? 0 : args[0], end = args.length === 1 ? args[0] : args[1], step = args.length === 3 ? args[2] : 1; if (![start, end, step].every(Number.isFinite) || step === 0) throw { type: "ValueError", message: "range() necesita números y paso distinto de cero." }; const out = []; for (let n = start; step > 0 ? n < end : n > end; n += step) { out.push(n); if (out.length > MAX_EXECUTION_STEPS) throw { type: "RuntimeError", message: "range() supera el límite seguro de 1000 pasos." }; } return out; }
     if (name === "int") { const v = args[0]; if (typeof v === "string") { const n = Number(v.trim()); if (Number.isNaN(n)) throw { type: "ValueError", message: "int() no puede convertir el texto a entero." }; return Math.trunc(n); } if (typeof v === "boolean") return v ? 1 : 0; if (typeof v === "number") return Math.trunc(v); throw { type: "TypeError", message: "int() recibe un número o texto." }; }
     if (name === "float") { const v = args[0]; if (typeof v === "number") return v; if (typeof v === "string") { const n = Number(v.trim()); if (Number.isNaN(n)) throw { type: "ValueError", message: "float() no puede convertir el texto a número." }; return n; } throw { type: "TypeError", message: "float() recibe un número o texto." }; }
-    if (name === "str") { return this._display(args[0]); }
+    if (name === "str") { if (args.length === 1 && this._isInstance(args[0])) { const s = this._findMethod(args[0].__class__, "__str__"); if (s) { const res = this._callMethod(s, args[0], []); if (res.error) throw res.error; return this._display(res.value); } } return this._display(args[0]); }
     if (name === "abs") { if (args.length !== 1 || typeof args[0] !== "number") throw { type: "TypeError", message: "abs() recibe un número." }; return Math.abs(args[0]); }
     if (name === "max" || name === "min") { const nums = args.length === 1 && Array.isArray(args[0]) ? args[0] : args; if (!nums.length || nums.some(n => typeof n !== "number")) throw { type: "TypeError", message: name + "() recibe números." }; return name === "max" ? Math.max(...nums) : Math.min(...nums); }
     if (name === "sum") { if (args.length !== 1 || !Array.isArray(args[0])) throw { type: "TypeError", message: "sum() recibe una lista de números." }; return args[0].reduce((a, b) => a + b, 0); }
@@ -1546,7 +1799,7 @@ class PythonEngine {
     this._safeTokens = tokens; this._safeIndex = index;
     if (result.error) throw result.error; this.calls.push({ name, args }); return result.value;
   }
-  _display(value) { if (value === null) return "None"; if (value === true) return "True"; if (value === false) return "False"; if (Array.isArray(value)) return "[" + value.map(v => this._display(v)).join(", ") + "]"; return String(value); }
+  _display(value) { if (value === null) return "None"; if (value === true) return "True"; if (value === false) return "False"; if (Array.isArray(value)) return "[" + value.map(v => this._display(v)).join(", ") + "]"; if (this._isInstance(value)) { const s = this._findMethod(value.__class__, "__str__"); if (s) { const res = this._callMethod(s, value, []); if (res && !res.error) return String(res.value); } return "<" + value.__class__ + " objeto>"; } return String(value); }
    _execFunctionWithArgs(name, args) { const fn = this.functions[name]; if (!fn) return { error: { type: "NameError", message: "Función '" + name + "' no definida." } }; if (args.length !== fn.params.length) return { error: { type: "TypeError", message: "'" + name + "' esperaba " + fn.params.length + " argumentos y recibió " + args.length + "." } }; const env = {}; fn.params.forEach((p, i) => { env[p] = args[i]; }); try { const flow = this._safeExecBlock(fn.body, env, true, false); return { value: flow && flow.type === "return" ? flow.value : null }; } catch (e) { return { error: e && e.type ? e : { type: "RuntimeError", message: "Error al ejecutar la función." } }; } }
   _safeTokensOf(src) {
     const out = []; let i = 0; const decode = raw => raw.replace(/\\([\\'"nrt])/g, (_, c) => ({ n: "\n", r: "\r", t: "\t" }[c] || c));
@@ -1564,13 +1817,114 @@ class PythonEngine {
   _safeMul(env, evaluate) { let v = this._safeUnary(env, evaluate); while (["*", "/", "%", "//"].includes(this._safePeek().v)) { const op = this._safeTake().v, r = this._safeUnary(env, evaluate); if (evaluate) { if ((op === "/" || op === "%" || op === "//") && r === 0) throw { type: "ZeroDivisionError", message: "No se puede dividir entre cero." }; v = op === "*" ? v * r : op === "/" ? v / r : op === "%" ? v % r : Math.floor(v / r); } } return evaluate ? v : null; }
   _safePower(env, evaluate) { let v = this._safePostfix(env, evaluate); if (this._safePeek().v === "**") { this._safeTake(); const right = this._safeUnary(env, evaluate); if (evaluate) v = Math.pow(v, right); } return evaluate ? v : null; }
   _safeUnary(env, evaluate) { if (this._safePeek().v === "-") { this._safeTake(); const value = this._safeUnary(env, evaluate); return evaluate ? -value : null; } if (this._safePeek().v === "+") { this._safeTake(); const value = this._safeUnary(env, evaluate); return evaluate ? +value : null; } return this._safePower(env, evaluate); }
-  _safePostfix(env, evaluate) { let v = this._safePrimary(env, evaluate); while (true) { if (this._safePeek().v === "[") { this._safeTake(); const index = this._safeOr(env, evaluate); if (this._safePeek().v !== "]") throw { type: "SyntaxError", message: "Falta ']'." }; this._safeTake(); if (evaluate) { if (!Array.isArray(v) && typeof v !== "string") throw { type: "TypeError", message: "Solo puedes indexar listas o textos." }; v = v[index]; } continue; } if (this._safePeek().v === ".") { this._safeTake(); const attr = this._safeTake(); if (attr.v !== "append") throw { type: "NameError", message: "Método no disponible en sandbox." }; v = evaluate ? { __method: "append", target: v } : null; continue; } if (this._safePeek().v === "(") { this._safeTake(); const args = []; if (this._safePeek().v !== ")") { args.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); args.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake(); if (evaluate) { if (v && v.__method === "append") { if (!Array.isArray(v.target) || args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.target.push(args[0]); v = null; } else if (v && v.__callable) v = this._safeCall(v.__callable, args); else throw { type: "TypeError", message: "Ese valor no se puede llamar." }; } continue; } break; } return evaluate ? v : null; }
+  _safePostfix(env, evaluate) { let v = this._safePrimary(env, evaluate); while (true) { if (this._safePeek().v === "[") { this._safeTake(); const index = this._safeOr(env, evaluate); if (this._safePeek().v !== "]") throw { type: "SyntaxError", message: "Falta ']'." }; this._safeTake(); if (evaluate) { if (!Array.isArray(v) && typeof v !== "string") throw { type: "TypeError", message: "Solo puedes indexar listas o textos." }; v = v[index]; } continue; } if (this._safePeek().v === ".") { this._safeTake(); const attr = this._safeTake(); if (this._safePeek().v === "(") {
+        this._safeTake(); const args = []; if (this._safePeek().v !== ")") { args.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); args.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake();
+        if (!evaluate) continue;
+        if (attr.v === "append" && Array.isArray(v)) { if (args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.push(args[0]); v = null; continue; }
+        if (v && v.__method === "append") { if (!Array.isArray(v.target) || args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.target.push(args[0]); v = null; continue; }
+        if (v && this._isInstance(v)) {
+          const method = this._findMethod(v.__class__, attr.v);
+          if (!method) throw { type: "AttributeError", message: "La clase '" + v.__class__ + "' no tiene el método '" + attr.v + "'." };
+          const res = this._callMethod(method, v, args);
+          if (res.error) throw res.error;
+          v = res.value;
+          continue;
+        }
+        if (v && v.__callable) { v = this._safeCall(v.__callable, args); continue; }
+        throw { type: "TypeError", message: "Ese valor no se puede llamar." };
+      }
+      if (!evaluate) continue;
+      if (v && v.__class__ && !v.__attrs__) {
+        const clsRef = this.classes[v.__class__];
+        if (clsRef && Object.prototype.hasOwnProperty.call(clsRef.classAttrs || {}, attr.v)) { v = clsRef.classAttrs[attr.v]; continue; }
+        const method = this._findMethod(v.__class__, attr.v);
+        if (method) { v = { __boundMethod: method, __instance: { __class__: v.__class__ }, __classCall: true }; continue; }
+        throw { type: "AttributeError", message: "La clase '" + v.__class__ + "' no tiene el atributo '" + attr.v + "'." };
+      }
+      if (v && v.classAttrs) {
+        if (Object.prototype.hasOwnProperty.call(v.classAttrs, attr.v)) { v = v.classAttrs[attr.v]; continue; }
+        throw { type: "AttributeError", message: "La clase '" + (v.name || "?") + "' no tiene el atributo '" + attr.v + "'." };
+      }
+      if (v && this._isInstance(v)) {
+        const key = this._mangleAttr(v, attr.v);
+        const raw = (v.__attrs__ || {})[key];
+        if (raw !== undefined) { v = raw; continue; }
+        const method = this._findMethod(v.__class__, attr.v);
+        if (method) { v = { __boundMethod: method, __instance: v }; continue; }
+        throw { type: "AttributeError", message: "La instancia '" + v.__class__ + "' no tiene el atributo '" + attr.v + "'." };
+      }
+      if (attr.v !== "append") throw { type: "NameError", message: "Método no disponible en sandbox." }; v = { __method: "append", target: v }; continue; }
+      if (this._safePeek().v === "(") { this._safeTake(); const args = []; if (this._safePeek().v !== ")") { args.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); args.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake(); if (evaluate) { if (v && v.__boundMethod) { const res = this._callMethod(v.__boundMethod, v.__instance, args); if (res.error) throw res.error; v = res.value; } else if (v && v.__method === "append") { if (!Array.isArray(v.target) || args.length !== 1) throw { type: "TypeError", message: "append() recibe un solo valor para una lista." }; v.target.push(args[0]); v = null; } else if (v && v.__callable) v = this._safeCall(v.__callable, args); else if (v && v.__class__) { const inst = this._instantiate(v.__class__, args); if (inst.error) throw inst.error; v = inst.value; } else throw { type: "TypeError", message: "Ese valor no se puede llamar." }; } continue; } break; } return evaluate ? v : null; }
   _safePrimary(env, evaluate) { const t = this._safeTake(); if (t.t === "num" || t.t === "str") return evaluate ? t.v : null; if (t.t === "fstr") { if (!evaluate) return null; const tokens = this._safeTokens, index = this._safeIndex; const value = t.v.replace(/\{([^{}]+)\}/g, (_, expr) => this._display(this._safeExpr(expr, env))); this._safeTokens = tokens; this._safeIndex = index; return value; } if (t.v === "(") { const first = this._safeOr(env, evaluate), values = [first]; while (this._safePeek().v === ",") { this._safeTake(); if (this._safePeek().v === ")") break; values.push(this._safeOr(env, evaluate)); } if (this._safePeek().v !== ")") throw { type: "SyntaxError", message: "Falta ')'." }; this._safeTake(); return evaluate ? (values.length > 1 ? values : first) : null; } if (t.v === "[") { const values = []; if (this._safePeek().v !== "]") { values.push(this._safeOr(env, evaluate)); while (this._safePeek().v === ",") { this._safeTake(); if (this._safePeek().v === "]") break; values.push(this._safeOr(env, evaluate)); } } if (this._safePeek().v !== "]") throw { type: "SyntaxError", message: "Falta ']' de lista." }; this._safeTake(); return evaluate ? values : null; } if (t.t === "id") { if (!evaluate) return null; if (t.v === "True") return true; if (t.v === "False") return false; if (t.v === "None") return null; return this._safeLookup(t.v, env); } throw { type: "SyntaxError", message: "Expresión inválida." }; }
   _deepEqual(a, b) { if (Array.isArray(a) || Array.isArray(b)) return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => this._deepEqual(v, b[i])); return a === b; }
   run(code) {
-    this.output = []; this.calls = []; this.vars = {}; this.globals = {}; this.functions = {}; this.steps = 0;
-     try { const program = this._safeParse(code); for (const node of program) if (node.type === "def") this.functions[node.name] = { params: node.params, body: node.body }; const flow = this._safeExecBlock(program, this.globals, false, false); if (flow && flow.type === "return") return this._err("SyntaxError", "return está fuera de una función.", "Usa return dentro de def."); return { ok: true, output: this.output, calls: this.calls, error: null }; }
+    this.output = []; this.calls = []; this.vars = {}; this.globals = {}; this.functions = {}; this.classes = {}; this.steps = 0;
+     try {
+       const program = this._safeParse(code);
+       for (const node of program) {
+         if (node.type === "def") this.functions[node.name] = { params: node.params, body: node.body, decorators: node.decorators || [] };
+         if (node.type === "class") this.classes[node.name] = this._collectClass(node);
+       }
+       const flow = this._safeExecBlock(program, this.globals, false, false);
+       if (flow && flow.type === "return") return this._err("SyntaxError", "return está fuera de una función.", "Usa return dentro de def.");
+       return { ok: true, output: this.output, calls: this.calls, classes: this.classes, error: null };
+     }
     catch (e) { return this._fromThrow(e); }
+  }
+  _collectClass(node) {
+    const methods = {};
+    const classAttrs = {};
+    for (const child of node.body) {
+      if (child.type === "def") {
+        methods[child.name] = { params: child.params, body: child.body, decorators: child.decorators || [] };
+      } else if (child.type === "line") {
+        const am = child.line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
+        if (am) { const env = {}; try { classAttrs[am[1]] = this._safeExpr(am[2], env); } catch (e) { classAttrs[am[1]] = null; } }
+      }
+    }
+    return { name: node.name, bases: node.bases || [], methods, classAttrs };
+  }
+  _mangleAttr(instance, attr) {
+    if (attr.startsWith("__") && !attr.endsWith("__")) return "_" + instance.__class__ + attr;
+    return attr;
+  }
+  _isInstance(v) { return !!(v && v.__class__); }
+  _findMethod(clsName, methodName) {
+    let cur = this.classes[clsName];
+    const seen = new Set();
+    while (cur) {
+      if (cur.methods && cur.methods[methodName]) return cur.methods[methodName];
+      if (seen.has(cur.name)) return null;
+      seen.add(cur.name);
+      cur = (cur.bases && cur.bases.length) ? (this.classes[cur.bases[0]] || null) : null;
+    }
+    return null;
+  }
+  _callMethod(method, instance, args) {
+    const env = {};
+    if (method.decorators && method.decorators.includes("classmethod")) {
+      env[method.params[0]] = this.classes[instance.__class__];
+    } else {
+      env[method.params[0]] = instance;
+    }
+    for (let k = 1; k < method.params.length; k++) env[method.params[k]] = args[k - 1];
+    try {
+      const flow = this._safeExecBlock(method.body, env, true, false);
+      return { value: flow && flow.type === "return" ? flow.value : null };
+    } catch (e) { return { error: e && e.type ? e : { type: "RuntimeError", message: "Error al ejecutar el método." } }; }
+  }
+  _instantiate(clsName, args) {
+    const cls = this.classes[clsName];
+    if (!cls) return { error: { type: "NameError", message: "Clase '" + clsName + "' no definida." } };
+    const instance = { __class__: clsName, __attrs__: {} };
+    const init = this._findMethod(clsName, "__init__");
+    if (init) {
+      const res = this._callMethod(init, instance, args);
+      if (res.error) return res;
+    } else if (args.length) {
+      return { error: { type: "TypeError", message: "'" + clsName + "' no acepta argumentos." } };
+    }
+    return { value: instance };
   }
 }
 
@@ -1609,6 +1963,16 @@ class InteractionSystem {
     for (const npc of this.world.npcs) { const d = Math.hypot(c.x - (npc.x + 16), c.y - (npc.y + 16)); if (d < bestDist) { best = { kind: "npc", ref: npc }; bestDist = d; } }
     for (const it of this.world.interactables) { const d = Math.hypot(c.x - (it.x + (it.w || 32) / 2), c.y - (it.y + (it.h || 32))); if (d < bestDist) { best = { kind: "interactable", ref: it }; bestDist = d; } }
     for (const door of this.world.doors) { const dx = door.tileCol * 32 + 16, dy = door.tileRow * 32 + 16; const d = Math.hypot(c.x - dx, c.y - dy); if (d < bestDist && !this.world.flags.senderoAbierto) { best = { kind: "door", ref: door }; bestDist = d; } }
+    return best;
+  }
+  findNearbyDecor(player) {
+    const c = player.center(); let best = null, bestDist = this.range;
+    for (const d of this.world.decor) {
+      if (!d.interactable) continue;
+      const dx = d.x + (d.w || 32) / 2, dy = d.y + (d.h || 32) / 2;
+      const dist = Math.hypot(c.x - dx, c.y - dy);
+      if (dist < bestDist) { best = { kind: "decor", ref: d }; bestDist = dist; }
+    }
     return best;
   }
 }
@@ -1772,6 +2136,56 @@ const VALIDATORS = {
         const test = fnSpec.cases[i], result = engine._execFunctionWithArgs(fnSpec.defName, test.args);
         if (result.error) return { valid: false, error: result.error };
         if (!engine._deepEqual(result.value, test.expected)) { const argsTxt = (test.args || []).map(a => engine._display(a)).join(", "); return { valid: false, error: { type: "LogicError", message: "'" + fnSpec.defName + "(" + argsTxt + ")' devolvió " + engine._display(result.value) + ", se esperaba " + engine._display(test.expected) + ".", hint: "Revisa límites, acumuladores y el tipo de valor que retornás." } }; }
+      }
+    }
+    return { valid: true };
+  },
+  class_cases(engine, code, spec) {
+    if (!code.trim()) return { valid: false, error: { type: "LogicError", message: "Escribe una solución antes de ejecutar." } };
+    const reqs = spec.requirements || spec;
+    const run = engine.run(code);
+    if (!run.ok) return { valid: false, error: run.error };
+    for (const clsSpec of (reqs.classes || [])) {
+      const cls = engine.classes[clsSpec.name];
+      if (!cls) return { valid: false, error: { type: "LogicError", message: `Falta definir la clase ${clsSpec.name}.`, hint: `Usa class ${clsSpec.name}:` } };
+      for (const cm of (clsSpec.classMethods || [])) {
+        const m = cls.methods[cm.name];
+        if (!m) return { valid: false, error: { type: "LogicError", message: `Falta el método de clase ${cm.name}() en ${clsSpec.name}.` } };
+        if (!(m.decorators || []).includes("classmethod")) return { valid: false, error: { type: "LogicError", message: `${cm.name}() debe ser @classmethod.` } };
+      }
+      const createCount = clsSpec.instances || 1;
+      let inst;
+      for (let n = 0; n < createCount; n++) {
+        const resolvedArgs = (clsSpec.initArgs || []).map(a => {
+          if (a && typeof a === "object" && a.__ref) {
+            const ref = engine._instantiate(a.__ref, a.args || []);
+            if (ref.error) return a;
+            return ref.value;
+          }
+          return a;
+        });
+        inst = engine._instantiate(clsSpec.name, resolvedArgs);
+        if (inst.error) return { valid: false, error: inst.error };
+      }
+      const obj = inst.value;
+      for (const mSpec of (clsSpec.methods || [])) {
+        const method = engine._findMethod(clsSpec.name, mSpec.name);
+        if (!method) return { valid: false, error: { type: "LogicError", message: `Falta el método ${mSpec.name}() en ${clsSpec.name}.` } };
+        for (let i = 0; i < (mSpec.cases || []).length; i++) {
+          const test = mSpec.cases[i];
+          const callTarget = (mSpec.classMethod || clsSpec.classMethods && clsSpec.classMethods.some(c => c.name === mSpec.name)) ? { __class__: clsSpec.name } : obj;
+          const res = engine._callMethod(method, callTarget, test.args || []);
+          if (res.error) return { valid: false, error: res.error };
+          const got = res.value;
+          if (!engine._deepEqual(got, test.expected)) {
+            const argsTxt = (test.args || []).map(a => engine._display(a)).join(", ");
+            return { valid: false, error: { type: "LogicError", message: `${clsSpec.name}.${mSpec.name}(${argsTxt}) devolvió ${engine._display(got)}, se esperaba ${engine._display(test.expected)}.`, hint: "Revisa atributos, cálculos y el tipo de valor que retornás." } };
+          }
+        }
+      }
+      for (const priv of (clsSpec.privateAttrs || [])) {
+        const mangled = engine._mangleAttr(obj, priv);
+        if ((obj.__attrs__ || {})[mangled] === undefined) return { valid: false, error: { type: "LogicError", message: `La clase ${clsSpec.name} debe declarar el atributo privado ${priv} (self.${priv}) y acceder solo por métodos.` } };
       }
     }
     return { valid: true };
@@ -1990,8 +2404,96 @@ class UIManager {
   showDialogue(speaker, text) { this.$("dialogueBox").classList.remove("hidden"); this.$("dialogueSpeaker").textContent = speaker; this.$("dialogueText").textContent = text; }
   hideDialogue() { this.$("dialogueBox").classList.add("hidden"); }
    setLessonUi(config) { const title = config && config.bookTitle || "Libro de Supervivencia"; this.$("bookTitle").textContent = "📋 " + title; this.$("bookBtn").title = title; this.$("editorTerminalLabel").textContent = config && config.editorLabel || "CONSOLA DE CAMPO"; }
-   showEditor(challenge, terminalLabel) { this.$("editorModal").classList.remove("hidden"); this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO"; this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase(); this.$("editorTitle").textContent = challenge.title; this.$("editorObjective").textContent = challenge.objective; this.$("editorExample").textContent = challenge.example || ""; this.$("editorExampleBlock").classList.toggle("hidden", !challenge.example); this.$("editorTextarea").value = challenge.starterCode || ""; this.$("editorOutput").innerHTML = ""; this.$("editorHintText").classList.add("hidden"); this._syncEditor(); setTimeout(() => this.$("editorTextarea").focus(), 30); }
-  hideEditor() { this.$("editorModal").classList.add("hidden"); }
+   showEditor(challenge, terminalLabel) {
+     this.$("editorModal").classList.remove("hidden");
+     this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO";
+     this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase();
+     this.$("editorTitle").textContent = challenge.title;
+     this.$("editorObjective").textContent = challenge.objective;
+     if (challenge.classDiagram) {
+       this.$("editorDiagramBlock").classList.remove("hidden");
+       this.renderClassDiagram(challenge.classDiagram);
+     } else {
+       this.$("editorDiagramBlock").classList.add("hidden");
+       this.$("editorDiagramCards").innerHTML = "";
+     }
+     this.$("editorExample").textContent = challenge.example || "";
+     this.$("editorExampleBlock").classList.toggle("hidden", !challenge.example);
+     this.$("editorTextarea").value = challenge.starterCode || "";
+     this.$("editorOutput").innerHTML = "";
+     this.$("editorHintText").classList.add("hidden");
+     this._syncEditor();
+     setTimeout(() => this.$("editorTextarea").focus(), 30);
+   }
+   _formatUmlItem(text) {
+     const s = escapeHtml(String(text || "").trim());
+     if (s.startsWith("-")) return `<span class="uml-vis-priv">-</span>${s.slice(1).trim()}`;
+     if (s.startsWith("+")) return `<span class="uml-vis-pub">+</span>${s.slice(1).trim()}`;
+     if (s.startsWith("~") || s.startsWith("#")) return `<span class="uml-vis-pkg">${s[0]}</span>${s.slice(1).trim()}`;
+     return s;
+   }
+   renderClassDiagram(data) {
+     const container = this.$("editorDiagramCards");
+     container.innerHTML = "";
+     if (typeof data === "string") {
+       const pre = document.createElement("pre");
+       pre.className = "uml-pre";
+       pre.textContent = data;
+       container.appendChild(pre);
+       return;
+     }
+     const list = Array.isArray(data) ? data : [data];
+     list.forEach((cls, idx) => {
+       if (idx > 0 && cls.relation) {
+         const rel = document.createElement("div");
+         rel.className = "uml-relation";
+         rel.textContent = cls.relation;
+         container.appendChild(rel);
+       }
+       const card = document.createElement("div");
+       card.className = "uml-card";
+
+       const header = document.createElement("div");
+       header.className = "uml-header";
+       if (cls.stereotype) {
+         const st = document.createElement("span");
+         st.className = "uml-stereotype";
+         st.textContent = `<<${cls.stereotype}>>`;
+         header.appendChild(st);
+       }
+       const titleSpan = document.createElement("span");
+       titleSpan.textContent = cls.className || cls.name || "Clase";
+       header.appendChild(titleSpan);
+       card.appendChild(header);
+
+       if (cls.attributes && cls.attributes.length > 0) {
+         const attrSec = document.createElement("div");
+         attrSec.className = "uml-section";
+         cls.attributes.forEach(attr => {
+           const item = document.createElement("div");
+           item.className = "uml-item";
+           item.innerHTML = this._formatUmlItem(attr);
+           attrSec.appendChild(item);
+         });
+         card.appendChild(attrSec);
+       }
+
+       if (cls.methods && cls.methods.length > 0) {
+         const methSec = document.createElement("div");
+         methSec.className = "uml-section";
+         cls.methods.forEach(meth => {
+           const item = document.createElement("div");
+           item.className = "uml-item";
+           item.innerHTML = this._formatUmlItem(meth);
+           methSec.appendChild(item);
+         });
+         card.appendChild(methSec);
+       }
+
+       container.appendChild(card);
+     });
+   }
+   hideEditor() { this.$("editorModal").classList.add("hidden"); }
   getEditorCode() { return this.$("editorTextarea").value; }
   showRunSuccess(message) { this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`; }
   showRunError(error) { this.$("editorOutput").innerHTML = `<div class="out-line out-err">✕ ${escapeHtml(error.type)}</div><div class="out-line">${escapeHtml(error.message)}</div>` + (error.hint ? `<div class="out-line out-hint">💡 ${escapeHtml(error.hint)}</div>` : ""); }
@@ -2017,7 +2519,7 @@ const {
   WeatherSystem,
   World, Player, Renderer, PythonEngine, WorldActions, DialogueSystem,
   InteractionSystem, LESSONS, BookSystem, ChallengeSystem, StatisticsSystem,
-  SaveSystem, TitiBridge, UIManager
+  SaveSystem, TitiBridge, UIManager, ZONES
 } = NS;
 
 /* =========================================================================
@@ -2035,6 +2537,7 @@ class Game {
     this.ui = new UIManager(); this.dialogue = new DialogueSystem(this.ui);
     this.lesson = null; this.challengeSystem = null; this.statistics = null; this.nearby = null;
     this.introDone = false; this.missionComplete = false; this._lastTs = 0;
+    this.nearby = null; this.nearbyDecor = null; this._lastPortal = null;
     this._bindUiCallbacks(); this._bindMobileControls(); this._bindResize();
   }
 
@@ -2048,7 +2551,9 @@ class Game {
 
   startLesson(lessonId) {
     this.lesson = LESSONS[lessonId] || LESSONS[Object.keys(LESSONS)[0]];
-    this.world = new World(); this.player = new Player(); this.camera.x = this.camera.y = 0;
+    this._spawnZone = this.lesson.zone || "exterior";
+    this.world = new World(this._spawnZone); this.player = new Player(); this.camera.x = this.camera.y = 0;
+    this._applyZoneWeather(this.world);
     this.worldActions = new WorldActions(this.world, this.particles, this.audio); this.interaction = new InteractionSystem(this.world);
     this.engine = new PythonEngine(); this.challengeSystem = new ChallengeSystem(this.lesson, this.engine); this.statistics = new StatisticsSystem(this.lesson, this.challengeSystem);
     this.challengeSystem.start(); GameState.lesson = this.lesson;
@@ -2056,6 +2561,48 @@ class Game {
      this.introDone = false; this.missionComplete = false; this._syncWorldState();
     if (!this._loopStarted) { this._loopStarted = true; requestAnimationFrame((ts) => this._loop(ts)); }
      setTimeout(() => { this.dialogue.start(this.lesson.introDialogue.speaker, this.lesson.introDialogue.lines, () => { this.introDone = true; this._syncWorldState(); const current = this.challengeSystem.current(); this.ui.setObjective(current ? (this.lesson.objectives[current.id] || current.objective) : "Elegí cualquier estación pendiente en el radar."); }); }, 400);
+  }
+
+  _applyZoneWeather(world) {
+    if (this.renderer) this.renderer.setWeather(world.weather || {});
+  }
+
+  _findWalkableSpawn(world, px, py) {
+    const cx = Math.floor(px / TILE), cy = Math.floor(py / TILE);
+    if (world.isWalkable(px, py) && world.isWalkable(px + this.player.w - 4, py + this.player.h - 2)) return { x: px, y: py };
+    for (let radius = 1; radius <= 8; radius++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) continue;
+          const col = cx + dx, row = cy + dy;
+          const sx = col * TILE + 3, sy = row * TILE + 4;
+          if (world.isWalkable(sx, sy) && world.isWalkable(sx + this.player.w - 4, sy + this.player.h - 2)) return { x: sx, y: sy };
+        }
+      }
+    }
+    return { x: px, y: py };
+  }
+  enterZone(zoneId, spawnX, spawnY) {
+    if (!ZONES[zoneId]) return;
+    const prevZone = this.world.zoneId;
+    this.world.load(ZONES[zoneId]);
+    this.world.zoneId = zoneId;
+    let px = (spawnX != null) ? spawnX : this.player.x;
+    let py = (spawnY != null) ? spawnY : this.player.y;
+    if (zoneId === "exterior" && prevZone !== "exterior" && this._lastPortal) {
+      const origin = ZONES.exterior.interactables.find(i => i.id === this._lastPortal.portalId);
+      if (origin) {
+        px = origin.x + (origin.w || 32) / 2;
+        py = origin.y + (origin.h || 32) + 4;
+      }
+    }
+    const safe = this._findWalkableSpawn(this.world, px, py);
+    this.player.x = safe.x; this.player.y = safe.y;
+    this.camera.x = this.camera.y = 0;
+    this.worldActions = new WorldActions(this.world, this.particles, this.audio);
+    this.interaction = new InteractionSystem(this.world);
+    this._applyZoneWeather(this.world);
+    this._syncWorldState();
   }
 
    _getActiveTargetId() {
@@ -2093,6 +2640,8 @@ class Game {
 
       this.nearby = this.interaction.findNearby(this.player);
       if (this.input.wantsInteract()) this._handleInteract();
+      this.nearbyDecor = this.interaction.findNearbyDecor(this.player);
+      if (this.input.wantsInteractDecor()) this._handleInteractDecor();
     } else {
       if (this.dialogue.active && this.input.wantsInteract()) this.dialogue.advance();
       if (this.input.wantsClose()) this._closeTopModal();
@@ -2104,6 +2653,7 @@ class Game {
      this.renderer.renderWorld(this.world, this.camera, this.canvas.width, this.canvas.height, this.challengeSystem);
      this.renderer.renderDepthScene(this.world, this.player, this.camera, this.challengeSystem);
       this.renderer.renderCanopy(this.world, this.camera);
+      this.renderer.renderLighting(this.world, this.player, this.camera, this.canvas.width, this.canvas.height, this.challengeSystem);
 
     // Renderizado del Sistema de Guía
       const targetId = this._getActiveTargetId();
@@ -2118,14 +2668,37 @@ class Game {
       const y = r.y !== undefined ? r.y - 2 : r.tileRow * TILE - 6;
       this.renderer.renderInteractPrompt(this.ctx, x, y, this.camera);
     }
+    if (this.nearbyDecor && !this._isModalOpen()) {
+      const d = this.nearbyDecor.ref;
+      const dx = d.x + (d.w || 32) / 2, dy = d.y - 2;
+      let promptLabel = d.prompt || "";
+      if (d.kind === "chest") {
+        promptLabel = (d.state === (d.stateOn || "open")) ? "Cerrar cofre" : "Abrir cofre";
+      }
+      this.renderer.renderDecorPrompt(this.ctx, dx, dy, this.camera, promptLabel);
+    }
   }
 
   _handleInteract() {
-    if (!this.nearby) return;
+    if (!this.nearby) {
+      if (this.nearbyDecor) this._handleInteractDecor();
+      return;
+    }
     if (this.nearby.kind === "npc") { const npc = this.nearby.ref; this.dialogue.start(npc.name, npc.dialogue); return; }
     if (this.nearby.kind === "door") { this.ui.toast("El sendero está bloqueado."); return; }
     if (this.nearby.kind === "interactable") {
       const it = this.nearby.ref;
+       if (it.type === "portal") {
+         if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
+         if (it.toZone) {
+           if (it.toZone !== "exterior") {
+             this._lastPortal = { portalId: it.id, x: it.x, y: it.y };
+           }
+           this.enterZone(it.toZone, it.spawnX, it.spawnY);
+           this.audio.play("open");
+         }
+         return;
+       }
        if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
        const free = this.lesson.progression && this.lesson.progression.mode === "free";
        if (it.missionNode) {
@@ -2135,6 +2708,50 @@ class Game {
           if (!free && it.id !== ch.target) { this.ui.toast("Estación bloqueada. Sigue el orden indicado."); return; }
          this._syncWorldState(); this.ui.setObjective(this.lesson.objectives[ch.id] || ch.objective); this.ui.showEditor(ch, (this.lesson.ui && this.lesson.ui.editorLabel) || "CONSOLA DE CAMPO");
        }
+    }
+  }
+
+  _handleInteractDecor() {
+    if (!this.nearbyDecor) return;
+    if (!this.introDone) { this.ui.toast("Completá primero la conversación inicial."); return; }
+    const d = this.nearbyDecor.ref;
+    const next = this.world.toggleDecor(d.id);
+    if (next === null) return;
+    const px = d.x + (d.w || 32) / 2, py = d.y + (d.h || 32) / 2;
+    if (d.kind === "campfire" || d.kind === "fogata") {
+      if (next === (d.stateOn || "on")) {
+        this.audio.play("success");
+        this.particles.spawnEmoji(px, py - 14, "🔥");
+        this.particles.spawnBurst(px, py, "#ff6b6b", 14);
+        this.ui.toast("Encendiste la fogata. El fuego ilumina el sector.");
+      } else {
+        this.audio.play("error");
+        this.particles.spawnText(px, py - 20, "Apagada", "#b7c4cc");
+      }
+    } else if (d.kind === "lamp") {
+      if (next === (d.stateOn || "on")) {
+        this.audio.play("open");
+        this.particles.spawnEmoji(px, py - 14, "💡");
+        this.particles.spawnBurst(px, py, "#ffd166", 10);
+        this.ui.toast("Encendiste el farol.");
+      } else {
+        this.audio.play("click");
+        this.particles.spawnText(px, py - 20, "Apagado", "#b7c4cc");
+      }
+    } else if (d.kind === "chest") {
+      if (next === (d.stateOn || "open")) {
+        this.audio.play("success");
+        this.particles.spawnEmoji(px, py - 18, "✨");
+        this.particles.spawnBurst(px, py - 8, "#ffd166", 18);
+        this.particles.spawnBurst(px, py - 12, "#ffffff", 8);
+        this.ui.toast(d.openMessage || "¡Abriste el cofre! Contiene notas y gemas de arquitectura.");
+      } else {
+        this.audio.play("open");
+        this.particles.spawnText(px, py - 20, "Cerrado", "#b7c4cc");
+      }
+    } else {
+      this.audio.play("success");
+      this.particles.spawnBurst(px, py - 8, "#57c86f", 8);
     }
   }
 
@@ -2171,8 +2788,8 @@ class Game {
     base.addEventListener("touchmove", (e) => { e.preventDefault(); move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
     base.addEventListener("touchend", (e) => { e.preventDefault(); end(); }, { passive: false });
     base.addEventListener("mousedown", (e) => start(e.clientX, e.clientY)); window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY)); window.addEventListener("mouseup", () => end());
-    interactBtn.addEventListener("touchstart", (e) => { e.preventDefault(); this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); }, { passive: false });
-    interactBtn.addEventListener("click", () => { this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); });
+    interactBtn.addEventListener("touchstart", (e) => { e.preventDefault(); this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); else if (!this.nearby && this.nearbyDecor) this._handleInteractDecor(); }, { passive: false });
+    interactBtn.addEventListener("click", () => { this.input.touchInteract = true; if (this._isModalOpen() && this.dialogue.active) this.dialogue.advance(); else if (!this.nearby && this.nearbyDecor) this._handleInteractDecor(); });
   }
 
   _bindResize() {
