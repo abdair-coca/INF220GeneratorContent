@@ -119,6 +119,8 @@ def build_lessons_js(lesson):
             "starterCode: " + js_str(c.get("starterCode", "")),
             "hints: " + js_list(c["hints"]),
         ]
+        if "classDiagram" in c:
+            parts.append("classDiagram: " + js_value(c["classDiagram"]))
         if v["kind"] in ("structure", "class_cases"):
             parts.append("requirements: " + req_js)
         parts.append("validate: " + validate_js)
@@ -421,6 +423,30 @@ def validar_esquema(data, fuente, manifest=None):
                     for n, case in enumerate(cases):
                         if not isinstance(case, dict) or not isinstance(case.get("args"), list) or "expected" not in case:
                             _err(pref + ".methods." + str(m.get("name")) + f".cases[{n}]", "requiere args[] y expected.")
+
+        # Validación de classDiagram (si fue provisto)
+        cd = ch.get("classDiagram")
+        if cd is not None:
+            if not isinstance(cd, (list, dict, str)):
+                _err(f"lesson.challenges[{cid}].classDiagram", "debe ser una lista de tarjetas, un objeto o string.")
+            elif isinstance(cd, list):
+                for cidx, card in enumerate(cd):
+                    if not isinstance(card, dict) or not (card.get("className") or card.get("name")):
+                        _err(f"lesson.challenges[{cid}].classDiagram[{cidx}]", "cada tarjeta requiere 'className'.")
+
+        # Regla pedagógica: prohibido pedir o usar listas/arrays/estructuras complejas en niveles introductorios de POO
+        ch_chapter = data.get("chapter", "")
+        if ch_chapter in ("clases_y_objetos", "practica_5_objetos", "encapsulamiento", "herencia_polimorfismo") or "objeto" in str(lesson.get("id", "")).lower():
+            import re
+            FORBIDDEN_TERMS = ["lista", "listas", "array", "arrays", "arreglo", "arreglos", "diccionario", "diccionarios", "tupla", "tuplas"]
+            for fterm in FORBIDDEN_TERMS:
+                pat = r'\b' + re.escape(fterm) + r'\b'
+                if re.search(pat, ch.get("objective", ""), re.IGNORECASE):
+                    _err(f"lesson.challenges[{cid}].objective", f"prohibido el uso o mención de estructuras complejas ('{fterm}') en nivel introductorio.")
+                for hi, htext in enumerate(ch.get("hints", [])):
+                    if re.search(pat, htext, re.IGNORECASE):
+                        _err(f"lesson.challenges[{cid}].hints[{hi}]", f"prohibido mencionar estructuras complejas ('{fterm}') en pistas.")
+
         if a.get("kind") == "station_transition":
             if a.get("id") != target:
                 _err(f"lesson.challenges[{cid}].successAction.id", "debe coincidir con target en una transición de estación.")
@@ -597,6 +623,11 @@ def autocompletar_leccion(lesson):
             if st:
                 ch["starterCode"] = st
                 relleno.add("starterCode")
+        if not ch.get("classDiagram") and v.get("kind") in ("class_cases", "structure"):
+            cd = _autoclassdiagram(ch)
+            if cd:
+                ch["classDiagram"] = cd
+                relleno.add("classDiagram")
         antes = len(ch.get("hints", []))
         ch["hints"] = _autohints(v, ch.get("hints", []))
         if len(ch["hints"]) > antes:
@@ -604,6 +635,36 @@ def autocompletar_leccion(lesson):
         if relleno:
             autollenos.append((ch["id"], sorted(relleno)))
     return autollenos
+
+
+def _autoclassdiagram(ch):
+    """Deriva un diagrama de clase UML básico a partir de requirements si no se definió."""
+    reqs = ch.get("requirements") or {}
+    classes = reqs.get("classes") or []
+    if not classes:
+        return None
+    cards = []
+    vistas = set()
+    for cs in classes:
+        cname = cs.get("name")
+        if not cname or cname in vistas:
+            continue
+        vistas.add(cname)
+        attrs = []
+        for pa in (cs.get("privateAttrs") or []):
+            attrs.append(f"- __{pa}")
+        if cs.get("initArgs"):
+            attrs.append(f"- atributos ({len(cs['initArgs'])} params)")
+        methods = []
+        for m in (cs.get("methods") or []):
+            prefix = "~" if m.get("classMethod") else "+"
+            methods.append(f"{prefix} {m['name']}()")
+        cards.append({
+            "className": cname,
+            "attributes": attrs,
+            "methods": methods
+        })
+    return cards if cards else None
 
 
 def _autoejemplo_class(reqs):
@@ -675,9 +736,10 @@ def _autostarter_class(reqs):
     return "\n\n".join(bloques)
 
 
-def auditar_calidad(lesson):
+def auditar_calidad(lesson, chapter=""):
     """Reporte de calidad pedagógica por desafío (objetivo claro, casos
-    suficientes, ejemplo y esqueleto presentes). Devuelve cantidad de problemas."""
+    suficientes, ejemplo y esqueleto presentes, diagrama de clase en POO y sin
+    estructuras complejas no autorizadas). Devuelve cantidad de problemas."""
     problemas = 0
     for ch in lesson["challenges"]:
         cid = ch["id"]
@@ -695,6 +757,18 @@ def auditar_calidad(lesson):
         if len(ch.get("hints", [])) < 2:
             flags.append("pocas pistas (<2)")
             problemas += 1
+        if v.get("kind") in ("class_cases", "structure"):
+            if not ch.get("classDiagram"):
+                flags.append("sin classDiagram (obligatorio para POO)")
+                problemas += 1
+        if chapter in ("clases_y_objetos", "practica_5_objetos", "encapsulamiento", "herencia_polimorfismo") or "objeto" in str(lesson.get("id", "")).lower():
+            import re
+            FORBIDDEN_TERMS = ["lista", "listas", "array", "arrays", "arreglo", "arreglos", "diccionario", "diccionarios", "tupla", "tuplas"]
+            texto_total = " ".join([ch.get("objective", "")] + ch.get("hints", []) + ch.get("concepts", []))
+            for term in FORBIDDEN_TERMS:
+                if re.search(r'\b' + re.escape(term) + r'\b', texto_total, re.IGNORECASE):
+                    flags.append(f"estructura compleja no permitida ('{term}')")
+                    problemas += 1
         if v.get("kind") == "class_cases":
             reqs = ch.get("requirements") or {}
             por_metodo = {}
@@ -713,6 +787,7 @@ def auditar_calidad(lesson):
                     flags.append(f"{f['defName']}: <2 casos de prueba")
                     problemas += 1
         estado = (f"objective={len((ch.get('objective') or '').strip())}c "
+                  f"diagram={'sí' if ch.get('classDiagram') else 'no'} "
                   f"example={'sí' if ch.get('example') else 'no'} "
                   f"starterCode={'sí' if ch.get('starterCode') else 'no'} "
                   f"hints={len(ch.get('hints', []))}")
@@ -892,7 +967,7 @@ def main():
         import copy
         lesson_probe = copy.deepcopy(lesson)
         autocompletar_leccion(lesson_probe)
-        problemas = auditar_calidad(lesson_probe)
+        problemas = auditar_calidad(lesson_probe, chapter=data.get("chapter", ""))
         print(f"Problemas detectados: {problemas}")
         sys.exit(1 if problemas else 0)
 

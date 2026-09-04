@@ -312,6 +312,22 @@ html, body {
 .editor-brief { background: #181d27; border-bottom: 1px solid #343b4e; }
 .editor-brief h4 { color: #ffd166; font-size: 13px; }
 .editor-brief pre { border: 1px solid #343b4e; }
+.editor-diagram-block { margin: 8px 0; background: #11151e; border: 1px solid #343f55; border-radius: 4px; padding: 7px 9px; }
+.editor-diagram-block.hidden { display: none; }
+.editor-diagram-title { color: #8ba4d8; font-size: 10px; font-weight: bold; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.editor-diagram-title::before { content: "📊"; font-size: 11px; }
+.editor-diagram-cards { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.uml-card { background: #181e2b; border: 1.5px solid #4a5b7d; border-radius: 3px; min-width: 190px; max-width: 100%; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; color: #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.35); flex: 1; }
+.uml-header { background: #222a3d; padding: 5px 8px; text-align: center; font-weight: bold; color: #ffd166; border-bottom: 1px solid #4a5b7d; letter-spacing: 0.4px; }
+.uml-stereotype { font-size: 9px; color: #8ba4d8; font-weight: normal; display: block; margin-bottom: 1px; }
+.uml-section { padding: 4px 8px; border-bottom: 1px solid #2d384d; font-size: 11px; }
+.uml-section:last-child { border-bottom: none; }
+.uml-item { line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.uml-vis-priv { color: #ff6b6b; font-weight: bold; margin-right: 4px; }
+.uml-vis-pub { color: #18d6a0; font-weight: bold; margin-right: 4px; }
+.uml-vis-pkg { color: #ffd166; font-weight: bold; margin-right: 4px; }
+.uml-relation { align-self: center; color: #4dd0e1; font-size: 13px; font-weight: bold; padding: 0 4px; user-select: none; }
+.uml-pre { margin: 0; background: #11151e; color: #d9e2f2; font-size: 11px; white-space: pre-wrap; font-family: inherit; }
 .code-editor-wrap { height: 190px; margin: 0; border: 0; border-radius: 0; border-top: 1px solid #252c3a; border-bottom: 1px solid #252c3a; }
 #editorLineNumbers { background: #11151d; color: #526071; padding-left: 9px; padding-right: 9px; }
 #editorHighlight, #editorTextarea { padding: 10px 12px; }
@@ -389,6 +405,10 @@ html, body {
         <div class="editor-brief">
           <h4 id="editorTitle">Desafío</h4>
           <p id="editorObjective">Objetivo</p>
+          <div class="editor-diagram-block hidden" id="editorDiagramBlock">
+            <div class="editor-diagram-title">Diagrama de Clase</div>
+            <div class="editor-diagram-cards" id="editorDiagramCards"></div>
+          </div>
           <div class="editor-example-block" id="editorExampleBlock"><p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p><pre id="editorExample"></pre></div>
         </div>
         <div class="code-editor-wrap">
@@ -2221,8 +2241,96 @@ class UIManager {
   showDialogue(speaker, text) { this.$("dialogueBox").classList.remove("hidden"); this.$("dialogueSpeaker").textContent = speaker; this.$("dialogueText").textContent = text; }
   hideDialogue() { this.$("dialogueBox").classList.add("hidden"); }
    setLessonUi(config) { const title = config && config.bookTitle || "Libro de Supervivencia"; this.$("bookTitle").textContent = "📋 " + title; this.$("bookBtn").title = title; this.$("editorTerminalLabel").textContent = config && config.editorLabel || "CONSOLA DE CAMPO"; }
-   showEditor(challenge, terminalLabel) { this.$("editorModal").classList.remove("hidden"); this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO"; this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase(); this.$("editorTitle").textContent = challenge.title; this.$("editorObjective").textContent = challenge.objective; this.$("editorExample").textContent = challenge.example || ""; this.$("editorExampleBlock").classList.toggle("hidden", !challenge.example); this.$("editorTextarea").value = challenge.starterCode || ""; this.$("editorOutput").innerHTML = ""; this.$("editorHintText").classList.add("hidden"); this._syncEditor(); setTimeout(() => this.$("editorTextarea").focus(), 30); }
-  hideEditor() { this.$("editorModal").classList.add("hidden"); }
+   showEditor(challenge, terminalLabel) {
+     this.$("editorModal").classList.remove("hidden");
+     this.$("editorTerminalLabel").textContent = terminalLabel || "CONSOLA DE CAMPO";
+     this.$("editorContext").textContent = "OBJETIVO · " + challenge.id.toUpperCase();
+     this.$("editorTitle").textContent = challenge.title;
+     this.$("editorObjective").textContent = challenge.objective;
+     if (challenge.classDiagram) {
+       this.$("editorDiagramBlock").classList.remove("hidden");
+       this.renderClassDiagram(challenge.classDiagram);
+     } else {
+       this.$("editorDiagramBlock").classList.add("hidden");
+       this.$("editorDiagramCards").innerHTML = "";
+     }
+     this.$("editorExample").textContent = challenge.example || "";
+     this.$("editorExampleBlock").classList.toggle("hidden", !challenge.example);
+     this.$("editorTextarea").value = challenge.starterCode || "";
+     this.$("editorOutput").innerHTML = "";
+     this.$("editorHintText").classList.add("hidden");
+     this._syncEditor();
+     setTimeout(() => this.$("editorTextarea").focus(), 30);
+   }
+   _formatUmlItem(text) {
+     const s = escapeHtml(String(text || "").trim());
+     if (s.startsWith("-")) return `<span class="uml-vis-priv">-</span>${s.slice(1).trim()}`;
+     if (s.startsWith("+")) return `<span class="uml-vis-pub">+</span>${s.slice(1).trim()}`;
+     if (s.startsWith("~") || s.startsWith("#")) return `<span class="uml-vis-pkg">${s[0]}</span>${s.slice(1).trim()}`;
+     return s;
+   }
+   renderClassDiagram(data) {
+     const container = this.$("editorDiagramCards");
+     container.innerHTML = "";
+     if (typeof data === "string") {
+       const pre = document.createElement("pre");
+       pre.className = "uml-pre";
+       pre.textContent = data;
+       container.appendChild(pre);
+       return;
+     }
+     const list = Array.isArray(data) ? data : [data];
+     list.forEach((cls, idx) => {
+       if (idx > 0 && cls.relation) {
+         const rel = document.createElement("div");
+         rel.className = "uml-relation";
+         rel.textContent = cls.relation;
+         container.appendChild(rel);
+       }
+       const card = document.createElement("div");
+       card.className = "uml-card";
+
+       const header = document.createElement("div");
+       header.className = "uml-header";
+       if (cls.stereotype) {
+         const st = document.createElement("span");
+         st.className = "uml-stereotype";
+         st.textContent = `<<${cls.stereotype}>>`;
+         header.appendChild(st);
+       }
+       const titleSpan = document.createElement("span");
+       titleSpan.textContent = cls.className || cls.name || "Clase";
+       header.appendChild(titleSpan);
+       card.appendChild(header);
+
+       if (cls.attributes && cls.attributes.length > 0) {
+         const attrSec = document.createElement("div");
+         attrSec.className = "uml-section";
+         cls.attributes.forEach(attr => {
+           const item = document.createElement("div");
+           item.className = "uml-item";
+           item.innerHTML = this._formatUmlItem(attr);
+           attrSec.appendChild(item);
+         });
+         card.appendChild(attrSec);
+       }
+
+       if (cls.methods && cls.methods.length > 0) {
+         const methSec = document.createElement("div");
+         methSec.className = "uml-section";
+         cls.methods.forEach(meth => {
+           const item = document.createElement("div");
+           item.className = "uml-item";
+           item.innerHTML = this._formatUmlItem(meth);
+           methSec.appendChild(item);
+         });
+         card.appendChild(methSec);
+       }
+
+       container.appendChild(card);
+     });
+   }
+   hideEditor() { this.$("editorModal").classList.add("hidden"); }
   getEditorCode() { return this.$("editorTextarea").value; }
   showRunSuccess(message) { this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`; }
   showRunError(error) { this.$("editorOutput").innerHTML = `<div class="out-line out-err">✕ ${escapeHtml(error.type)}</div><div class="out-line">${escapeHtml(error.message)}</div>` + (error.hint ? `<div class="out-line out-hint">💡 ${escapeHtml(error.hint)}</div>` : ""); }
