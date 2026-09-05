@@ -133,67 +133,17 @@ html, body {
 }
 .modal-overlay.hidden { display: none; }
 
-/* ---------------- Editor (Mini VS Code) ---------------- */
-#editorModal .modal-panel {
-  width: 100%; max-width: 560px; max-height: 92vh; overflow: auto;
-  background: #1a1729; border: 3px solid var(--panel-border); border-radius: 10px;
-  display: flex; flex-direction: column;
-}
-.editor-titlebar {
-  background: #14111f; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 2px solid var(--panel-border);
-}
-.editor-titlebar span { font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
-.editor-titlebar button {
-  background: none; border: none; color: var(--text-dim); font-size: 16px; cursor: pointer;
-}
-.editor-brief { padding: 10px 14px; border-bottom: 1px dashed var(--panel-border); }
-.editor-brief h4 { margin: 0 0 4px; color: var(--accent); font-size: 12px; }
-.editor-brief p { margin: 0 0 6px; font-size: 12px; line-height: 1.4; }
-.editor-brief pre {
-  background: #0f0d18; padding: 6px 8px; border-radius: 4px; font-size: 11px; color: var(--accent2);
-  margin: 0; overflow-x: auto;
-}
-.code-editor-wrap {
-  position: relative; display: flex; background: #0f0d18; margin: 10px 14px; border-radius: 6px;
-  border: 1px solid var(--panel-border); overflow: hidden; height: 130px;
-}
-#editorLineNumbers {
-  padding: 8px 6px; text-align: right; color: #514a72; font-size: 13px; line-height: 1.5;
-  white-space: pre; user-select: none; background: #100e1a; min-width: 26px;
-}
-.code-editor-inner { position: relative; flex: 1; overflow: hidden; }
-#editorHighlight, #editorTextarea {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  margin: 0; padding: 8px; font-size: 13px; line-height: 1.5; font-family: 'Consolas','Courier New',monospace;
-  white-space: pre; overflow: auto; box-sizing: border-box;
-}
-#editorHighlight { color: var(--text); pointer-events: none; }
-#editorTextarea {
-  background: transparent; color: transparent; caret-color: var(--accent);
-  border: none; resize: none; outline: none; z-index: 2;
-}
+/* ---------------- Editor Tokens & Shared ---------------- */
 .tok-kw { color: #ff8fb3; font-weight: bold; }
 .tok-str { color: #a4e07f; }
 .tok-num { color: #7cc7ff; }
 .tok-id { color: #efeaff; }
 .tok-com { color: #6a628a; font-style: italic; }
 
-#editorHintText {
-  margin: 0 14px 8px; font-size: 11px; color: var(--accent2); background: #0f2a30;
-  padding: 6px 8px; border-radius: 4px; border-left: 3px solid var(--accent2);
-}
-#editorHintText.hidden { display: none; }
-
-#editorOutput { margin: 0 14px 10px; min-height: 20px; font-size: 12px; }
 .out-line { padding: 2px 0; }
 .out-ok { color: var(--ok); }
 .out-err { color: var(--err); font-weight: bold; }
 .out-hint { color: var(--accent); }
-
-.editor-actions {
-  display: flex; gap: 8px; padding: 10px 14px 14px; border-top: 1px solid var(--panel-border);
-}
 .btn {
   flex: 1; padding: 9px 10px; border-radius: 6px; border: 2px solid var(--panel-border);
   background: #241f3a; color: var(--text); font-family: inherit; font-size: 11px; cursor: pointer; font-weight: bold;
@@ -303,15 +253,48 @@ html, body {
 /* Editor: portátil del personaje + ergonomía tipo VS Code */
 #editorModal { background: rgba(8,12,18,.72); }
 #editorModal .modal-panel {
-  max-width: 720px; max-height: 94vh; border: 4px solid #111827; border-radius: 8px;
-  background: #151922; box-shadow: 0 12px 0 rgba(0,0,0,.28);
+  width: 95%; max-width: 940px; height: 92vh; max-height: 640px;
+  background: #151922; border: 4px solid #111827; border-radius: 8px;
+  box-shadow: 0 12px 0 rgba(0,0,0,.28), 0 0 30px rgba(0,0,0,0.6);
+  display: flex; flex-direction: column; overflow: hidden;
 }
-.editor-titlebar { background: #202634; border-bottom: 1px solid #343b4e; padding: 7px 10px; }
+.editor-titlebar {
+  flex-shrink: 0; background: #202634; border-bottom: 1px solid #343b4e; padding: 7px 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
 .editor-titlebar::before { content: "TITI//CODEX"; color: #8ba4d8; font-size: 9px; letter-spacing: 1.4px; margin-right: 10px; }
+.editor-titlebar button { background: none; border: none; color: var(--text-dim); font-size: 16px; cursor: pointer; }
 #editorTerminalLabel { color: #d9e2f2; flex: 1; }
-.editor-brief { background: #181d27; border-bottom: 1px solid #343b4e; }
-.editor-brief h4 { color: #ffd166; font-size: 13px; }
-.editor-brief pre { border: 1px solid #343b4e; }
+.editor-tabbar {
+  flex-shrink: 0; display: flex; align-items: center; min-height: 30px;
+  background: #11151d; border-bottom: 1px solid #343b4e;
+}
+.editor-tab { padding: 8px 12px 7px; color: #d9e2f2; background: #181d27; border-top: 2px solid #ffd166; font-size: 10px; }
+.editor-context { color: #7e8da8; font-size: 9px; margin-left: auto; padding-right: 10px; }
+
+/* Cuerpo dividido en dos paneles: referencia a la izquierda, código a la derecha */
+.editor-body {
+  flex: 1; min-height: 0; display: flex; flex-direction: row;
+  overflow: hidden; background: #14111f;
+}
+.editor-side-pane {
+  width: 44%; min-width: 260px; max-width: 440px;
+  border-right: 1px solid #2d3545;
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column; background: #181d27;
+}
+.editor-code-pane {
+  flex: 1; min-width: 0; min-height: 0;
+  display: flex; flex-direction: column; background: #151922;
+  overflow: hidden;
+}
+.editor-brief { padding: 10px 14px; }
+.editor-brief h4 { color: #ffd166; font-size: 13px; margin: 0 0 4px; }
+.editor-brief p { margin: 0 0 6px; font-size: 12px; line-height: 1.4; color: #c4cede; }
+.editor-brief pre {
+  border: 1px solid #343b4e; background: #0f0d18; padding: 6px 8px; border-radius: 4px;
+  font-size: 11px; color: var(--accent2); margin: 0; overflow-x: auto; max-height: 120px; overflow-y: auto;
+}
 .editor-diagram-block { margin: 8px 0; background: #11151e; border: 1px solid #343f55; border-radius: 4px; padding: 7px 9px; }
 .editor-diagram-block.hidden { display: none; }
 .editor-diagram-title { color: #8ba4d8; font-size: 10px; font-weight: bold; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
@@ -328,18 +311,66 @@ html, body {
 .uml-vis-pkg { color: #ffd166; font-weight: bold; margin-right: 4px; }
 .uml-relation { align-self: center; color: #4dd0e1; font-size: 13px; font-weight: bold; padding: 0 4px; user-select: none; }
 .uml-pre { margin: 0; background: #11151e; color: #d9e2f2; font-size: 11px; white-space: pre-wrap; font-family: inherit; }
-.code-editor-wrap { height: 190px; margin: 0; border: 0; border-radius: 0; border-top: 1px solid #252c3a; border-bottom: 1px solid #252c3a; }
-#editorLineNumbers { background: #11151d; color: #526071; padding-left: 9px; padding-right: 9px; }
-#editorHighlight, #editorTextarea { padding: 10px 12px; }
-#editorHintText { margin-top: 10px; }
-#editorOutput { background: #10141b; border: 1px solid #2d3545; margin-top: 8px; padding: 8px 10px; border-radius: 3px; }
-.editor-actions { background: #181d27; padding-top: 9px; }
-.btn { border-radius: 3px; }
-.btn-primary { background: #4e9b63; border-color: #79c28b; color: #07170d; }
-.editor-statusbar { display:flex; justify-content:space-between; gap:12px; padding:5px 10px; background:#263f70; color:#f2f6ff; font-size:9px; letter-spacing:.3px; }
-.editor-tabbar { display:flex; align-items:center; min-height:30px; background:#11151d; border-bottom:1px solid #343b4e; }
-.editor-tab { padding:8px 12px 7px; color:#d9e2f2; background:#181d27; border-top:2px solid #ffd166; font-size:10px; }
-.editor-context { color:#7e8da8; font-size:9px; margin-left:auto; padding-right:10px; }
+
+/* Panel de código interactivo */
+.code-editor-wrap {
+  flex: 1; min-height: 160px; position: relative; display: flex;
+  background: #0f0d18; margin: 0;
+  border-bottom: 1px solid #252c3a; overflow: hidden; cursor: text;
+}
+#editorLineNumbers {
+  background: #11151d; color: #526071; padding: 10px 8px; font-size: 13px; line-height: 20px;
+  text-align: right; white-space: pre; user-select: none; min-width: 32px; box-sizing: border-box;
+}
+.code-editor-inner { position: relative; flex: 1; overflow: hidden; }
+#editorHighlight, #editorTextarea {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 10px 12px; font-size: 13px; line-height: 20px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  white-space: pre; overflow: auto; box-sizing: border-box;
+  tab-size: 4; -moz-tab-size: 4;
+}
+#editorHighlight { color: #efeaff; pointer-events: none; z-index: 1; }
+#editorTextarea {
+  background: transparent; color: transparent; caret-color: #ffd166;
+  border: none; resize: none; outline: none; z-index: 2;
+  user-select: text; -webkit-user-select: text;
+}
+#editorTextarea::selection { background: rgba(139, 164, 216, 0.35); color: transparent; }
+
+#editorHintText {
+  flex-shrink: 0; margin: 6px 10px; font-size: 11px; color: var(--accent2);
+  background: #0f2a30; padding: 6px 8px; border-radius: 4px; border-left: 3px solid var(--accent2);
+}
+#editorHintText.hidden { display: none; }
+#editorOutput {
+  flex-shrink: 0; max-height: 120px; min-height: 28px; overflow-y: auto;
+  background: #10141b; border-top: 1px solid #2d3545;
+  margin: 0; padding: 6px 10px; font-size: 12px;
+}
+
+.editor-actions {
+  flex-shrink: 0; background: #181d27; padding: 8px 12px;
+  display: flex; gap: 8px; border-top: 1px solid #252c3a;
+}
+.btn {
+  border-radius: 3px; flex: 1; padding: 9px 10px; border: 2px solid var(--panel-border);
+  background: #241f3a; color: var(--text); font-family: inherit; font-size: 11px; cursor: pointer; font-weight: bold;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: #4e9b63; border-color: #79c28b; color: #07170d; flex: 1.4; }
+.btn-secondary { background: var(--accent); color: #3a2a00; border-color: #c9a04e; }
+.editor-statusbar {
+  flex-shrink: 0; display: flex; justify-content: space-between; gap: 12px;
+  padding: 5px 10px; background: #263f70; color: #f2f6ff; font-size: 9px; letter-spacing: .3px;
+}
+.editor-tabbar {
+  flex-shrink: 0; display: flex; align-items: center; min-height: 30px;
+  background: #11151d; border-bottom: 1px solid #343b4e;
+}
+.editor-tab { padding: 8px 12px 7px; color: #d9e2f2; background: #181d27; border-top: 2px solid #ffd166; font-size: 10px; }
+.editor-context { color: #7e8da8; font-size: 9px; margin-left: auto; padding-right: 10px; }
 
 #bookModal .modal-panel, #completionScreen .modal-panel, #missionSelectorModal .modal-panel {
   border-radius: 4px; box-shadow: var(--pixel-shadow);
@@ -348,13 +379,17 @@ html, body {
 #completionScreen h2 { color: var(--poke-blue-dark); }
 .stat-row { border-color: #c8bea1; }
 
-@media (max-width: 620px) {
+@media (max-width: 680px) {
   #hud { min-height: 54px; padding: 6px 8px; }
   #missionTitleText { max-width: 58vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   #objectiveRow { max-width: 62vw; }
   #progressDots { display: none; }
   #dialogueBox { bottom: 112px; }
-  .code-editor-wrap { height: 170px; }
+  #editorModal .modal-panel { width: 98%; max-height: 96vh; }
+  .editor-body { flex-direction: column; }
+  .editor-side-pane { width: 100%; min-width: 0; max-width: 100%; max-height: 170px; flex-shrink: 0; border-right: none; border-bottom: 1px solid #2d3545; }
+  .editor-code-pane { flex: 1; min-height: 170px; }
+  .code-editor-wrap { min-height: 140px; }
   .editor-actions { padding: 8px; gap: 5px; }
   #radarCanvas { top:6px; right:6px; width:154px; height:64px; }
 }
@@ -402,24 +437,30 @@ html, body {
           <div class="editor-tab">reto.py</div>
           <div class="editor-context" id="editorContext">MODO APRENDIZAJE</div>
         </div>
-        <div class="editor-brief">
-          <h4 id="editorTitle">Desafío</h4>
-          <p id="editorObjective">Objetivo</p>
-          <div class="editor-diagram-block hidden" id="editorDiagramBlock">
-            <div class="editor-diagram-title">Diagrama de Clase</div>
-            <div class="editor-diagram-cards" id="editorDiagramCards"></div>
+        <div class="editor-body" id="editorBody">
+          <div class="editor-side-pane" id="editorSidePane">
+            <div class="editor-brief">
+              <h4 id="editorTitle">Desafío</h4>
+              <p id="editorObjective">Objetivo</p>
+              <div class="editor-diagram-block hidden" id="editorDiagramBlock">
+                <div class="editor-diagram-title">Diagrama de Clase</div>
+                <div class="editor-diagram-cards" id="editorDiagramCards"></div>
+              </div>
+              <div class="editor-example-block" id="editorExampleBlock"><p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p><pre id="editorExample"></pre></div>
+            </div>
           </div>
-          <div class="editor-example-block" id="editorExampleBlock"><p style="color:var(--text-dim); font-size:11px; margin-bottom:2px;">Ejemplo:</p><pre id="editorExample"></pre></div>
-        </div>
-        <div class="code-editor-wrap">
-          <div id="editorLineNumbers">1</div>
-          <div class="code-editor-inner">
-            <pre id="editorHighlight"></pre>
-            <textarea id="editorTextarea" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+          <div class="editor-code-pane" id="editorCodePane">
+            <div class="code-editor-wrap">
+              <div id="editorLineNumbers">1</div>
+              <div class="code-editor-inner">
+                <pre id="editorHighlight"></pre>
+                <textarea id="editorTextarea" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+              </div>
+            </div>
+            <div id="editorHintText" class="hidden"></div>
+            <div id="editorOutput"></div>
           </div>
         </div>
-        <div id="editorHintText" class="hidden"></div>
-        <div id="editorOutput"></div>
         <div class="editor-actions">
           <button class="btn" id="btnBookInEditor">📘 Manual</button>
           <button class="btn btn-secondary" id="btnHint">💡 Pista</button>
@@ -2222,15 +2263,80 @@ class UIManager {
   }
   _bindEditorSync() {
     const ta = this.$("editorTextarea");
-    const sync = () => { const code = ta.value; this.$("editorHighlight").innerHTML = highlightPython(code) + "\n"; let gutter = ""; for (let i = 1; i <= code.split("\n").length; i++) gutter += i + "\n"; this.$("editorLineNumbers").textContent = gutter; };
-    ta.addEventListener("input", sync); ta.addEventListener("scroll", () => { this.$("editorHighlight").scrollTop = ta.scrollTop; this.$("editorHighlight").scrollLeft = ta.scrollLeft; this.$("editorLineNumbers").scrollTop = ta.scrollTop; });
+    const sync = () => {
+      const code = ta.value;
+      this.$("editorHighlight").innerHTML = highlightPython(code) + "\n";
+      let gutter = "";
+      for (let i = 1; i <= code.split("\n").length; i++) gutter += i + "\n";
+      this.$("editorLineNumbers").textContent = gutter;
+    };
+    ta.addEventListener("input", sync);
+    ta.addEventListener("scroll", () => {
+      this.$("editorHighlight").scrollTop = ta.scrollTop;
+      this.$("editorHighlight").scrollLeft = ta.scrollLeft;
+      this.$("editorLineNumbers").scrollTop = ta.scrollTop;
+    });
+    const wrap = this.$("editorModal") ? this.$("editorModal").querySelector(".code-editor-wrap") : null;
+    if (wrap) {
+      wrap.addEventListener("click", (e) => {
+        if (e.target !== ta) ta.focus();
+      });
+    }
     ta.addEventListener("keydown", (e) => {
-      if (e.key === "Tab") { e.preventDefault(); const start = ta.selectionStart, end = ta.selectionEnd; ta.value = ta.value.slice(0, start) + "    " + ta.value.slice(end); ta.selectionStart = ta.selectionEnd = start + 4; sync(); return; }
-      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); this.onRunCode && this.onRunCode(this.getEditorCode()); return; }
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        if (e.shiftKey) {
+          const before = ta.value.slice(0, start);
+          const after = ta.value.slice(end);
+          const lineStart = before.lastIndexOf("\n") + 1;
+          const fullBlock = ta.value.slice(lineStart, end);
+          const unindented = fullBlock.split("\n").map(l => l.replace(/^ {1,4}/, "")).join("\n");
+          ta.value = ta.value.slice(0, lineStart) + unindented + after;
+          ta.selectionStart = lineStart;
+          ta.selectionEnd = lineStart + unindented.length;
+        } else if (start !== end && ta.value.slice(start, end).includes("\n")) {
+          const before = ta.value.slice(0, start);
+          const lineStart = before.lastIndexOf("\n") + 1;
+          const fullBlock = ta.value.slice(lineStart, end);
+          const indented = fullBlock.split("\n").map(l => "    " + l).join("\n");
+          ta.value = ta.value.slice(0, lineStart) + indented + ta.value.slice(end);
+          ta.selectionStart = start + 4;
+          ta.selectionEnd = lineStart + indented.length;
+        } else {
+          ta.value = ta.value.slice(0, start) + "    " + ta.value.slice(end);
+          ta.selectionStart = ta.selectionEnd = start + 4;
+        }
+        sync();
+        return;
+      }
+      if (e.key === "Backspace" && ta.selectionStart === ta.selectionEnd) {
+        const start = ta.selectionStart;
+        const line = ta.value.slice(0, start).split("\n").pop() || "";
+        if (line.length > 0 && line.length % 4 === 0 && /^ +$/.test(line)) {
+          e.preventDefault();
+          ta.value = ta.value.slice(0, start - 4) + ta.value.slice(start);
+          ta.selectionStart = ta.selectionEnd = start - 4;
+          sync();
+          return;
+        }
+      }
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        this.onRunCode && this.onRunCode(this.getEditorCode());
+        return;
+      }
       if (e.key === "Enter") {
-        const start = ta.selectionStart; const before = ta.value.slice(0, start); const line = before.split("\n").pop() || "";
+        const start = ta.selectionStart;
+        const before = ta.value.slice(0, start);
+        const line = before.split("\n").pop() || "";
         const indent = (line.match(/^\s*/) || [""])[0] + (line.trim().endsWith(":") ? "    " : "");
-        if (indent) { e.preventDefault(); ta.value = ta.value.slice(0, start) + "\n" + indent + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = start + 1 + indent.length; sync(); }
+        if (indent) {
+          e.preventDefault();
+          ta.value = ta.value.slice(0, start) + "\n" + indent + ta.value.slice(ta.selectionEnd);
+          ta.selectionStart = ta.selectionEnd = start + 1 + indent.length;
+          sync();
+        }
       }
     });
     this._syncEditor = sync;
@@ -2259,8 +2365,17 @@ class UIManager {
      this.$("editorTextarea").value = challenge.starterCode || "";
      this.$("editorOutput").innerHTML = "";
      this.$("editorHintText").classList.add("hidden");
-     this._syncEditor();
-     setTimeout(() => this.$("editorTextarea").focus(), 30);
+     this.$("editorHintText").textContent = "";
+     if (this.$("editorSidePane")) this.$("editorSidePane").scrollTop = 0;
+     this._syncEditor && this._syncEditor();
+     setTimeout(() => {
+       const ta = this.$("editorTextarea");
+       if (ta) {
+         ta.focus();
+         const len = ta.value.length;
+         ta.setSelectionRange(len, len);
+       }
+     }, 50);
    }
    _formatUmlItem(text) {
      const s = escapeHtml(String(text || "").trim());
@@ -2332,8 +2447,14 @@ class UIManager {
    }
    hideEditor() { this.$("editorModal").classList.add("hidden"); }
   getEditorCode() { return this.$("editorTextarea").value; }
-  showRunSuccess(message) { this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`; }
-  showRunError(error) { this.$("editorOutput").innerHTML = `<div class="out-line out-err">✕ ${escapeHtml(error.type)}</div><div class="out-line">${escapeHtml(error.message)}</div>` + (error.hint ? `<div class="out-line out-hint">💡 ${escapeHtml(error.hint)}</div>` : ""); }
+   showRunSuccess(message) {
+     this.$("editorOutput").innerHTML = `<div class="out-line out-ok">▶ ${escapeHtml(message)}</div>`;
+     try { this.$("editorOutput").scrollTop = 0; } catch(e) {}
+   }
+   showRunError(error) {
+     this.$("editorOutput").innerHTML = `<div class="out-line out-err">✕ ${escapeHtml(error.type)}</div><div class="out-line">${escapeHtml(error.message)}</div>` + (error.hint ? `<div class="out-line out-hint">💡 ${escapeHtml(error.hint)}</div>` : "");
+     try { this.$("editorOutput").scrollTop = 0; } catch(e) {}
+   }
   showHint(text) { const el = this.$("editorHintText"); el.classList.remove("hidden"); el.textContent = "💡 " + text; }
   showNoMoreHints() { const el = this.$("editorHintText"); el.classList.remove("hidden"); el.textContent = "Ya usaste todas las pistas. ¡Tú puedes!"; }
   renderBook(pages) { const list = this.$("bookPagesList"); list.innerHTML = ""; pages.forEach((p, idx) => { const item = document.createElement("div"); item.className = "book-page-item" + (p.unlocked ? "" : " locked"); item.textContent = String(idx + 1).padStart(2, "0") + " " + (p.unlocked ? "✓ " : "🔒 ") + p.title; if (p.unlocked) item.addEventListener("click", () => this.showBookDetail(p)); list.appendChild(item); }); const first = pages.find(p => p.unlocked); if (first) this.showBookDetail(first); }
