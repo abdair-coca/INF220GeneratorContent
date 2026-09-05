@@ -32730,6 +32730,4922 @@
           "sparks"
         ]
       }
+    },
+    "objeto_persona": {
+      "id": "objeto_persona",
+      "name": "El Censo · Persona",
+      "category": "stations",
+      "notes": "Maniquí de censo de la Ciudad de la Interfaz.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 6,
+              "w": 12,
+              "h": 10,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 24,
+              "y": 8,
+              "w": 4,
+              "h": 3,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 30,
+              "y": 11,
+              "w": 5,
+              "h": 2,
+              "color": "#5b5f66",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 18,
+              "y": 16,
+              "w": 20,
+              "h": 14,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 15,
+              "y": 18,
+              "w": 4,
+              "h": 12,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 37,
+              "y": 18,
+              "w": 4,
+              "h": 12,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 30,
+              "w": 16,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 6,
+              "w": 12,
+              "h": 10,
+              "color": "#f2e3c4",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 24,
+              "y": 8,
+              "w": 4,
+              "h": 3,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 30,
+              "y": 11,
+              "w": 5,
+              "h": 2,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 18,
+              "y": 16,
+              "w": 20,
+              "h": 14,
+              "color": "#a06b3d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 15,
+              "y": 18,
+              "w": 4,
+              "h": 12,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 37,
+              "y": 18,
+              "w": 4,
+              "h": 12,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 30,
+              "w": 16,
+              "h": 4,
+              "color": "#6b4626",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 30,
+              "y": 8,
+              "rx": 3,
+              "ry": 1.5,
+              "color": "#ffd166",
+              "alpha": 0.9
+            }
+          ]
+        }
+      }
+    },
+    "objeto_rectangulo": {
+      "id": "objeto_rectangulo",
+      "name": "La Medida · Rectángulo",
+      "category": "stations",
+      "notes": "Marco de carpintero para medir el claro.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 40,
+              "h": 5,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 39,
+              "w": 40,
+              "h": 5,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 5,
+              "h": 38,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 43,
+              "y": 6,
+              "w": 5,
+              "h": 38,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 11,
+              "w": 32,
+              "h": 28,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 14,
+              "y1": 16,
+              "x2": 42,
+              "y2": 36,
+              "color": "#3a4149",
+              "width": 2
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 40,
+              "h": 5,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 39,
+              "w": 40,
+              "h": 5,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 5,
+              "h": 38,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 43,
+              "y": 6,
+              "w": 5,
+              "h": 38,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 11,
+              "w": 32,
+              "h": 28,
+              "color": "#f2e3c4",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 13,
+              "w": 28,
+              "h": 24,
+              "color": "#cfe6c9",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 16,
+              "y1": 33,
+              "x2": 40,
+              "y2": 17,
+              "color": "#ffd166",
+              "width": 2
+            }
+          ]
+        }
+      }
+    },
+    "objeto_cuenta": {
+      "id": "objeto_cuenta",
+      "name": "La Caja · CuentaBancaria",
+      "category": "stations",
+      "notes": "Caja registradora oxidada de la antigua ciudad.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 10,
+              "y": 30,
+              "w": 36,
+              "h": 10,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 20,
+              "w": 32,
+              "h": 11,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 8,
+              "w": 16,
+              "h": 13,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 10,
+              "w": 3,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 27,
+              "y": 10,
+              "w": 3,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 32,
+              "y": 10,
+              "w": 3,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 15,
+              "w": 3,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 27,
+              "y": 15,
+              "w": 3,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 32,
+              "y": 15,
+              "w": 3,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 10,
+              "y": 30,
+              "w": 36,
+              "h": 10,
+              "color": "#6b4626",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 20,
+              "w": 32,
+              "h": 11,
+              "color": "#e0ab6b",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 8,
+              "w": 16,
+              "h": 13,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 10,
+              "w": 3,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 27,
+              "y": 10,
+              "w": 3,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 32,
+              "y": 10,
+              "w": 3,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 15,
+              "w": 3,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 27,
+              "y": 15,
+              "w": 3,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 32,
+              "y": 15,
+              "w": 3,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 22,
+              "w": 26,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_producto": {
+      "id": "objeto_producto",
+      "name": "El Almacén · Producto",
+      "category": "stations",
+      "notes": "Estante polvoriento del almacén de provisiones.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 6,
+              "h": 36,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 42,
+              "y": 6,
+              "w": 6,
+              "h": 36,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 40,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 18,
+              "w": 40,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 30,
+              "w": 40,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 11,
+              "w": 8,
+              "h": 7,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 26,
+              "y": 11,
+              "w": 8,
+              "h": 7,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 22,
+              "w": 10,
+              "h": 8,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 28,
+              "y": 22,
+              "w": 10,
+              "h": 8,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 34,
+              "w": 8,
+              "h": 6,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 26,
+              "y": 34,
+              "w": 8,
+              "h": 6,
+              "color": "#565b61",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 6,
+              "h": 36,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 42,
+              "y": 6,
+              "w": 6,
+              "h": 36,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 6,
+              "w": 40,
+              "h": 4,
+              "color": "#a06b3d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 18,
+              "w": 40,
+              "h": 4,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 30,
+              "w": 40,
+              "h": 4,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 11,
+              "w": 8,
+              "h": 7,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 26,
+              "y": 11,
+              "w": 8,
+              "h": 7,
+              "color": "#e05a4e",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 22,
+              "w": 10,
+              "h": 8,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 28,
+              "y": 22,
+              "w": 10,
+              "h": 8,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 34,
+              "w": 8,
+              "h": 6,
+              "color": "#f2e3c4",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 26,
+              "y": 34,
+              "w": 8,
+              "h": 6,
+              "color": "#4dd0e1",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_estudiante": {
+      "id": "objeto_estudiante",
+      "name": "La Escuela · Estudiante",
+      "category": "stations",
+      "notes": "Pizarra de la escuela del manual.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 6,
+              "w": 44,
+              "h": 30,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 9,
+              "y": 9,
+              "w": 38,
+              "h": 24,
+              "color": "#2b2f34",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 12,
+              "y1": 14,
+              "x2": 44,
+              "y2": 14,
+              "color": "#3d4248",
+              "width": 3
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 38,
+              "w": 6,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 30,
+              "y": 38,
+              "w": 6,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 6,
+              "w": 44,
+              "h": 30,
+              "color": "#6b4626",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 9,
+              "y": 9,
+              "w": 38,
+              "h": 24,
+              "color": "#1f3a2e",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 14,
+              "y1": 20,
+              "x2": 30,
+              "y2": 14,
+              "color": "#f2e3c4",
+              "width": 2
+            },
+            {
+              "type": "line",
+              "x1": 14,
+              "y1": 24,
+              "x2": 26,
+              "y2": 19,
+              "color": "#f2e3c4",
+              "width": 2
+            },
+            {
+              "type": "rect",
+              "x": 26,
+              "y": 38,
+              "w": 4,
+              "h": 4,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 26,
+              "y": 38,
+              "w": 4,
+              "h": 4,
+              "color": "#8a5a33",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_empleado": {
+      "id": "objeto_empleado",
+      "name": "La Nómina · Empleado",
+      "category": "stations",
+      "notes": "Cofre con candado de la nómina justa.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 10,
+              "y": 24,
+              "w": 36,
+              "h": 16,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 20,
+              "w": 40,
+              "h": 7,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 24,
+              "y": 22,
+              "w": 8,
+              "h": 5,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 23,
+              "y": 14,
+              "w": 10,
+              "h": 8,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 25,
+              "y": 10,
+              "w": 6,
+              "h": 4,
+              "color": "#3a4149",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 10,
+              "y": 24,
+              "w": 36,
+              "h": 16,
+              "color": "#e0ab6b",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 20,
+              "w": 40,
+              "h": 7,
+              "color": "#a06b3d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 24,
+              "y": 22,
+              "w": 8,
+              "h": 5,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 23,
+              "y": 14,
+              "w": 10,
+              "h": 8,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 25,
+              "y": 10,
+              "w": 6,
+              "h": 4,
+              "color": "#ffd166",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_carrito": {
+      "id": "objeto_carrito",
+      "name": "El Carro · CarritoDeCompras",
+      "category": "stations",
+      "notes": "Carretilla varada del carro de víveres.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 10,
+              "w": 44,
+              "h": 18,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 10,
+              "w": 44,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 12,
+              "y1": 28,
+              "x2": 6,
+              "y2": 40,
+              "color": "#3a4149",
+              "width": 3
+            },
+            {
+              "type": "line",
+              "x1": 44,
+              "y1": 28,
+              "x2": 50,
+              "y2": 40,
+              "color": "#3a4149",
+              "width": 3
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 42,
+              "w": 12,
+              "h": 12,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 48,
+              "rx": 5,
+              "ry": 5,
+              "color": "#4d5964",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 10,
+              "w": 44,
+              "h": 18,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 10,
+              "w": 44,
+              "h": 3,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 12,
+              "y1": 28,
+              "x2": 6,
+              "y2": 40,
+              "color": "#7d8b96",
+              "width": 3
+            },
+            {
+              "type": "line",
+              "x1": 44,
+              "y1": 28,
+              "x2": 50,
+              "y2": 40,
+              "color": "#7d8b96",
+              "width": 3
+            },
+            {
+              "type": "rect",
+              "x": 22,
+              "y": 42,
+              "w": 12,
+              "h": 12,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 48,
+              "rx": 5,
+              "ry": 5,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 10,
+              "y": 14,
+              "w": 6,
+              "h": 8,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 14,
+              "w": 6,
+              "h": 8,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 30,
+              "y": 14,
+              "w": 6,
+              "h": 8,
+              "color": "#e05a4e",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_vehiculo": {
+      "id": "objeto_vehiculo",
+      "name": "La Carreta · Vehículo",
+      "category": "stations",
+      "notes": "Carreta expedicionaria con la rueda rota.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 4,
+              "y": 16,
+              "w": 48,
+              "h": 14,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 4,
+              "y": 16,
+              "w": 48,
+              "h": 3,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 10,
+              "y1": 30,
+              "x2": 34,
+              "y2": 30,
+              "color": "#3a4149",
+              "width": 3
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 42,
+              "w": 12,
+              "h": 12,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 12,
+              "y": 48,
+              "rx": 5,
+              "ry": 5,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 40,
+              "y": 42,
+              "w": 12,
+              "h": 12,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 46,
+              "y": 48,
+              "rx": 5,
+              "ry": 5,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 10,
+              "w": 3,
+              "h": 8,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 8,
+              "w": 3,
+              "h": 10,
+              "color": "#3a4149",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 4,
+              "y": 16,
+              "w": 48,
+              "h": 14,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 4,
+              "y": 16,
+              "w": 48,
+              "h": 3,
+              "color": "#a06b3d",
+              "alpha": 1
+            },
+            {
+              "type": "line",
+              "x1": 10,
+              "y1": 30,
+              "x2": 34,
+              "y2": 30,
+              "color": "#6b4626",
+              "width": 3
+            },
+            {
+              "type": "rect",
+              "x": 6,
+              "y": 42,
+              "w": 12,
+              "h": 12,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 12,
+              "y": 48,
+              "rx": 5,
+              "ry": 5,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 40,
+              "y": 42,
+              "w": 12,
+              "h": 12,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "ellipse",
+              "x": 46,
+              "y": 48,
+              "rx": 5,
+              "ry": 5,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 10,
+              "w": 3,
+              "h": 8,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 20,
+              "y": 8,
+              "w": 3,
+              "h": 10,
+              "color": "#8a5a33",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 19,
+              "w": 8,
+              "h": 8,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 18,
+              "y": 19,
+              "w": 8,
+              "h": 8,
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_libro": {
+      "id": "objeto_libro",
+      "name": "El Único Manual · Libro",
+      "category": "stations",
+      "notes": "El único libro de la biblioteca de las ruinas.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 8,
+              "w": 32,
+              "h": 30,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 10,
+              "w": 28,
+              "h": 26,
+              "color": "#4a4e54",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 8,
+              "w": 4,
+              "h": 30,
+              "color": "#7d8b96",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 8,
+              "w": 32,
+              "h": 30,
+              "color": "#e05a4e",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 10,
+              "w": 28,
+              "h": 26,
+              "color": "#f2e3c4",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 8,
+              "w": 4,
+              "h": 30,
+              "color": "#a06b3d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 16,
+              "y": 18,
+              "w": 20,
+              "h": 3,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 16,
+              "y": 24,
+              "w": 14,
+              "h": 2,
+              "color": "#17151d",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 38,
+              "y": 16,
+              "w": 4,
+              "h": 4,
+              "color": "#ffd166",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "objeto_fecha": {
+      "id": "objeto_fecha",
+      "name": "La Ficha · Fecha+Estudiante",
+      "category": "stations",
+      "notes": "Expediente que une el nombre con su fecha.",
+      "stateLabels": {
+        "pendiente": "Pendiente",
+        "reconstruido": "Reconstruido"
+      },
+      "size": {
+        "w": 56,
+        "h": 56
+      },
+      "anchor": {
+        "x": 28,
+        "y": 54
+      },
+      "hitbox": {
+        "x": 18,
+        "y": 40,
+        "w": 20,
+        "h": 12
+      },
+      "depth": {
+        "mode": "y_sort",
+        "footY": 54
+      },
+      "collision": "base_only",
+      "interactable": true,
+      "states": {
+        "pendiente": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 10,
+              "w": 32,
+              "h": 30,
+              "color": "#3a4149",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 10,
+              "w": 32,
+              "h": 6,
+              "color": "#565b61",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 16,
+              "y": 20,
+              "w": 24,
+              "h": 3,
+              "color": "#4a4e54",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 16,
+              "y": 26,
+              "w": 18,
+              "h": 3,
+              "color": "#4a4e54",
+              "alpha": 1
+            }
+          ]
+        },
+        "reconstruido": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 28,
+              "y": 52,
+              "rx": 26,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.25
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 42,
+              "w": 32,
+              "h": 8,
+              "color": "#6f747a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 8,
+              "y": 36,
+              "w": 40,
+              "h": 8,
+              "color": "#9aa0a6",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 14,
+              "y": 50,
+              "w": 28,
+              "h": 4,
+              "color": "#4a2f1a",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 10,
+              "w": 32,
+              "h": 30,
+              "color": "#4dd0e1",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 12,
+              "y": 10,
+              "w": 32,
+              "h": 6,
+              "color": "#7d8b96",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 16,
+              "y": 20,
+              "w": 24,
+              "h": 3,
+              "color": "#f2e3c4",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 16,
+              "y": 26,
+              "w": 18,
+              "h": 3,
+              "color": "#f2e3c4",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 34,
+              "y": 20,
+              "w": 6,
+              "h": 3,
+              "color": "#ffd166",
+              "alpha": 1
+            },
+            {
+              "type": "rect",
+              "x": 10,
+              "y": 8,
+              "w": 5,
+              "h": 4,
+              "color": "#ffd166",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_alma": {
+      "id": "marker_objeto_alma",
+      "name": "Censo · Persona",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#e0ab6b",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_medida": {
+      "id": "marker_objeto_medida",
+      "name": "Medida · Rectángulo",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#4dd0e1",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_caja": {
+      "id": "marker_objeto_caja",
+      "name": "Caja · CuentaBancaria",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#ffd166",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_almacen": {
+      "id": "marker_objeto_almacen",
+      "name": "Almacén · Producto",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_escuela": {
+      "id": "marker_objeto_escuela",
+      "name": "Escuela · Estudiante",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#c9bde0",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_nomina": {
+      "id": "marker_objeto_nomina",
+      "name": "Nómina · Empleado",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#e05a4e",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_carro": {
+      "id": "marker_objeto_carro",
+      "name": "Carro · Carrito",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#4dd0e1",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_carreta": {
+      "id": "marker_objeto_carreta",
+      "name": "Carreta · Vehículo",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#e0ab6b",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_manual": {
+      "id": "marker_objeto_manual",
+      "name": "Manual · Libro",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#c98f2d",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
+    },
+    "marker_objeto_ficha": {
+      "id": "marker_objeto_ficha",
+      "name": "Ficha · Fecha",
+      "category": "markers",
+      "notes": "Icono HUD para el radar de Los Objetos Perdidos.",
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "hitbox": null,
+      "depth": {
+        "mode": "y_sort",
+        "footY": 29
+      },
+      "collision": false,
+      "stateLabels": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Reconstruido"
+      },
+      "states": {
+        "pending": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#4d5964",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#8a7ab5",
+              "alpha": 1
+            }
+          ]
+        },
+        "active": {
+          "frames": [
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 2,
+                  "ry": 2,
+                  "color": "#ffffff",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 19,
+                  "y1": 5,
+                  "x2": 24,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 13,
+                  "y1": 5,
+                  "x2": 8,
+                  "y2": 2,
+                  "color": "#55b8d9",
+                  "width": 1
+                }
+              ]
+            },
+            {
+              "draw": [
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 28,
+                  "rx": 8,
+                  "ry": 3,
+                  "color": "#2a241e",
+                  "alpha": 0.2
+                },
+                {
+                  "type": "rect",
+                  "x": 13,
+                  "y": 10,
+                  "w": 6,
+                  "h": 16,
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "polygon",
+                  "points": [
+                    [
+                      10,
+                      10
+                    ],
+                    [
+                      22,
+                      10
+                    ],
+                    [
+                      16,
+                      4
+                    ]
+                  ],
+                  "color": "#55b8d9",
+                  "alpha": 1
+                },
+                {
+                  "type": "ellipse",
+                  "x": 16,
+                  "y": 5,
+                  "rx": 3,
+                  "ry": 3,
+                  "color": "#bdeaf5",
+                  "alpha": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 20,
+                  "y1": 4,
+                  "x2": 26,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                },
+                {
+                  "type": "line",
+                  "x1": 12,
+                  "y1": 4,
+                  "x2": 6,
+                  "y2": 1,
+                  "color": "#bdeaf5",
+                  "width": 1
+                }
+              ]
+            }
+          ],
+          "fps": 6
+        },
+        "completed": {
+          "draw": [
+            {
+              "type": "ellipse",
+              "x": 16,
+              "y": 28,
+              "rx": 8,
+              "ry": 3,
+              "color": "#2a241e",
+              "alpha": 0.2
+            },
+            {
+              "type": "rect",
+              "x": 13,
+              "y": 10,
+              "w": 6,
+              "h": 16,
+              "color": "#57c86f",
+              "alpha": 1
+            },
+            {
+              "type": "polygon",
+              "points": [
+                [
+                  10,
+                  10
+                ],
+                [
+                  22,
+                  10
+                ],
+                [
+                  16,
+                  4
+                ]
+              ],
+              "color": "#57c86f",
+              "alpha": 1
+            }
+          ]
+        }
+      }
     }
   },
   "effects": {
@@ -33082,10 +37998,30 @@
       "bush_flowers",
       "flowers_mixed",
       "grass_tufts",
+      "objeto_persona",
+      "objeto_rectangulo",
+      "objeto_cuenta",
+      "objeto_producto",
+      "objeto_estudiante",
+      "objeto_empleado",
+      "objeto_carrito",
+      "objeto_vehiculo",
+      "objeto_libro",
+      "objeto_fecha",
       "fachada_posada",
       "fachada_banco",
       "fachada_escuela",
       "fachada_taller",
+      "marker_objeto_alma",
+      "marker_objeto_medida",
+      "marker_objeto_caja",
+      "marker_objeto_almacen",
+      "marker_objeto_escuela",
+      "marker_objeto_nomina",
+      "marker_objeto_carro",
+      "marker_objeto_carreta",
+      "marker_objeto_manual",
+      "marker_objeto_ficha",
       "puerta_interior",
       "mueble_mesa",
       "mueble_silla",
@@ -33094,27 +38030,7 @@
       "mueble_cofre",
       "mueble_tapete",
       "decor_lampara",
-      "decor_fogata",
-      "station_signal_tower",
-      "station_sensor_pillar",
-      "station_supply_sorter",
-      "station_ration_board",
-      "station_frequency_beacon",
-      "station_resource_depot",
-      "station_reverse_beacon",
-      "station_energy_console",
-      "station_stability_monitor",
-      "storm_core",
-      "marker_station_signal",
-      "marker_station_sensor",
-      "marker_station_supply",
-      "marker_station_ration",
-      "marker_station_frequency",
-      "marker_station_resource",
-      "marker_station_reverse",
-      "marker_station_energy",
-      "marker_station_stability",
-      "marker_storm_core"
+      "decor_fogata"
     ]
   }
 }
