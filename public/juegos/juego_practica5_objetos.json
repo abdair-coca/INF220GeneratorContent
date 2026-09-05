@@ -67,48 +67,48 @@
       {
         "id": "altar_alma",
         "type": "station",
-        "asset": "station_sensor_pillar",
-        "markerAsset": "marker_station_sensor",
+        "asset": "objeto_persona",
+        "markerAsset": "marker_objeto_alma",
         "x": 104,
         "y": 90,
-        "w": 48,
-        "h": 80,
+        "w": 56,
+        "h": 56,
         "missionNode": "objeto_alma",
         "stateMap": {
-          "pending": "inactive",
-          "active": "scanning",
-          "completed": "diagnosed"
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
         },
         "solid": {
-          "x": 6,
-          "y": 60,
-          "w": 36,
-          "h": 14
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
         },
-        "sortOffset": 72
+        "sortOffset": 52
       },
       {
         "id": "altar_medida",
         "type": "station",
-        "asset": "station_stability_monitor",
-        "markerAsset": "marker_station_stability",
+        "asset": "objeto_rectangulo",
+        "markerAsset": "marker_objeto_medida",
         "x": 600,
         "y": 90,
-        "w": 80,
-        "h": 72,
+        "w": 56,
+        "h": 56,
         "missionNode": "objeto_medida",
         "stateMap": {
-          "pending": "alert",
-          "active": "analyzing",
-          "completed": "stable"
+          "pending": "pendiente",
+          "active": "pendiente",
+          "completed": "reconstruido"
         },
         "solid": {
-          "x": 10,
-          "y": 50,
-          "w": 60,
-          "h": 16
+          "x": 8,
+          "y": 40,
+          "w": 40,
+          "h": 12
         },
-        "sortOffset": 64
+        "sortOffset": 52
       },
       {
         "id": "portal_posada",
@@ -518,71 +518,71 @@
         {
           "id": "altar_caja",
           "type": "station",
-          "asset": "station_energy_console",
-          "markerAsset": "marker_station_energy",
+          "asset": "objeto_cuenta",
+          "markerAsset": "marker_objeto_caja",
           "x": 80,
           "y": 210,
-          "w": 72,
-          "h": 64,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_caja",
           "stateMap": {
-            "pending": "broken",
-            "active": "repairing",
-            "completed": "online"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
             "x": 8,
-            "y": 44,
-            "w": 56,
-            "h": 14
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 56
+          "sortOffset": 52
         },
         {
           "id": "altar_nomina",
           "type": "station",
-          "asset": "station_reverse_beacon",
-          "markerAsset": "marker_station_reverse",
+          "asset": "objeto_empleado",
+          "markerAsset": "marker_objeto_nomina",
           "x": 180,
           "y": 210,
-          "w": 64,
-          "h": 88,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_nomina",
           "stateMap": {
-            "pending": "locked",
-            "active": "decoding",
-            "completed": "decoded"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
-            "x": 14,
-            "y": 66,
-            "w": 36,
-            "h": 16
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 80
+          "sortOffset": 52
         },
         {
           "id": "altar_ficha",
           "type": "station",
-          "asset": "station_frequency_beacon",
-          "markerAsset": "marker_station_frequency",
+          "asset": "objeto_fecha",
+          "markerAsset": "marker_objeto_ficha",
           "x": 280,
           "y": 210,
           "w": 56,
-          "h": 88,
+          "h": 56,
           "missionNode": "objeto_ficha",
           "stateMap": {
-            "pending": "off",
-            "active": "searching",
-            "completed": "active"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
-            "x": 12,
-            "y": 66,
-            "w": 32,
-            "h": 16
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 80
+          "sortOffset": 52
         }
       ],
       "decor": [
@@ -762,25 +762,25 @@
         {
           "id": "altar_almacen",
           "type": "station",
-          "asset": "station_resource_depot",
-          "markerAsset": "marker_station_resource",
+          "asset": "objeto_producto",
+          "markerAsset": "marker_objeto_almacen",
           "x": 190,
           "y": 210,
-          "w": 96,
-          "h": 72,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_almacen",
           "stateMap": {
-            "pending": "mixed",
-            "active": "separating",
-            "completed": "classified"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
-            "x": 6,
-            "y": 48,
-            "w": 84,
-            "h": 18
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 64
+          "sortOffset": 52
         }
       ],
       "decor": [
@@ -960,48 +960,48 @@
         {
           "id": "altar_escuela",
           "type": "station",
-          "asset": "station_signal_tower",
-          "markerAsset": "marker_station_signal",
+          "asset": "objeto_estudiante",
+          "markerAsset": "marker_objeto_escuela",
           "x": 130,
           "y": 210,
-          "w": 64,
-          "h": 96,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_escuela",
           "stateMap": {
-            "pending": "apagada",
-            "active": "transmitting",
-            "completed": "connected"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
-            "x": 12,
-            "y": 74,
+            "x": 8,
+            "y": 40,
             "w": 40,
-            "h": 16
+            "h": 12
           },
-          "sortOffset": 88
+          "sortOffset": 52
         },
         {
           "id": "altar_manual",
           "type": "station",
-          "asset": "storm_core",
-          "markerAsset": "marker_storm_core",
+          "asset": "objeto_libro",
+          "markerAsset": "marker_objeto_manual",
           "x": 250,
           "y": 210,
-          "w": 80,
-          "h": 80,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_manual",
           "stateMap": {
-            "pending": "sealed",
-            "active": "unstable",
-            "completed": "activated"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
-            "x": 14,
-            "y": 58,
-            "w": 52,
-            "h": 16
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 72
+          "sortOffset": 52
         }
       ],
       "decor": [
@@ -1196,48 +1196,48 @@
         {
           "id": "altar_carro",
           "type": "station",
-          "asset": "station_supply_sorter",
-          "markerAsset": "marker_station_supply",
+          "asset": "objeto_carrito",
+          "markerAsset": "marker_objeto_carro",
           "x": 130,
           "y": 210,
-          "w": 80,
-          "h": 64,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_carro",
           "stateMap": {
-            "pending": "messy",
-            "active": "sorting",
-            "completed": "organized"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
             "x": 8,
-            "y": 42,
-            "w": 64,
-            "h": 16
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 56
+          "sortOffset": 52
         },
         {
           "id": "altar_carreta",
           "type": "station",
-          "asset": "station_ration_board",
-          "markerAsset": "marker_station_ration",
+          "asset": "objeto_vehiculo",
+          "markerAsset": "marker_objeto_carreta",
           "x": 250,
           "y": 210,
-          "w": 80,
-          "h": 72,
+          "w": 56,
+          "h": 56,
           "missionNode": "objeto_carreta",
           "stateMap": {
-            "pending": "empty",
-            "active": "calculating",
-            "completed": "stocked"
+            "pending": "pendiente",
+            "active": "pendiente",
+            "completed": "reconstruido"
           },
           "solid": {
-            "x": 10,
-            "y": 50,
-            "w": 60,
-            "h": 16
+            "x": 8,
+            "y": 40,
+            "w": 40,
+            "h": 12
           },
-          "sortOffset": 64
+          "sortOffset": 52
         }
       ],
       "decor": [
